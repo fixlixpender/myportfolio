@@ -385,26 +385,39 @@
     // 4. START SCREEN INTERACTION (UPDATED)
     // ==========================================
     
-    // Check if system is already booted (from Session Storage)
+    // Check if we have been here before
     const isBooted = sessionStorage.getItem('deck_booted');
 
     if (isBooted === 'true') {
-        // --- FAST LOAD (Skip Animation) ---
-        if (startOverlay) startOverlay.style.display = 'none'; 
-        if (bootScreen) bootScreen.style.display = 'none';
+        // --- RETURNING VISITOR (Auto-Play Logs) ---
         
-        mainInterface.classList.remove('hidden-force');
-        mainInterface.classList.add('fade-in');
+        // 1. Hide the "Click to Initialize" overlay immediately
+        if (startOverlay) startOverlay.style.display = 'none'; 
+        
+        // 2. Ensure the Black Boot Screen is visible for the logs
+        if (bootScreen) {
+            bootScreen.style.display = 'flex';
+            bootScreen.style.opacity = '1';
+        }
+
+        // 3. Run the Logs Animation immediately (No click needed)
+        logIndex = 0; 
+        logContainer.innerHTML = ''; 
+        runBootSequence();
+
     } else {
-        // --- NORMAL LOAD (Show Animation) ---
+        // --- FIRST TIME VISITOR (Wait for Click) ---
         if (startOverlay) {
             startOverlay.addEventListener('click', () => {
+                // Fade out overlay
                 startOverlay.style.transition = "opacity 0.5s ease";
                 startOverlay.style.opacity = '0';
                 setTimeout(() => startOverlay.remove(), 500);
 
+                // Play Sound
                 playSFX('sfx-boot');
 
+                // Start Logs
                 logIndex = 0; 
                 logContainer.innerHTML = ''; 
                 runBootSequence();
