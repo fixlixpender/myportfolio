@@ -295,217 +295,234 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // --- 1. Boot Sequence Logic ---
-        const logs = [
-            "WAKE UP, FILIPE...",
-            "LOADING NEURAL INTERFACE...",
-            "CHECKING SECURITY PROTOCOLS... OK",
-            "ESTABLISHING CONNECTION TO COVENTRY UK SERVER...",
-            "ACCESS GRANTED.",
-            "WELCOME."
-        ];
-        
-        const logContainer = document.getElementById('log-container');
-        const bootScreen = document.getElementById('boot-screen');
-        const mainInterface = document.getElementById('main-interface');
-        let logIndex = 0;
+    // ==========================================
+    // 1. CONFIGURATION & VARIABLES
+    // ==========================================
+    const logs = [
+        "INITIALIZING KERNEL...",
+        "LOADING NEURAL INTERFACE...",
+        "CHECKING SECURITY PROTOCOLS... OK",
+        "ESTABLISHING CONNECTION TO SERVER...",
+        "MOUNTING FILE SYSTEM...",
+        "DECK ONLINE."
+    ];
+    
+    // DOM Elements
+    const logContainer = document.getElementById('log-container');
+    const bootScreen = document.getElementById('boot-screen');
+    const mainInterface = document.getElementById('main-interface');
+    const startOverlay = document.getElementById('start-overlay');
+    const input = document.getElementById('terminal-input');
+    const helper = document.getElementById('terminal-helper');
+    
+    // Audio Elements
+    const music = document.getElementById('bg-music');
+    const musicBtn = document.getElementById('music-btn');
 
-        function runBootSequence() {
-        // Try to play boot sound immediately
-        if (logIndex === 0) {
-             playSFX('sfx-boot');
+    // State
+    let logIndex = 0;
+
+    // ==========================================
+    // 2. AUDIO SYSTEM (SFX)
+    // ==========================================
+    function playSFX(id) {
+        const audio = document.getElementById(id);
+        if (audio) {
+            audio.volume = 0.3; 
+            audio.currentTime = 0; 
+            audio.play().catch(e => console.log("Audio waiting for interaction..."));
         }
+    }
 
+    // ==========================================
+    // 3. BOOT SEQUENCE LOGIC
+    // ==========================================
+    function runBootSequence() {
         if (logIndex < logs.length) {
-            // ... rest of your existing boot code ...
-            } else {
-                setTimeout(() => {
-                    // Fade out boot screen
-                    bootScreen.style.transition = "opacity 0.5s ease";
-                    bootScreen.style.opacity = "0";
-                    
-                    setTimeout(() => {
-                        bootScreen.remove(); // Remove from DOM
-                        mainInterface.classList.remove('hidden-force'); // Show Dashboard
-                    }, 500);
-                }, 800);
-            }
-        }
-
-        // --- MODIFIED BOOT LOGIC ---
-const startOverlay = document.getElementById('start-overlay');
-
-// Wait for user to click to start everything
-startOverlay.addEventListener('click', () => {
-    // 1. Hide the start screen
-    startOverlay.style.opacity = '0';
-    setTimeout(() => startOverlay.remove(), 500);
-
-    // 2. Play the Boot Sound (Now guaranteed to work because user clicked)
-    playSFX('sfx-boot');
-
-    // 3. Start the text animation
-    runBootSequence();
-});
-
-// Remove the old 'window.addEventListener' line if you haven't already!
-
-
-        // --- 2. Terminal Logic ---
-        const input = document.getElementById('terminal-input');
-        const helper = document.getElementById('terminal-helper');
-
-        input.addEventListener('keydown', function(e) {
-        // Play Typing Sound on any key press
-        playSFX('sfx-type');
-
-        if (e.key === 'Enter') {
-            // Play Success Sound on Enter
-            playSFX('sfx-enter');
+            // Create a new log line
+            const div = document.createElement('div');
+            div.className = "mb-2 border-l-2 border-cyber-green pl-2 animate-pulse";
+            div.innerHTML = `<span class="opacity-50 mr-2">[${new Date().toLocaleTimeString()}]</span> ${logs[logIndex]}`;
             
-            const command = input.value.trim().toUpperCase();
-            processCommand(command);
-            input.value = ''; 
-        }
-    });
+            // Add to screen
+            logContainer.appendChild(div);
+            
+            // Play typing sound for every line (optional, maybe too noisy?)
+            // playSFX('sfx-type'); 
 
-        // Keep focus on input (UNLESS clicking a button or link)
+            logIndex++;
+            setTimeout(runBootSequence, 500); // Next line in 500ms
+        } else {
+            // Sequence Complete
+            setTimeout(() => {
+                // Fade out boot screen
+                bootScreen.style.transition = "opacity 0.8s ease";
+                bootScreen.style.opacity = "0";
+                
+                setTimeout(() => {
+                    bootScreen.remove(); // Remove from DOM
+                    mainInterface.classList.remove('hidden-force'); // Show Dashboard
+                    mainInterface.classList.add('fade-in'); // Trigger fade animation
+                }, 800);
+            }, 800);
+        }
+    }
+
+    // ==========================================
+    // 4. START SCREEN INTERACTION
+    // ==========================================
+    if (startOverlay) {
+        startOverlay.addEventListener('click', () => {
+            // 1. Fade out the "Click to Start" overlay
+            startOverlay.style.transition = "opacity 0.5s ease";
+            startOverlay.style.opacity = '0';
+            setTimeout(() => startOverlay.remove(), 500);
+
+            // 2. Play Boot Sound
+            playSFX('sfx-boot');
+
+            // 3. Reset and Start Boot Text Logic
+            logIndex = 0; 
+            logContainer.innerHTML = ''; // Clear any garbage
+            runBootSequence();
+        });
+    } else {
+        // Fallback if overlay is missing
+        runBootSequence();
+    }
+
+    // ==========================================
+    // 5. TERMINAL & COMMAND LOGIC
+    // ==========================================
+    
+    // Focus Logic: Keep input focused unless clicking a button/link
     document.addEventListener('click', (e) => {
-        // If user clicked a button, link, or is selecting text, do nothing
         if (e.target.closest('button') || e.target.closest('a') || window.getSelection().toString().length > 0) {
             return;
         }
         input.focus();
     });
 
-        function processCommand(cmd) {
-            let msg = "";
-            let action = null;
-            
-            // Get Music Elements
-            const music = document.getElementById('bg-music');
-            const musicBtn = document.getElementById('music-btn');
+    // Keydown Logic
+    input.addEventListener('keydown', function(e) {
+        playSFX('sfx-type'); // Typing sound
 
-            switch(cmd) {
-                case "WHOAMI":
-                case "ABOUT":
-                    msg = "NAVIGATING TO IDENTITY MATRIX...";
-                    action = () => setTimeout(() => window.location.href = "about.html", 1000);
-                    break;
-                case "LS":
-                case "PROJECTS":
-                    msg = "LISTING PROJECT DIRECTORIES...";
-                    action = () => setTimeout(() => window.location.href = "projects.html", 1000);
-                    break;
-                case "RECRUIT":
-                case "CONTACT":
-                    msg = "OPENING COMM CHANNELS...";
-                    action = () => setTimeout(() => window.location.href = "contact.html", 1000);
-                    break;
-                
-                // --- NEW MUSIC COMMANDS ---
-                case "MUSIC ON":
-                    msg = "AUDIO STREAM ESTABLISHED.";
-                    action = () => {
-                        music.play();
-                        // Update the visual button to match
-                        musicBtn.innerHTML = "MUSIC: <span class='animate-pulse'>ON</span>";
-                        musicBtn.classList.remove('border-cyber-green', 'text-cyber-green', 'hover:bg-cyber-green');
-                        musicBtn.classList.add('border-cyber-pink', 'text-cyber-pink', 'hover:bg-cyber-pink');
-                    };
-                    break;
-                
-                case "MUSIC OFF":
-                    msg = "AUDIO STREAM DISCONNECTED.";
-                    action = () => {
-                        music.pause();
-                        // Update the visual button to match
-                        musicBtn.innerHTML = "MUSIC: OFF";
-                        musicBtn.classList.remove('border-cyber-pink', 'text-cyber-pink', 'hover:bg-cyber-pink');
-                        musicBtn.classList.add('border-cyber-green', 'text-cyber-green', 'hover:bg-cyber-green');
-                    };
-                    break;
-
-                    case "RESTART":
-                case "REBOOT":
-                    msg = "INITIATING SYSTEM REBOOT...";
-                    // Reloads the page after 1 second
-                    action = () => setTimeout(() => window.location.reload(), 1000);
-                    break;
-
-                // ---------------------------
-
-                case "HELP":
-                    msg = "COMMANDS: WHOAMI, LS, RECRUIT, MUSIC ON, MUSIC OFF, CLEAR";
-                    break;
-                case "CLEAR":
-                    msg = "";
-                    helper.style.height = "0";
-                    helper.textContent = "";
-                    return;
-                default:
-                    msg = `COMMAND '${cmd}' NOT RECOGNIZED. TRY 'HELP'.`;
-            }
-
-            // Display Helper Text
-            if (msg) {
-                helper.innerHTML = `>> ${msg}`; // Changed to innerHTML to support styling if needed
-                helper.style.height = "auto";
-            }
-
-            // Execute Action if any
-            if (action) action();
-        }
-
-        // Function for the dashboard buttons to simulate navigation
-        function handleNav(destination) {
-            processCommand(destination); // Reuse terminal logic for visual consistency
-        }
-
-        // --- AUDIO CONTROLLER ---
-    const music = document.getElementById('bg-music');
-    const musicBtn = document.getElementById('music-btn');
-    
-    // Set initial volume (optional, 0.0 to 1.0)
-    music.volume = 0.5;
-
-    musicBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // <--- ADD THIS LINE (Prevents jumping to terminal)
-
-        if (music.paused) {
-            music.play();
-            musicBtn.innerHTML = "MUSIC: <span class='animate-pulse'>ON</span>";
-            musicBtn.classList.remove('border-cyber-green', 'text-cyber-green', 'hover:bg-cyber-green');
-            musicBtn.classList.add('border-cyber-pink', 'text-cyber-pink', 'hover:bg-cyber-pink');
-        } else {
-            music.pause();
-            musicBtn.innerHTML = "MUSIC: OFF";
-            musicBtn.classList.remove('border-cyber-pink', 'text-cyber-pink', 'hover:bg-cyber-pink');
-            musicBtn.classList.add('border-cyber-green', 'text-cyber-green', 'hover:bg-cyber-green');
+        if (e.key === 'Enter') {
+            playSFX('sfx-enter'); // Enter sound
+            const command = input.value.trim().toUpperCase();
+            processCommand(command);
+            input.value = ''; 
         }
     });
 
-    // --- SFX SYSTEM ---
-    function playSFX(id) {
-        const audio = document.getElementById(id);
-        if (audio) {
-            audio.volume = 0.3; // Keep SFX subtle (30% volume)
-            audio.currentTime = 0; // Reset sound to start (allows rapid firing)
-            // Try to play (browsers might block it if user hasn't interacted yet)
-            audio.play().catch(e => console.log("Audio waiting for interaction..."));
+    function processCommand(cmd) {
+        let msg = "";
+        let action = null;
+
+        switch(cmd) {
+            case "WHOAMI":
+            case "ABOUT":
+                msg = "NAVIGATING TO IDENTITY MATRIX...";
+                action = () => setTimeout(() => window.location.href = "about.html", 1000);
+                break;
+            case "LS":
+            case "PROJECTS":
+                msg = "LISTING PROJECT DIRECTORIES...";
+                action = () => setTimeout(() => window.location.href = "projects.html", 1000);
+                break;
+            case "RECRUIT":
+            case "CONTACT":
+                msg = "OPENING COMM CHANNELS...";
+                action = () => setTimeout(() => window.location.href = "contact.html", 1000);
+                break;
+            
+            // Music Commands
+            case "MUSIC ON":
+                msg = "AUDIO STREAM ESTABLISHED.";
+                action = () => {
+                    music.play();
+                    updateMusicBtn(true);
+                };
+                break;
+            case "MUSIC OFF":
+                msg = "AUDIO STREAM DISCONNECTED.";
+                action = () => {
+                    music.pause();
+                    updateMusicBtn(false);
+                };
+                break;
+
+            // System Commands
+            case "RESTART":
+            case "REBOOT":
+                msg = "INITIATING SYSTEM REBOOT...";
+                action = () => setTimeout(() => window.location.reload(), 1000);
+                break;
+
+            case "HELP":
+                msg = "COMMANDS: WHOAMI, LS, RECRUIT, MUSIC ON/OFF, REBOOT";
+                break;
+            case "CLEAR":
+                msg = "";
+                helper.style.height = "0";
+                helper.innerHTML = "";
+                return;
+            default:
+                msg = `COMMAND '${cmd}' NOT RECOGNIZED. TRY 'HELP'.`;
+        }
+
+        if (msg) {
+            helper.innerHTML = `>> ${msg}`;
+            helper.style.height = "auto";
+        }
+        if (action) action();
+    }
+
+    // Dashboard Navigation Helper (Simulates Terminal)
+    function handleNav(destination) {
+        processCommand(destination); 
+    }
+
+    // ==========================================
+    // 6. MUSIC BUTTON LOGIC
+    // ==========================================
+    function updateMusicBtn(isPlaying) {
+        if (isPlaying) {
+            musicBtn.innerHTML = "[ MUSIC: <span class='animate-pulse'>ON</span> ]";
+            musicBtn.classList.remove('border-cyber-green', 'text-cyber-green', 'hover:bg-cyber-green');
+            musicBtn.classList.add('border-cyber-pink', 'text-cyber-pink', 'hover:bg-cyber-pink');
+        } else {
+            musicBtn.innerHTML = "[ MUSIC: OFF ]";
+            musicBtn.classList.remove('border-cyber-pink', 'text-cyber-pink', 'hover:bg-cyber-pink');
+            musicBtn.classList.add('border-cyber-green', 'text-cyber-green', 'hover:bg-cyber-green');
         }
     }
 
-    // Add Hover Sound to all Dashboard Links
-    const buttons = document.querySelectorAll('a, button');
-    
-    buttons.forEach(btn => {
+    if (musicBtn) {
+        musicBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent terminal focus
+            playSFX('sfx-click'); // Optional click sound
+            
+            if (music.paused) {
+                music.play();
+                updateMusicBtn(true);
+            } else {
+                music.pause();
+                updateMusicBtn(false);
+            }
+        });
+    }
+
+    // ==========================================
+    // 7. HOVER SOUNDS
+    // ==========================================
+    document.querySelectorAll('a, button').forEach(btn => {
         btn.addEventListener('mouseenter', () => {
             playSFX('sfx-hover');
         });
     });
-        
-    </script>
+
+</script>
 
     <!-- SOUND EFFECTS -->
 <!-- Note: volume="0.2" isn't valid HTML, we set volume in JS -->
