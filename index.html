@@ -165,7 +165,8 @@
     </div>
 
     <!-- 2. MAIN DASHBOARD (Initially Hidden) -->
-    <main id="main-interface" class="hidden-force p-6 md:p-12 max-w-[1600px] mx-auto w-full z-10 relative">
+    <!-- Changed p-6 to px-6 pb-6 pt-24 (More space at the top for mobile) -->
+<main id="main-interface" class="hidden-force px-6 pb-6 pt-24 md:p-12 max-w-[1600px] mx-auto w-full z-10 relative">
         
         <!-- Header -->
         <header class="mb-12 border-b border-cyber-green/30 pb-6 flex justify-between items-end fade-in">
@@ -382,46 +383,44 @@
     }
 
     // ==========================================
-    // 4. START SCREEN INTERACTION (ROBUST FIX)
+    // 4. START SCREEN INTERACTION (SCROLL FIX)
     // ==========================================
     
     // Check if we have been here before
     const isBooted = sessionStorage.getItem('deck_booted');
 
     if (isBooted === 'true') {
-        // --- RETURNING VISITOR (Auto-Play Logs) ---
+        // --- RETURNING VISITOR ---
         
-        // 1. Hide the "Click to Initialize" overlay immediately
+        // 1. Force Scroll to Top (Fixes the "Cut Off" issue)
+        window.scrollTo(0, 0);
+
         if (startOverlay) startOverlay.style.display = 'none';
         
-        // 2. Ensure black screen is ready for logs
         if (bootScreen) {
             bootScreen.style.display = 'flex';
             bootScreen.style.opacity = '1';
         }
 
-        // 3. Run Logs
         logIndex = 0; 
         logContainer.innerHTML = ''; 
         runBootSequence();
 
     } else {
-        // --- FIRST TIME VISITOR (Click Required) ---
+        // --- FIRST TIME VISITOR ---
         if (startOverlay) {
             startOverlay.addEventListener('click', () => {
-                
-                // *** FIX: SAVE STATE IMMEDIATELY ON CLICK ***
                 sessionStorage.setItem('deck_booted', 'true');
 
-                // Fade out overlay
+                // 1. Force Scroll to Top
+                window.scrollTo(0, 0);
+
                 startOverlay.style.transition = "opacity 0.5s ease";
                 startOverlay.style.opacity = '0';
                 setTimeout(() => startOverlay.remove(), 500);
 
-                // Play Sound
                 playSFX('sfx-boot');
 
-                // Start Logs
                 logIndex = 0; 
                 logContainer.innerHTML = ''; 
                 runBootSequence();
