@@ -382,47 +382,34 @@
     }
 
     // ==========================================
-    // 4. START SCREEN INTERACTION (UPDATED)
+    // 4. START SCREEN INTERACTION (FIXED FOR SOUND)
     // ==========================================
     
     // Check if we have been here before
     const isBooted = sessionStorage.getItem('deck_booted');
+    const titleElement = startOverlay.querySelector('.animate-pulse');
 
+    // Change the text if the user is returning
     if (isBooted === 'true') {
-        // --- RETURNING VISITOR (Auto-Play Logs) ---
-        
-        // 1. Hide the "Click to Initialize" overlay immediately
-        if (startOverlay) startOverlay.style.display = 'none'; 
-        
-        // 2. Ensure the Black Boot Screen is visible for the logs
-        if (bootScreen) {
-            bootScreen.style.display = 'flex';
-            bootScreen.style.opacity = '1';
-        }
+        if (titleElement) titleElement.textContent = ">> RESUME UPLINK <<";
+    }
 
-        // 3. Run the Logs Animation immediately (No click needed)
-        logIndex = 0; 
-        logContainer.innerHTML = ''; 
-        runBootSequence();
+    // ALWAYS wait for a click (This fixes the Sound Bug)
+    if (startOverlay) {
+        startOverlay.addEventListener('click', () => {
+            // 1. Fade out overlay
+            startOverlay.style.transition = "opacity 0.5s ease";
+            startOverlay.style.opacity = '0';
+            setTimeout(() => startOverlay.remove(), 500);
 
-    } else {
-        // --- FIRST TIME VISITOR (Wait for Click) ---
-        if (startOverlay) {
-            startOverlay.addEventListener('click', () => {
-                // Fade out overlay
-                startOverlay.style.transition = "opacity 0.5s ease";
-                startOverlay.style.opacity = '0';
-                setTimeout(() => startOverlay.remove(), 500);
+            // 2. Play Boot Sound (Now works 100% because you clicked)
+            playSFX('sfx-boot');
 
-                // Play Sound
-                playSFX('sfx-boot');
-
-                // Start Logs
-                logIndex = 0; 
-                logContainer.innerHTML = ''; 
-                runBootSequence();
-            });
-        }
+            // 3. Start Logs Animation
+            logIndex = 0; 
+            logContainer.innerHTML = ''; 
+            runBootSequence();
+        });
     }
 
     // ==========================================
