@@ -299,13 +299,13 @@
         let logIndex = 0;
 
         function runBootSequence() {
-            if (logIndex < logs.length) {
-                const div = document.createElement('div');
-                div.className = "mb-2 border-l-2 border-cyber-green pl-2 animate-pulse";
-                div.innerHTML = `<span class="opacity-50 mr-2">[${new Date().toLocaleTimeString()}]</span> ${logs[logIndex]}`;
-                logContainer.appendChild(div);
-                logIndex++;
-                setTimeout(runBootSequence, 500); // Speed of logs
+        // Try to play boot sound immediately
+        if (logIndex === 0) {
+             playSFX('sfx-boot');
+        }
+
+        if (logIndex < logs.length) {
+            // ... rest of your existing boot code ...
             } else {
                 setTimeout(() => {
                     // Fade out boot screen
@@ -329,12 +329,18 @@
         const helper = document.getElementById('terminal-helper');
 
         input.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                const command = input.value.trim().toUpperCase();
-                processCommand(command);
-                input.value = ''; // Clear input
-            }
-        });
+        // Play Typing Sound on any key press
+        playSFX('sfx-type');
+
+        if (e.key === 'Enter') {
+            // Play Success Sound on Enter
+            playSFX('sfx-enter');
+            
+            const command = input.value.trim().toUpperCase();
+            processCommand(command);
+            input.value = ''; 
+        }
+    });
 
         // Keep focus on input (UNLESS clicking a button or link)
     document.addEventListener('click', (e) => {
@@ -399,7 +405,7 @@
                     // Reloads the page after 1 second
                     action = () => setTimeout(() => window.location.reload(), 1000);
                     break;
-                    
+
                 // ---------------------------
 
                 case "HELP":
@@ -451,7 +457,34 @@
             musicBtn.classList.add('border-cyber-green', 'text-cyber-green', 'hover:bg-cyber-green');
         }
     });
+
+    // --- SFX SYSTEM ---
+    function playSFX(id) {
+        const audio = document.getElementById(id);
+        if (audio) {
+            audio.volume = 0.3; // Keep SFX subtle (30% volume)
+            audio.currentTime = 0; // Reset sound to start (allows rapid firing)
+            // Try to play (browsers might block it if user hasn't interacted yet)
+            audio.play().catch(e => console.log("Audio waiting for interaction..."));
+        }
+    }
+
+    // Add Hover Sound to all Dashboard Links
+    const buttons = document.querySelectorAll('a, button');
+    
+    buttons.forEach(btn => {
+        btn.addEventListener('mouseenter', () => {
+            playSFX('sfx-hover');
+        });
+    });
         
     </script>
+
+    <!-- SOUND EFFECTS -->
+<!-- Note: volume="0.2" isn't valid HTML, we set volume in JS -->
+<audio id="sfx-type" src="sfx-type.mp3"></audio>
+<audio id="sfx-enter" src="sfx-enter.mp3"></audio>
+<audio id="sfx-hover" src="sfx-hover.mp3"></audio>
+<audio id="sfx-boot" src="sfx-boot.mp3"></audio>
 </body>
 </html>
