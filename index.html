@@ -323,13 +323,24 @@
     let logIndex = 0;
 
     // ==========================================
-    // 2. AUDIO SYSTEM (SFX)
+    // ==========================================
+    // 2. AUDIO SYSTEM (SFX) - UPDATED
     // ==========================================
     function playSFX(id) {
+        // Check if user is on mobile (Screen smaller than 768px)
+        const isMobile = window.innerWidth < 768;
+
+        // BLOCK SPECIFIC SOUNDS ON MOBILE
+        if (isMobile) {
+            if (id === 'sfx-hover') return; // Stop Hover Bleeps
+            if (id === 'sfx-type') return;  // Stop Typing Clicks
+        }
+
         const audio = document.getElementById(id);
         if (audio) {
             audio.volume = 0.3; 
             audio.currentTime = 0; 
+            // Try to play
             audio.play().catch(e => console.log("Audio waiting for interaction..."));
         }
     }
