@@ -433,12 +433,12 @@
 
         if (music.paused) {
             music.play();
-            musicBtn.innerHTML = "[ MUSIC: <span class='animate-pulse'>ON</span> ]";
+            musicBtn.innerHTML = "MUSIC: <span class='animate-pulse'>ON</span>";
             musicBtn.classList.remove('border-cyber-green', 'text-cyber-green', 'hover:bg-cyber-green');
             musicBtn.classList.add('border-cyber-pink', 'text-cyber-pink', 'hover:bg-cyber-pink');
         } else {
             music.pause();
-            musicBtn.innerHTML = "[ MUSIC: OFF ]";
+            musicBtn.innerHTML = "MUSIC: OFF";
             musicBtn.classList.remove('border-cyber-pink', 'text-cyber-pink', 'hover:bg-cyber-pink');
             musicBtn.classList.add('border-cyber-green', 'text-cyber-green', 'hover:bg-cyber-green');
         }
