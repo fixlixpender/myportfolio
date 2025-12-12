@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Filipe Oliveira | The Developer's Deck</title>
 
     <script src="background.js"></script>
@@ -336,8 +336,14 @@
             }
         });
 
-        // Keep focus on input
-        document.addEventListener('click', () => input.focus());
+        // Keep focus on input (UNLESS clicking a button or link)
+    document.addEventListener('click', (e) => {
+        // If user clicked a button, link, or is selecting text, do nothing
+        if (e.target.closest('button') || e.target.closest('a') || window.getSelection().toString().length > 0) {
+            return;
+        }
+        input.focus();
+    });
 
         function processCommand(cmd) {
             let msg = "";
@@ -422,17 +428,17 @@
     // Set initial volume (optional, 0.0 to 1.0)
     music.volume = 0.5;
 
-    musicBtn.addEventListener('click', () => {
+    musicBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // <--- ADD THIS LINE (Prevents jumping to terminal)
+
         if (music.paused) {
             music.play();
             musicBtn.innerHTML = "[ MUSIC: <span class='animate-pulse'>ON</span> ]";
-            // Change border/text to Pink when active for visual feedback
             musicBtn.classList.remove('border-cyber-green', 'text-cyber-green', 'hover:bg-cyber-green');
             musicBtn.classList.add('border-cyber-pink', 'text-cyber-pink', 'hover:bg-cyber-pink');
         } else {
             music.pause();
             musicBtn.innerHTML = "[ MUSIC: OFF ]";
-            // Revert colors to Green
             musicBtn.classList.remove('border-cyber-pink', 'text-cyber-pink', 'hover:bg-cyber-pink');
             musicBtn.classList.add('border-cyber-green', 'text-cyber-green', 'hover:bg-cyber-green');
         }
