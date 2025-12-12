@@ -382,34 +382,50 @@
     }
 
     // ==========================================
-    // 4. START SCREEN INTERACTION (FIXED FOR SOUND)
+    // 4. START SCREEN INTERACTION (FINAL LOGIC)
     // ==========================================
     
     // Check if we have been here before
     const isBooted = sessionStorage.getItem('deck_booted');
-    const titleElement = startOverlay.querySelector('.animate-pulse');
 
-    // Change the text if the user is returning
     if (isBooted === 'true') {
-        if (titleElement) titleElement.textContent = ">> RESUME UPLINK <<";
-    }
+        // --- RETURNING VISITOR (NO CLICK REQUIRED) ---
+        
+        // 1. Hide the "Click to Start" overlay completely
+        if (startOverlay) startOverlay.style.display = 'none';
 
-    // ALWAYS wait for a click (This fixes the Sound Bug)
-    if (startOverlay) {
-        startOverlay.addEventListener('click', () => {
-            // 1. Fade out overlay
-            startOverlay.style.transition = "opacity 0.5s ease";
-            startOverlay.style.opacity = '0';
-            setTimeout(() => startOverlay.remove(), 500);
+        // 2. Ensure the black background is there for the text logs
+        if (bootScreen) {
+            bootScreen.style.display = 'flex';
+            bootScreen.style.opacity = '1';
+        }
 
-            // 2. Play Boot Sound (Now works 100% because you clicked)
-            playSFX('sfx-boot');
+        // 3. Run the Logs Animation immediately
+        logIndex = 0; 
+        logContainer.innerHTML = ''; 
+        runBootSequence();
+        
+        // Attempt to play boot sound (Might be silent due to browser policy, but text will work)
+        playSFX('sfx-boot');
 
-            // 3. Start Logs Animation
-            logIndex = 0; 
-            logContainer.innerHTML = ''; 
-            runBootSequence();
-        });
+    } else {
+        // --- FIRST TIME VISITOR (CLICK REQUIRED) ---
+        if (startOverlay) {
+            startOverlay.addEventListener('click', () => {
+                // Fade out overlay
+                startOverlay.style.transition = "opacity 0.5s ease";
+                startOverlay.style.opacity = '0';
+                setTimeout(() => startOverlay.remove(), 500);
+
+                // Play Sound
+                playSFX('sfx-boot');
+
+                // Start Logs
+                logIndex = 0; 
+                logContainer.innerHTML = ''; 
+                runBootSequence();
+            });
+        }
     }
 
     // ==========================================
