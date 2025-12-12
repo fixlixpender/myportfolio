@@ -202,16 +202,20 @@
             <div id="terminal-helper" class="text-cyber-blue mb-2 overflow-hidden h-0 transition-all duration-300"></div>
             
             <!-- Input Line -->
-            <div class="flex items-center text-lg md:text-xl text-cyber-green">
-                <span class="mr-3 font-bold">admin@deck:~$</span>
-                <input 
-                    id="terminal-input"
-                    type="text" 
-                    class="flex-1 bg-transparent border-none outline-none text-cyber-green placeholder-cyber-green/30 uppercase font-mono"
-                    placeholder="ENTER COMMAND (TRY 'HELP')..."
-                    autofocus
-                >
-            </div>
+        <div class="flex items-center text-sm md:text-xl text-cyber-green">
+            <!-- Responsive Prompt: Shows 'admin@deck:~$' on PC, but just '~$' on Mobile -->
+            <span class="mr-2 md:mr-3 font-bold">
+                <span class="hidden md:inline">admin@deck:</span>~$
+            </span>
+            
+            <input 
+                id="terminal-input"
+                type="text" 
+                class="flex-1 bg-transparent border-none outline-none text-cyber-green placeholder-cyber-green/30 uppercase font-mono min-w-0"
+                placeholder="ENTER COMMAND..."
+                autocomplete="off"
+            >
+        </div>
         </div>
     </div>
 
