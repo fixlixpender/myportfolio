@@ -342,46 +342,67 @@
         function processCommand(cmd) {
             let msg = "";
             let action = null;
+            
+            // Get Music Elements
+            const music = document.getElementById('bg-music');
+            const musicBtn = document.getElementById('music-btn');
 
             switch(cmd) {
                 case "WHOAMI":
-                case "ABOUT": // Added this so the Identity button works
+                case "ABOUT":
                     msg = "NAVIGATING TO IDENTITY MATRIX...";
                     action = () => setTimeout(() => window.location.href = "about.html", 1000);
                     break;
-
-                // --- THIS IS THE PART TO UPDATE FOR PROJECTS ---
                 case "LS":
-                case "PROJECTS": // Added this so the Projects button works
+                case "PROJECTS":
                     msg = "LISTING PROJECT DIRECTORIES...";
-                    // This command actually changes the page:
                     action = () => setTimeout(() => window.location.href = "projects.html", 1000);
                     break;
-                // -----------------------------------------------
-
                 case "RECRUIT":
-                case "CONTACT": // Added this so the Recruit button works
+                case "CONTACT":
                     msg = "OPENING COMM CHANNELS...";
                     action = () => setTimeout(() => window.location.href = "contact.html", 1000);
                     break;
+                
+                // --- NEW MUSIC COMMANDS ---
+                case "MUSIC ON":
+                    msg = "AUDIO STREAM ESTABLISHED.";
+                    action = () => {
+                        music.play();
+                        // Update the visual button to match
+                        musicBtn.innerHTML = "[ MUSIC: <span class='animate-pulse'>ON</span> ]";
+                        musicBtn.classList.remove('border-cyber-green', 'text-cyber-green', 'hover:bg-cyber-green');
+                        musicBtn.classList.add('border-cyber-pink', 'text-cyber-pink', 'hover:bg-cyber-pink');
+                    };
+                    break;
+                
+                case "MUSIC OFF":
+                    msg = "AUDIO STREAM DISCONNECTED.";
+                    action = () => {
+                        music.pause();
+                        // Update the visual button to match
+                        musicBtn.innerHTML = "[ MUSIC: OFF ]";
+                        musicBtn.classList.remove('border-cyber-pink', 'text-cyber-pink', 'hover:bg-cyber-pink');
+                        musicBtn.classList.add('border-cyber-green', 'text-cyber-green', 'hover:bg-cyber-green');
+                    };
+                    break;
+                // ---------------------------
 
                 case "HELP":
-                    msg = "AVAILABLE COMMANDS: WHOAMI, LS, RECRUIT, CLEAR";
+                    msg = "COMMANDS: WHOAMI, LS, RECRUIT, MUSIC ON, MUSIC OFF, CLEAR";
                     break;
-
                 case "CLEAR":
                     msg = "";
                     helper.style.height = "0";
                     helper.textContent = "";
                     return;
-
                 default:
                     msg = `COMMAND '${cmd}' NOT RECOGNIZED. TRY 'HELP'.`;
             }
 
             // Display Helper Text
             if (msg) {
-                helper.textContent = `>> ${msg}`;
+                helper.innerHTML = `>> ${msg}`; // Changed to innerHTML to support styling if needed
                 helper.style.height = "auto";
             }
 
