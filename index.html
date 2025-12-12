@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filipe Oliveira | The Developer's Deck</title>
+
+    <script src="background.js"></script>
+    
+    <!-- Tailwind CSS (via CDN for standalone use) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+
+    <!-- Configuration for Tailwind Colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            black: "#050505",
+                            dark: "#0a0a0a",
+                            blue: "#00f0ff",
+                            pink: "#ff00ff",
+                            green: "#00ff41",
+                            red: "#ff2a2a",
+                        },
+                    },
+                    fontFamily: {
+                        mono: ['"Share Tech Mono"', 'monospace'],
+                    },
+                    backgroundImage: {
+                        'grid-pattern': "linear-gradient(to right, #111 1px, transparent 1px), linear-gradient(to bottom, #111 1px, transparent 1px)",
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS for Animations & CRT Effects -->
+    <style>
+        body {
+            background-color: #050505;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            font-family: "Share Tech Mono", monospace;
+        }
+
+        
+
+        /* Glitch Effect on Hover */
+.glitch-hover:hover {
+    animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+    color: #ff00ff; /* Changes text color to pink while glitching */
+}
+
+@keyframes glitch-anim {
+    0% { transform: translate(0) }
+    20% { transform: translate(-2px, 2px) }
+    40% { transform: translate(-2px, -2px) }
+    60% { transform: translate(2px, 2px) }
+    80% { transform: translate(2px, -2px) }
+    100% { transform: translate(0) }
+}
+
+        @keyframes scrollScanlines {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100%; }
+        }
+
+
+        /* Utility Glows */
+        .neon-text-blue { text-shadow: 0 0 5px #00f0ff; }
+        .neon-box-green:hover { box-shadow: 0 0 10px #00ff41, inset 0 0 5px #00ff41; border-color: #00ff41; }
+        .neon-box-blue:hover { box-shadow: 0 0 10px #00f0ff, inset 0 0 5px #00f0ff; border-color: #00f0ff; }
+        .neon-box-pink:hover { box-shadow: 0 0 10px #ff00ff, inset 0 0 5px #ff00ff; border-color: #ff00ff; }
+
+        /* Animation Classes */
+        .fade-in { animation: fadeIn 1s forwards; opacity: 0; }
+        .slide-up { animation: slideUp 0.8s forwards; opacity: 0; transform: translateY(20px); }
+        
+        @keyframes fadeIn { to { opacity: 1; } }
+        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* Hidden Utility */
+        .hidden-force { display: none !important; }
+    </style>
+</head>
+<body class="bg-cyber-black min-h-screen relative pb-24">
+
+    
+
+<!-- NEW: Three.js Background Container -->
+<div id="canvas-container" class="fixed inset-0 z-[-1] pointer-events-none"></div>
+
+    <!-- 1. BOOT SEQUENCE OVERLAY -->
+    <div id="boot-screen" class="fixed inset-0 bg-cyber-black z-[100] flex flex-col justify-end p-8 text-cyber-green text-lg md:text-xl">
+        <div class="max-w-2xl w-full mx-auto" id="log-container">
+            <!-- Logs will be injected here by JS -->
+        </div>
+    </div>
+
+    <!-- 2. MAIN DASHBOARD (Initially Hidden) -->
+    <main id="main-interface" class="hidden-force p-6 md:p-12 max-w-[1600px] mx-auto w-full z-10 relative">
+        
+        <!-- Header -->
+        <header class="mb-12 border-b border-cyber-green/30 pb-6 flex justify-between items-end fade-in">
+            <div>
+                <h2 class="text-cyber-green text-sm mb-2 tracking-widest">SYSTEM: ONLINE</h2>
+                <h1 class="text-4xl md:text-6xl font-bold text-cyber-blue glitch-hover cursor-default">THE DEVELOPER'S DECK</h1>
+                <p class="mt-2 text-gray-400 max-w-lg">FILIPE OLIVEIRA // FULL-STACK OPERATIVE</p>
+            </div>
+            <div class="hidden md:block text-right">
+                <div class="text-cyber-pink text-xs">BUILD v.2.0.4</div>
+                <div class="text-cyber-blue text-xs">SECURE CONNECTION</div>
+            </div>
+        </header>
+
+        <!-- Dashboard Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            
+            <!-- Col 1: Navigation -->
+            <nav class="lg:col-span-1 flex flex-col gap-4 slide-up" style="animation-delay: 0.2s;">
+                <a href="#" onclick="handleNav('PROJECTS')" class="bg-cyber-dark border border-gray-800 p-6 text-center transition-all duration-300 neon-box-blue group">
+                    <span class="font-bold text-lg group-hover:text-cyber-blue">PROJECTS [LS]</span>
+                </a>
+                <a href="#" onclick="handleNav('ABOUT')" class="bg-cyber-dark border border-gray-800 p-6 text-center transition-all duration-300 neon-box-green group">
+                    <span class="font-bold text-lg group-hover:text-cyber-green">IDENTITY [WHOAMI]</span>
+                </a>
+                <a href="#" onclick="handleNav('CONTACT')" class="bg-cyber-dark border border-gray-800 p-6 text-center transition-all duration-300 neon-box-pink group">
+                    <span class="font-bold text-lg group-hover:text-cyber-pink">RECRUIT [RECRUIT]</span>
+                </a>
+
+                <div class="mt-auto p-4 border border-cyber-green/20 bg-cyber-dark/50">
+                    <h3 class="text-cyber-green text-xs mb-2">SKILL_TREE</h3>
+                    <div class="flex flex-wrap gap-2 text-xs text-gray-400">
+                        <span>JavaScript</span>/<span>HTML5</span>/<span>CSS3</span>/<span>React</span>/<span>Node</span>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Col 2: Main Feed -->
+            <section class="lg:col-span-2 flex flex-col gap-6 slide-up" style="animation-delay: 0.4s;">
+                <div class="bg-cyber-dark/80 border border-cyber-green/30 p-6 relative overflow-hidden group hover:border-cyber-green transition-colors duration-300">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-cyber-green/50 group-hover:h-full transition-all duration-500"></div>
+                    <h3 class="text-xl text-cyber-blue mb-2">LATEST_DEPLOYMENT</h3>
+                    <p class="text-gray-300 mb-4">Project "Neon Horizon" deployed. A high-performance interface demonstrating pure HTML/CSS capabilities.</p>
+                    <div class="flex gap-2">
+                        <span class="px-2 py-1 bg-cyber-blue/10 text-cyber-blue text-xs border border-cyber-blue/30">Frontend</span>
+                        <span class="px-2 py-1 bg-cyber-blue/10 text-cyber-blue text-xs border border-cyber-blue/30">Design</span>
+                    </div>
+                </div>
+
+                <div class="bg-cyber-dark/80 border border-cyber-pink/30 p-6 relative overflow-hidden group hover:border-cyber-pink transition-colors duration-300">
+                    <h3 class="text-xl text-cyber-pink mb-2">DEV_LOG_ENTRY_404</h3>
+                    <p class="text-gray-300">System architecture optimized. Reducing load times by 40% through vanilla JS implementation.</p>
+                </div>
+            </section>
+
+            <!-- Col 3: Status -->
+            <aside class="lg:col-span-1 flex flex-col gap-4 slide-up" style="animation-delay: 0.6s;">
+                <div class="border border-cyber-green/30 p-4 bg-cyber-black">
+                    <h4 class="text-cyber-green text-xs border-b border-cyber-green/20 pb-2 mb-2">LOCATION_DATA</h4>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-gray-400">CITY:</span>
+                        <span class="text-cyber-blue">NUNEATON</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-400">REGION:</span>
+                        <span class="text-cyber-blue">UK</span>
+                    </div>
+                </div>
+
+                <div class="border border-cyber-blue/30 p-4 bg-cyber-black">
+                    <h4 class="text-cyber-blue text-xs border-b border-cyber-blue/20 pb-2 mb-2">SYSTEM_STATUS</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 bg-cyber-green rounded-full animate-pulse"></div>
+                            <span class="text-xs text-gray-300">SERVER: OPTIMAL</span>
+                        </div>
+                        <div class="w-full bg-gray-800 h-1 mt-2">
+                            <div class="bg-cyber-blue h-full" style="width: 87%"></div>
+                        </div>
+                        <div class="text-right text-[10px] text-cyber-blue">MEMORY_LOAD: 87%</div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- 3. TERMINAL COMPONENT -->
+    <div class="fixed bottom-0 left-0 w-full bg-cyber-black/95 border-t border-cyber-green/30 p-4 backdrop-blur-sm z-40">
+        <div class="max-w-7xl mx-auto w-full">
+            <!-- Helper Text Area -->
+            <div id="terminal-helper" class="text-cyber-blue mb-2 overflow-hidden h-0 transition-all duration-300"></div>
+            
+            <!-- Input Line -->
+            <div class="flex items-center text-lg md:text-xl text-cyber-green">
+                <span class="mr-3 font-bold">admin@deck:~$</span>
+                <input 
+                    id="terminal-input"
+                    type="text" 
+                    class="flex-1 bg-transparent border-none outline-none text-cyber-green placeholder-cyber-green/30 uppercase font-mono"
+                    placeholder="ENTER COMMAND (TRY 'HELP')..."
+                    autofocus
+                >
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- 1. Boot Sequence Logic ---
+        const logs = [
+            "INITIALIZING KERNEL...",
+            "LOADING NEURAL INTERFACE...",
+            "CHECKING SECURITY PROTOCOLS... OK",
+            "ESTABLISHING CONNECTION TO NUNEATON SERVER...",
+            "MOUNTING FILE SYSTEM...",
+            "DECK ONLINE."
+        ];
+        
+        const logContainer = document.getElementById('log-container');
+        const bootScreen = document.getElementById('boot-screen');
+        const mainInterface = document.getElementById('main-interface');
+        let logIndex = 0;
+
+        function runBootSequence() {
+            if (logIndex < logs.length) {
+                const div = document.createElement('div');
+                div.className = "mb-2 border-l-2 border-cyber-green pl-2 animate-pulse";
+                div.innerHTML = `<span class="opacity-50 mr-2">[${new Date().toLocaleTimeString()}]</span> ${logs[logIndex]}`;
+                logContainer.appendChild(div);
+                logIndex++;
+                setTimeout(runBootSequence, 500); // Speed of logs
+            } else {
+                setTimeout(() => {
+                    // Fade out boot screen
+                    bootScreen.style.transition = "opacity 0.5s ease";
+                    bootScreen.style.opacity = "0";
+                    
+                    setTimeout(() => {
+                        bootScreen.remove(); // Remove from DOM
+                        mainInterface.classList.remove('hidden-force'); // Show Dashboard
+                    }, 500);
+                }, 800);
+            }
+        }
+
+        // Start Boot on Load
+        window.addEventListener('load', runBootSequence);
+
+
+        // --- 2. Terminal Logic ---
+        const input = document.getElementById('terminal-input');
+        const helper = document.getElementById('terminal-helper');
+
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const command = input.value.trim().toUpperCase();
+                processCommand(command);
+                input.value = ''; // Clear input
+            }
+        });
+
+        // Keep focus on input
+        document.addEventListener('click', () => input.focus());
+
+        function processCommand(cmd) {
+            let msg = "";
+            let action = null;
+
+            switch(cmd) {
+                case "WHOAMI":
+                case "ABOUT": // Added this so the Identity button works
+                    msg = "NAVIGATING TO IDENTITY MATRIX...";
+                    action = () => setTimeout(() => window.location.href = "about.html", 1000);
+                    break;
+
+                // --- THIS IS THE PART TO UPDATE FOR PROJECTS ---
+                case "LS":
+                case "PROJECTS": // Added this so the Projects button works
+                    msg = "LISTING PROJECT DIRECTORIES...";
+                    // This command actually changes the page:
+                    action = () => setTimeout(() => window.location.href = "projects.html", 1000);
+                    break;
+                // -----------------------------------------------
+
+                case "RECRUIT":
+                case "CONTACT": // Added this so the Recruit button works
+                    msg = "OPENING COMM CHANNELS...";
+                    action = () => setTimeout(() => window.location.href = "contact.html", 1000);
+                    break;
+
+                case "HELP":
+                    msg = "AVAILABLE COMMANDS: WHOAMI, LS, RECRUIT, CLEAR";
+                    break;
+
+                case "CLEAR":
+                    msg = "";
+                    helper.style.height = "0";
+                    helper.textContent = "";
+                    return;
+
+                default:
+                    msg = `COMMAND '${cmd}' NOT RECOGNIZED. TRY 'HELP'.`;
+            }
+
+            // Display Helper Text
+            if (msg) {
+                helper.textContent = `>> ${msg}`;
+                helper.style.height = "auto";
+            }
+
+            // Execute Action if any
+            if (action) action();
+        }
+
+        // Function for the dashboard buttons to simulate navigation
+        function handleNav(destination) {
+            processCommand(destination); // Reuse terminal logic for visual consistency
+        }
+        
+    </script>
+</body>
+</html>
