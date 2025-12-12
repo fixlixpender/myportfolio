@@ -165,10 +165,18 @@
                 <h1 class="text-4xl md:text-6xl font-bold text-cyber-blue cursor-default glitch-permanent">FILIPE'S DECK</h1>
                 <p class="mt-2 text-gray-400 max-w-lg">FULL-STACK OPERATIVE</p>
             </div>
-            <div class="hidden md:block text-right">
-                <div class="text-cyber-pink text-xs">BUILD v.2.0.4</div>
-                <div class="text-cyber-blue text-xs">SECURE CONNECTION</div>
-            </div>
+            <div class="flex flex-col items-end gap-2">
+    <!-- Music Toggle Button -->
+    <button id="music-btn" class="border border-cyber-green text-cyber-green px-3 py-1 text-xs hover:bg-cyber-green hover:text-black transition-colors uppercase font-mono">
+        [ MUSIC: OFF ]
+    </button>
+
+    <!-- Version Info (Hidden on mobile to save space) -->
+    <div class="hidden md:block text-right">
+        <div class="text-cyber-pink text-xs">BUILD v.2.0.4</div>
+        <div class="text-cyber-blue text-xs">SECURE CONNECTION</div>
+    </div>
+</div>
         </header>
 
         <!-- Dashboard Grid -->
@@ -267,6 +275,11 @@
         </div>
         </div>
     </div>
+
+    <!-- Hidden Audio Player -->
+        <audio id="bg-music" loop>
+            <source src="cyberpunk-bg.mp3" type="audio/mpeg">
+        </audio>
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
@@ -380,6 +393,29 @@
         function handleNav(destination) {
             processCommand(destination); // Reuse terminal logic for visual consistency
         }
+
+        // --- AUDIO CONTROLLER ---
+    const music = document.getElementById('bg-music');
+    const musicBtn = document.getElementById('music-btn');
+    
+    // Set initial volume (optional, 0.0 to 1.0)
+    music.volume = 0.5;
+
+    musicBtn.addEventListener('click', () => {
+        if (music.paused) {
+            music.play();
+            musicBtn.innerHTML = "[ MUSIC: <span class='animate-pulse'>ON</span> ]";
+            // Change border/text to Pink when active for visual feedback
+            musicBtn.classList.remove('border-cyber-green', 'text-cyber-green', 'hover:bg-cyber-green');
+            musicBtn.classList.add('border-cyber-pink', 'text-cyber-pink', 'hover:bg-cyber-pink');
+        } else {
+            music.pause();
+            musicBtn.innerHTML = "[ MUSIC: OFF ]";
+            // Revert colors to Green
+            musicBtn.classList.remove('border-cyber-pink', 'text-cyber-pink', 'hover:bg-cyber-pink');
+            musicBtn.classList.add('border-cyber-green', 'text-cyber-green', 'hover:bg-cyber-green');
+        }
+    });
         
     </script>
 </body>
