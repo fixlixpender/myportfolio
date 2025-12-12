@@ -365,6 +365,8 @@
             setTimeout(runBootSequence, 500); // Next line in 500ms
         } else {
             // Sequence Complete
+            sessionStorage.setItem('deck_booted', 'true'); // <--- ADD THIS LINE
+            
             setTimeout(() => {
                 // Fade out boot screen
                 bootScreen.style.transition = "opacity 0.8s ease";
@@ -475,6 +477,8 @@
             case "RESTART":
             case "REBOOT":
                 msg = "INITIATING SYSTEM REBOOT...";
+                // Clear the memory so the animation plays again
+                sessionStorage.removeItem('deck_booted'); // <--- ADD THIS LINE
                 action = () => setTimeout(() => window.location.reload(), 1000);
                 break;
 
