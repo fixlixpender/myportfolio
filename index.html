@@ -392,6 +392,14 @@
                         musicBtn.classList.add('border-cyber-green', 'text-cyber-green', 'hover:bg-cyber-green');
                     };
                     break;
+
+                    case "RESTART":
+                case "REBOOT":
+                    msg = "INITIATING SYSTEM REBOOT...";
+                    // Reloads the page after 1 second
+                    action = () => setTimeout(() => window.location.reload(), 1000);
+                    break;
+                    
                 // ---------------------------
 
                 case "HELP":
