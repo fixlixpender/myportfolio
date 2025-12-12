@@ -140,6 +140,18 @@
 </head>
 <body class="bg-cyber-black min-h-screen relative pb-24">
 
+    <!-- CLICK TO START OVERLAY -->
+<div id="start-overlay" class="fixed inset-0 bg-cyber-black z-[200] flex items-center justify-center cursor-pointer">
+    <div class="text-center">
+        <div class="text-cyber-green text-2xl md:text-4xl font-mono tracking-widest animate-pulse border-b-2 border-cyber-green pb-2">
+            >> INITIALIZE SYSTEM <<
+        </div>
+        <p class="text-cyber-blue mt-4 text-xs md:text-sm font-mono opacity-70">
+            [ CLICK ANYWHERE TO BOOT ]
+        </p>
+    </div>
+</div>
+
     
 
 <!-- NEW: Three.js Background Container -->
@@ -320,8 +332,23 @@
             }
         }
 
-        // Start Boot on Load
-        window.addEventListener('load', runBootSequence);
+        // --- MODIFIED BOOT LOGIC ---
+const startOverlay = document.getElementById('start-overlay');
+
+// Wait for user to click to start everything
+startOverlay.addEventListener('click', () => {
+    // 1. Hide the start screen
+    startOverlay.style.opacity = '0';
+    setTimeout(() => startOverlay.remove(), 500);
+
+    // 2. Play the Boot Sound (Now guaranteed to work because user clicked)
+    playSFX('sfx-boot');
+
+    // 3. Start the text animation
+    runBootSequence();
+});
+
+// Remove the old 'window.addEventListener' line if you haven't already!
 
 
         // --- 2. Terminal Logic ---
