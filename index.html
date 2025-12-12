@@ -380,26 +380,34 @@
     }
 
     // ==========================================
-    // 4. START SCREEN INTERACTION
+    // 4. START SCREEN INTERACTION (UPDATED)
     // ==========================================
-    if (startOverlay) {
-        startOverlay.addEventListener('click', () => {
-            // 1. Fade out the "Click to Start" overlay
-            startOverlay.style.transition = "opacity 0.5s ease";
-            startOverlay.style.opacity = '0';
-            setTimeout(() => startOverlay.remove(), 500);
+    
+    // Check if system is already booted (from Session Storage)
+    const isBooted = sessionStorage.getItem('deck_booted');
 
-            // 2. Play Boot Sound
-            playSFX('sfx-boot');
-
-            // 3. Reset and Start Boot Text Logic
-            logIndex = 0; 
-            logContainer.innerHTML = ''; // Clear any garbage
-            runBootSequence();
-        });
+    if (isBooted === 'true') {
+        // --- FAST LOAD (Skip Animation) ---
+        if (startOverlay) startOverlay.style.display = 'none'; 
+        if (bootScreen) bootScreen.style.display = 'none';
+        
+        mainInterface.classList.remove('hidden-force');
+        mainInterface.classList.add('fade-in');
     } else {
-        // Fallback if overlay is missing
-        runBootSequence();
+        // --- NORMAL LOAD (Show Animation) ---
+        if (startOverlay) {
+            startOverlay.addEventListener('click', () => {
+                startOverlay.style.transition = "opacity 0.5s ease";
+                startOverlay.style.opacity = '0';
+                setTimeout(() => startOverlay.remove(), 500);
+
+                playSFX('sfx-boot');
+
+                logIndex = 0; 
+                logContainer.innerHTML = ''; 
+                runBootSequence();
+            });
+        }
     }
 
     // ==========================================
