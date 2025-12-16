@@ -230,33 +230,35 @@
                 <!-- Media Section -->
             <div class="space-y-4 order-1 lg:order-2">
                 
-                <!-- 1. Main Viewer (Default Image on Load) -->
-                <!-- Changed to website1.png so it looks good immediately -->
+                <!-- 1. Main Viewer (Defaulting to Video now) -->
                 <div id="p2-viewer" class="aspect-video bg-black border border-cyber-pink/50 relative overflow-hidden flex items-center justify-center">
-                <!-- Changed object-cover to object-contain -->
-                <img src="website1.png" class="w-full h-full object-contain">
-            </div>
+                    <!-- Added Video Tag with Autoplay -->
+                    <video class="w-full h-full object-contain" autoplay loop muted playsinline>
+                        <source src="websitevid.mp4" type="video/mp4">
+                    </video>
+                </div>
 
-                <!-- Thumbnails Row -->
+                <!-- Thumbnails Row (Reordered) -->
                 <div class="flex gap-3 overflow-x-auto pb-2">
                     
-                    <!-- 2. Button for Image 1 (website1.png) -->
+                    <!-- 1. Video Button (First & Active) -->
+                    <button onclick="switchMedia('p2', 'video', 'websitevid.mp4')" 
+                            class="w-20 h-12 border border-cyber-pink/30 hover:border-cyber-pink thumb-active shrink-0 bg-gray-900 flex items-center justify-center">
+                        <span class="text-[10px] text-cyber-pink">VIDEO</span>
+                    </button>
+
+                    <!-- 2. Button for Image 1 -->
                     <button onclick="switchMedia('p2', 'image', 'website1.png')" 
-                            class="w-20 h-12 border border-cyber-pink/30 hover:border-cyber-pink thumb-active shrink-0">
+                            class="w-20 h-12 border border-cyber-pink/30 hover:border-cyber-pink shrink-0">
                         <img src="website1.png" class="w-full h-full object-cover opacity-70 hover:opacity-100">
                     </button>
                     
-                    <!-- 3. Button for Image 2 (website2.png) -->
+                    <!-- 3. Button for Image 2 -->
                     <button onclick="switchMedia('p2', 'image', 'website2.png')" 
                             class="w-20 h-12 border border-cyber-pink/30 hover:border-cyber-pink shrink-0">
                         <img src="website2.png" class="w-full h-full object-cover opacity-70 hover:opacity-100">
                     </button>
 
-                    <!-- Video (Already updated previously) -->
-                    <button onclick="switchMedia('p2', 'video', 'websitevid.mp4')" 
-                            class="w-20 h-12 border border-cyber-pink/30 hover:border-cyber-pink shrink-0 bg-gray-900 flex items-center justify-center">
-                        <span class="text-[10px] text-cyber-pink">VIDEO</span>
-                    </button>
                 </div>
             </div>
             </div>
