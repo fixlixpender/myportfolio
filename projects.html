@@ -202,19 +202,19 @@
                 <!-- Info Section (Left on Desktop for variety) -->
                 <div class="flex flex-col h-full order-2 lg:order-1">
                     <div class="mb-4">
-                        <h2 class="text-3xl md:text-4xl text-white font-bold mb-2">SYNTH_CHAT_PROTOCOL</h2>
+                        <h2 class="text-3xl md:text-4xl text-white font-bold mb-2">TOUCHLESS WEBSITE</h2>
                         <div class="flex flex-wrap gap-2 mb-4">
-                            <span class="px-2 py-1 border border-cyber-pink text-cyber-pink text-xs">SOCKET.IO</span>
-                            <span class="px-2 py-1 border border-cyber-pink text-cyber-pink text-xs">NODE.JS</span>
-                            <span class="px-2 py-1 border border-cyber-pink text-cyber-pink text-xs">REDIS</span>
+                            <span class="px-2 py-1 border border-cyber-pink text-cyber-pink text-xs">MediaPipe</span>
+                            <span class="px-2 py-1 border border-cyber-pink text-cyber-pink text-xs">Three.js</span>
+                            <span class="px-2 py-1 border border-cyber-pink text-cyber-pink text-xs">JavaScript & HTML5</span>
                         </div>
                     </div>
                     
                     <div class="text-gray-400 text-sm md:text-base mb-6 leading-relaxed border-l-2 border-cyber-pink/20 pl-4">
                         <p class="mb-4">
-                            End-to-end encrypted messaging application. Built to withstand high-latency networks while maintaining message integrity.
+                            This is a futuristic, touchless website that you control entirely with your hand gestures in front of your webcam.
                         </p>
-                        <p>Features ephemeral messages, group channels, and file sharing with auto-deletion protocols.</p>
+                        <p>You don't need a mouse or keyboard. This application runs entirely in your web browser.</p>
                     </div>
 
                     <div class="mt-auto flex gap-4">
@@ -228,29 +228,36 @@
                 </div>
 
                 <!-- Media Section -->
-                <div class="space-y-4 order-1 lg:order-2">
-                    <div id="p2-viewer" class="aspect-video bg-black border border-cyber-pink/50 relative overflow-hidden flex items-center justify-center">
-                        <img src="https://placehold.co/600x400/111/ff00ff/png?text=Chat+Interface+v1" class="w-full h-full object-cover">
-                    </div>
-                    
-                    <div class="flex gap-3 overflow-x-auto pb-2">
-                        <!-- Image 1 -->
-                        <button onclick="switchMedia('p2', 'image', 'https://placehold.co/600x400/111/ff00ff/png?text=Chat+Interface+v1')" 
-                                class="w-20 h-12 border border-cyber-pink/30 hover:border-cyber-pink thumb-active shrink-0">
-                            <img src="https://placehold.co/600x400/111/ff00ff/png?text=UI" class="w-full h-full object-cover opacity-70 hover:opacity-100">
-                        </button>
-                        <!-- Image 2 -->
-                        <button onclick="switchMedia('p2', 'image', 'https://placehold.co/600x400/000/00ff41/png?text=Encryption+Log')" 
-                                class="w-20 h-12 border border-cyber-pink/30 hover:border-cyber-pink shrink-0">
-                            <img src="https://placehold.co/600x400/000/00ff41/png?text=Log" class="w-full h-full object-cover opacity-70 hover:opacity-100">
-                        </button>
-                         <!-- Video -->
-                         <button onclick="switchMedia('p2', 'video', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4')" 
-                            class="w-20 h-12 border border-cyber-pink/30 hover:border-cyber-pink shrink-0 bg-gray-900 flex items-center justify-center">
-                            <span class="text-[10px] text-cyber-pink">VIDEO</span>
-                        </button>
-                    </div>
+            <div class="space-y-4 order-1 lg:order-2">
+                
+                <!-- 1. Main Viewer (Default Image on Load) -->
+                <!-- Changed to website1.png so it looks good immediately -->
+                <div id="p2-viewer" class="aspect-video bg-black border border-cyber-pink/50 relative overflow-hidden flex items-center justify-center">
+                    <img src="website1.png" class="w-full h-full object-cover">
                 </div>
+
+                <!-- Thumbnails Row -->
+                <div class="flex gap-3 overflow-x-auto pb-2">
+                    
+                    <!-- 2. Button for Image 1 (website1.png) -->
+                    <button onclick="switchMedia('p2', 'image', 'website1.png')" 
+                            class="w-20 h-12 border border-cyber-pink/30 hover:border-cyber-pink thumb-active shrink-0">
+                        <img src="website1.png" class="w-full h-full object-cover opacity-70 hover:opacity-100">
+                    </button>
+                    
+                    <!-- 3. Button for Image 2 (website2.png) -->
+                    <button onclick="switchMedia('p2', 'image', 'website2.png')" 
+                            class="w-20 h-12 border border-cyber-pink/30 hover:border-cyber-pink shrink-0">
+                        <img src="website2.png" class="w-full h-full object-cover opacity-70 hover:opacity-100">
+                    </button>
+
+                    <!-- Video (Already updated previously) -->
+                    <button onclick="switchMedia('p2', 'video', 'websitevid.mp4')" 
+                            class="w-20 h-12 border border-cyber-pink/30 hover:border-cyber-pink shrink-0 bg-gray-900 flex items-center justify-center">
+                        <span class="text-[10px] text-cyber-pink">VIDEO</span>
+                    </button>
+                </div>
+            </div>
             </div>
         </article>
 
