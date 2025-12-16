@@ -233,8 +233,9 @@
                 <!-- 1. Main Viewer (Default Image on Load) -->
                 <!-- Changed to website1.png so it looks good immediately -->
                 <div id="p2-viewer" class="aspect-video bg-black border border-cyber-pink/50 relative overflow-hidden flex items-center justify-center">
-                    <img src="website1.png" class="w-full h-full object-cover">
-                </div>
+                <!-- Changed object-cover to object-contain -->
+                <img src="website1.png" class="w-full h-full object-contain">
+            </div>
 
                 <!-- Thumbnails Row -->
                 <div class="flex gap-3 overflow-x-auto pb-2">
@@ -371,7 +372,8 @@
             } else {
                 const img = document.createElement('img');
                 img.src = source;
-                img.className = 'w-full h-full object-cover animate-fade-in';
+                // Changed 'object-cover' to 'object-contain' so the whole image fits
+                img.className = 'w-full h-full object-contain animate-fade-in';
                 // Add fade effect class
                 img.style.animation = 'fadeIn 0.5s ease-out';
                 viewer.appendChild(img);
