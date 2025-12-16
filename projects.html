@@ -364,7 +364,7 @@
             if (type === 'video') {
                 const video = document.createElement('video');
                 video.src = source;
-                video.className = 'w-full h-full object-cover';
+                video.className = 'w-full h-full object-contain';
                 video.controls = true;
                 video.autoplay = true;
                 viewer.appendChild(video);
