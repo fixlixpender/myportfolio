@@ -53,24 +53,20 @@
             font-family: "Share Tech Mono", monospace;
         }
 
-        
-
         /* Glitch Effect on Hover */
-.glitch-hover:hover {
-    animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
-    color: #ff00ff; /* Changes text color to pink while glitching */
-}
+        .glitch-hover:hover {
+            animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+            color: #ff00ff;
+        }
 
-@keyframes glitch-anim {
-    0% { transform: translate(0) }
-    20% { transform: translate(-2px, 2px) }
-    40% { transform: translate(-2px, -2px) }
-    60% { transform: translate(2px, 2px) }
-    80% { transform: translate(2px, -2px) }
-    100% { transform: translate(0) }
-}
-
-        @keyframes scrollScanlines { 0% { background-position: 0 0; } 100% { background-position: 0 100%; } }
+        @keyframes glitch-anim {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
@@ -84,17 +80,30 @@
         /* Media Selector Active State */
         .thumb-active { border-color: #00ff41 !important; box-shadow: 0 0 8px #00ff41; }
 
-        /* Page Load Animation */
-        .slide-in { animation: slideIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards; opacity: 0; transform: translateY(20px); }
-        @keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
+        /* --- NEW SCROLL ANIMATION: 3D HOLOGRAPHIC REVEAL --- */
+        .cyber-reveal {
+            opacity: 0;
+            /* Start state: Pushed back, tilted, blurred, and grayscale */
+            transform: perspective(1000px) rotateX(30deg) scale(0.9) translateY(100px);
+            filter: blur(10px) grayscale(100%);
+            
+            /* Smooth transition */
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, opacity, filter;
+        }
+
+        .cyber-reveal.in-view {
+            opacity: 1;
+            /* End state: Flat, full size, sharp, full color */
+            transform: perspective(1000px) rotateX(0) scale(1) translateY(0);
+            filter: blur(0) grayscale(0%);
+        }
     </style>
 </head>
 <body class="bg-cyber-black min-h-screen pb-20">
 
-   
-
-<!-- NEW: Three.js Background Container -->
-<div id="canvas-container" class="fixed inset-0 z-[-1] pointer-events-none"></div>
+    <!-- Three.js Background Container -->
+    <div id="canvas-container" class="fixed inset-0 z-[-1] pointer-events-none"></div>
 
     <!-- Navigation Header -->
     <header class="sticky top-0 z-40 bg-cyber-black/90 backdrop-blur-md border-b border-cyber-green/30 p-4">
@@ -111,35 +120,30 @@
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-12">
+    <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-24"> <!-- Increased spacing to space-y-24 for better scroll effect -->
 
         <!-- PROJECT 1 -->
-        <article class="slide-in bg-transparent border border-cyber-green/30 p-1 md:p-6 relative group">
-            <!-- Decorative Corners -->
+        <!-- Added 'cyber-reveal' class here -->
+        <article class="cyber-reveal bg-transparent border border-cyber-green/30 p-1 md:p-6 relative group">
             <div class="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-cyber-green"></div>
             <div class="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-cyber-green"></div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 
-                <!-- Media Section (Video/Images) -->
+                <!-- Media Section -->
                 <div class="space-y-4">
-                    <!-- Main Viewer -->
                     <div id="p1-viewer" class="aspect-video bg-black border border-cyber-green/50 relative overflow-hidden flex items-center justify-center">
-                        <!-- Default Content (Video) -->
                         <video class="w-full h-full object-cover" autoplay loop muted playsinline poster="https://placehold.co/600x400/000000/00ff41/png?text=Loading+Feed...">
                             <source src="demo.mp4" type="video/mp4">
                         </video>
                         <div class="absolute top-2 right-2 px-2 bg-red-600 text-white text-[10px] animate-pulse">LIVE_FEED</div>
                     </div>
 
-                    <!-- Thumbnails -->
                     <div class="flex gap-3 overflow-x-auto pb-2">
-                        <!-- Video Thumb -->
                         <button onclick="switchMedia('p1', 'video', 'demo.mp4')" 
                                 class="w-20 h-12 border border-cyber-green/30 hover:border-cyber-green thumb-active shrink-0 bg-gray-900 flex items-center justify-center">
                             <span class="text-[10px] text-cyber-green">VIDEO</span>
                         </button>
-                        <!-- Image Thumbs -->
                         <button onclick="switchMedia('p1', 'image', 'room1.PNG')" 
                                 class="w-20 h-12 border border-cyber-green/30 hover:border-cyber-green shrink-0">
                             <img src="room1.PNG" class="w-full h-full object-cover opacity-70 hover:opacity-100">
@@ -194,12 +198,13 @@
         </article>
 
         <!-- PROJECT 2 -->
-        <article class="slide-in bg-transparent border border-cyber-pink/30 p-1 md:p-6 relative group" style="animation-delay: 0.2s">
+        <!-- Added 'cyber-reveal' class here -->
+        <article class="cyber-reveal bg-transparent border border-cyber-pink/30 p-1 md:p-6 relative group">
             <div class="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-cyber-pink"></div>
             <div class="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-cyber-pink"></div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Info Section (Left on Desktop for variety) -->
+                <!-- Info Section -->
                 <div class="flex flex-col h-full order-2 lg:order-1">
                     <div class="mb-4">
                         <h2 class="text-3xl md:text-4xl text-white font-bold mb-2">TOUCHLESS WEBSITE</h2>
@@ -243,80 +248,59 @@
                 </div>
 
                 <!-- Media Section -->
-            <div class="space-y-4 order-1 lg:order-2">
-                
-                <!-- 1. Main Viewer (Defaulting to Video now) -->
-                <div id="p2-viewer" class="aspect-video bg-black border border-cyber-pink/50 relative overflow-hidden flex items-center justify-center">
-                    <!-- Added Video Tag with Autoplay -->
-                    <video class="w-full h-full object-contain" autoplay loop muted playsinline>
-                        <source src="websitevid.mp4" type="video/mp4">
-                    </video>
+                <div class="space-y-4 order-1 lg:order-2">
+                    <div id="p2-viewer" class="aspect-video bg-black border border-cyber-pink/50 relative overflow-hidden flex items-center justify-center">
+                        <video class="w-full h-full object-contain" autoplay loop muted playsinline>
+                            <source src="websitevid.mp4" type="video/mp4">
+                        </video>
+                    </div>
+
+                    <div class="flex gap-3 overflow-x-auto pb-2">
+                        <button onclick="switchMedia('p2', 'video', 'websitevid.mp4')" 
+                                class="w-20 h-12 border border-cyber-pink/30 hover:border-cyber-pink thumb-active shrink-0 bg-gray-900 flex items-center justify-center">
+                            <span class="text-[10px] text-cyber-pink">VIDEO</span>
+                        </button>
+                        <button onclick="switchMedia('p2', 'image', 'website1.PNG')" 
+                                class="w-20 h-12 border border-cyber-pink/30 hover:border-cyber-pink shrink-0">
+                            <img src="website1.PNG" class="w-full h-full object-cover opacity-70 hover:opacity-100">
+                        </button>
+                        <button onclick="switchMedia('p2', 'image', 'website2.PNG')" 
+                                class="w-20 h-12 border border-cyber-pink/30 hover:border-cyber-pink shrink-0">
+                            <img src="website2.PNG" class="w-full h-full object-cover opacity-70 hover:opacity-100">
+                        </button>
+                    </div>
                 </div>
-
-                <!-- Thumbnails Row (Reordered) -->
-                <div class="flex gap-3 overflow-x-auto pb-2">
-                    
-                    <!-- 1. Video Button (First & Active) -->
-                    <button onclick="switchMedia('p2', 'video', 'websitevid.mp4')" 
-                            class="w-20 h-12 border border-cyber-pink/30 hover:border-cyber-pink thumb-active shrink-0 bg-gray-900 flex items-center justify-center">
-                        <span class="text-[10px] text-cyber-pink">VIDEO</span>
-                    </button>
-
-                    <!-- 2. Button for Image 1 -->
-                    <button onclick="switchMedia('p2', 'image', 'website1.PNG')" 
-                            class="w-20 h-12 border border-cyber-pink/30 hover:border-cyber-pink shrink-0">
-                        <img src="website1.PNG" class="w-full h-full object-cover opacity-70 hover:opacity-100">
-                    </button>
-                    
-                    <!-- 3. Button for Image 2 -->
-                    <button onclick="switchMedia('p2', 'image', 'website2.PNG')" 
-                            class="w-20 h-12 border border-cyber-pink/30 hover:border-cyber-pink shrink-0">
-                        <img src="website2.PNG" class="w-full h-full object-cover opacity-70 hover:opacity-100">
-                    </button>
-
-                </div>
-            </div>
             </div>
         </article>
 
         <!-- PROJECT 3 -->
-        <article class="slide-in bg-transparent border border-cyber-blue/30 p-1 md:p-6 relative group" style="animation-delay: 0.4s">
+        <!-- Added 'cyber-reveal' class here -->
+        <article class="cyber-reveal bg-transparent border border-cyber-blue/30 p-1 md:p-6 relative group">
             <div class="absolute top-0 left-0 w-full h-[1px] bg-cyber-blue/30"></div>
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div class="space-y-4">
-    
-                <!-- 1. Main Viewer (Defaults to Video 'ball.mp4') -->
-                <div id="p3-viewer" class="aspect-video bg-black border border-cyber-blue/50 relative overflow-hidden flex items-center justify-center">
-                    <!-- Autoplay Video with object-contain to prevent cropping -->
-                    <video class="w-full h-full object-contain" autoplay loop muted playsinline>
-                        <source src="ball.mp4" type="video/mp4">
-                    </video>
+                    <div id="p3-viewer" class="aspect-video bg-black border border-cyber-blue/50 relative overflow-hidden flex items-center justify-center">
+                        <video class="w-full h-full object-contain" autoplay loop muted playsinline>
+                            <source src="ball.mp4" type="video/mp4">
+                        </video>
+                    </div>
+
+                    <div class="flex gap-3 overflow-x-auto pb-2">
+                        <button onclick="switchMedia('p3', 'video', 'ball.mp4')" 
+                                class="w-20 h-12 border border-cyber-blue/30 hover:border-cyber-blue thumb-active shrink-0 bg-gray-900 flex items-center justify-center">
+                            <span class="text-[10px] text-cyber-blue">VIDEO</span>
+                        </button>
+                        <button onclick="switchMedia('p3', 'image', 'ball1.PNG')" 
+                                class="w-20 h-12 border border-cyber-blue/30 hover:border-cyber-blue shrink-0">
+                            <img src="ball1.PNG" class="w-full h-full object-cover opacity-70 hover:opacity-100">
+                        </button>
+                        <button onclick="switchMedia('p3', 'image', 'ball2.PNG')" 
+                                class="w-20 h-12 border border-cyber-blue/30 hover:border-cyber-blue shrink-0">
+                            <img src="ball2.PNG" class="w-full h-full object-cover opacity-70 hover:opacity-100">
+                        </button>
+                    </div>
                 </div>
-
-                <!-- 2. Thumbnails Row (Video first, then 2 Images) -->
-                <div class="flex gap-3 overflow-x-auto pb-2">
-                    
-                    <!-- Video Button (Active) -->
-                    <button onclick="switchMedia('p3', 'video', 'ball.mp4')" 
-                            class="w-20 h-12 border border-cyber-blue/30 hover:border-cyber-blue thumb-active shrink-0 bg-gray-900 flex items-center justify-center">
-                        <span class="text-[10px] text-cyber-blue">VIDEO</span>
-                    </button>
-
-                    <!-- Image 1 Button (ball1.PNG) -->
-                    <button onclick="switchMedia('p3', 'image', 'ball1.PNG')" 
-                            class="w-20 h-12 border border-cyber-blue/30 hover:border-cyber-blue shrink-0">
-                        <img src="ball1.PNG" class="w-full h-full object-cover opacity-70 hover:opacity-100">
-                    </button>
-
-                    <!-- Image 2 Button (ball2.PNG) -->
-                    <button onclick="switchMedia('p3', 'image', 'ball2.PNG')" 
-                            class="w-20 h-12 border border-cyber-blue/30 hover:border-cyber-blue shrink-0">
-                        <img src="ball2.PNG" class="w-full h-full object-cover opacity-70 hover:opacity-100">
-                    </button>
-                    
-                </div>
-            </div>
 
                 <div class="flex flex-col h-full">
                     <div class="mb-4">
@@ -352,7 +336,8 @@
         </article>
         
         <!-- PROJECT 4 -->
-        <article class="slide-in bg-transparent border border-gray-700 p-1 md:p-6 relative group" style="animation-delay: 0.6s">
+        <!-- Added 'cyber-reveal' class here -->
+        <article class="cyber-reveal bg-transparent border border-gray-700 p-1 md:p-6 relative group">
              <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                  <div class="flex flex-col h-full order-2 lg:order-1">
                     <div class="mb-4">
@@ -398,11 +383,7 @@
     <script>
         function switchMedia(projectId, type, source) {
             const viewer = document.getElementById(`${projectId}-viewer`);
-            
-            // 1. Clear current content
             viewer.innerHTML = '';
-
-            // 2. Inject new content
             if (type === 'video') {
                 const video = document.createElement('video');
                 video.src = source;
@@ -413,27 +394,42 @@
             } else {
                 const img = document.createElement('img');
                 img.src = source;
-                // Changed 'object-cover' to 'object-contain' so the whole image fits
                 img.className = 'w-full h-full object-contain animate-fade-in';
-                // Add fade effect class
                 img.style.animation = 'fadeIn 0.5s ease-out';
                 viewer.appendChild(img);
             }
-
-            // 3. Update Thumbnail Highlight (Visual Logic)
-            // Note: In a production app, we would pass 'this' or an ID to highlight the specific button clicked.
-            // For this lightweight version, we just let the click happen.
             const buttons = event.currentTarget.parentElement.querySelectorAll('button');
             buttons.forEach(btn => btn.classList.remove('thumb-active'));
             event.currentTarget.classList.add('thumb-active');
         }
 
-        // Add fadeIn animation definition for JS injection
         const style = document.createElement('style');
-        style.innerHTML = `
-            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        `;
+        style.innerHTML = `@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }`;
         document.head.appendChild(style);
+
+        // --- SCROLL OBSERVER LOGIC ---
+        // This handles the "Out of the Box" 3D Scroll effect
+        document.addEventListener("DOMContentLoaded", () => {
+            const observerOptions = {
+                threshold: [0.1], // Trigger when 10% of the element is visible
+                rootMargin: "0px 0px -50px 0px" // Offset the trigger slightly from bottom
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('in-view');
+                    } else {
+                        // Optional: Remove class to re-animate when scrolling back up
+                        // Comment this 'else' block out if you want them to stay visible once loaded
+                        entry.target.classList.remove('in-view');
+                    }
+                });
+            }, observerOptions);
+
+            const revealElements = document.querySelectorAll('.cyber-reveal');
+            revealElements.forEach(el => observer.observe(el));
+        });
     </script>
 </body>
 </html>
