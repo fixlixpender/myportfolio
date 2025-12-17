@@ -285,29 +285,48 @@
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div class="space-y-4">
-                    <div id="p3-viewer" class="aspect-video bg-black border border-cyber-blue/50 relative overflow-hidden flex items-center justify-center">
-                         <!-- Image Default -->
-                        <img src="https://placehold.co/600x400/050505/00f0ff/png?text=Data+Visualization" class="w-full h-full object-cover">
-                    </div>
-                    <div class="flex gap-3 overflow-x-auto pb-2">
-                        <button onclick="switchMedia('p3', 'image', 'https://placehold.co/600x400/050505/00f0ff/png?text=Data+Visualization')" 
-                                class="w-20 h-12 border border-cyber-blue/30 hover:border-cyber-blue thumb-active shrink-0">
-                            <img src="https://placehold.co/600x400/050505/00f0ff/png?text=Data" class="w-full h-full object-cover opacity-70 hover:opacity-100">
-                        </button>
-                        <button onclick="switchMedia('p3', 'video', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')" 
-                                class="w-20 h-12 border border-cyber-blue/30 hover:border-cyber-blue shrink-0 bg-gray-900 flex items-center justify-center">
-                            <span class="text-[10px] text-cyber-blue">VIDEO</span>
-                        </button>
-                    </div>
+    
+                <!-- 1. Main Viewer (Defaults to Video 'ball.mp4') -->
+                <div id="p3-viewer" class="aspect-video bg-black border border-cyber-blue/50 relative overflow-hidden flex items-center justify-center">
+                    <!-- Autoplay Video with object-contain to prevent cropping -->
+                    <video class="w-full h-full object-contain" autoplay loop muted playsinline>
+                        <source src="ball.mp4" type="video/mp4">
+                    </video>
                 </div>
+
+                <!-- 2. Thumbnails Row (Video first, then 2 Images) -->
+                <div class="flex gap-3 overflow-x-auto pb-2">
+                    
+                    <!-- Video Button (Active) -->
+                    <button onclick="switchMedia('p3', 'video', 'ball.mp4')" 
+                            class="w-20 h-12 border border-cyber-blue/30 hover:border-cyber-blue thumb-active shrink-0 bg-gray-900 flex items-center justify-center">
+                        <span class="text-[10px] text-cyber-blue">VIDEO</span>
+                    </button>
+
+                    <!-- Image 1 Button (ball1.PNG) -->
+                    <button onclick="switchMedia('p3', 'image', 'ball1.PNG')" 
+                            class="w-20 h-12 border border-cyber-blue/30 hover:border-cyber-blue shrink-0">
+                        <img src="ball1.PNG" class="w-full h-full object-cover opacity-70 hover:opacity-100">
+                    </button>
+
+                    <!-- Image 2 Button (ball2.PNG) -->
+                    <button onclick="switchMedia('p3', 'image', 'ball2.PNG')" 
+                            class="w-20 h-12 border border-cyber-blue/30 hover:border-cyber-blue shrink-0">
+                        <img src="ball2.PNG" class="w-full h-full object-cover opacity-70 hover:opacity-100">
+                    </button>
+                    
+                </div>
+            </div>
 
                 <div class="flex flex-col h-full">
                     <div class="mb-4">
-                        <h2 class="text-3xl md:text-4xl text-white font-bold mb-2">NEURAL_NET_VISUALIZER</h2>
+                        <h2 class="text-3xl md:text-4xl text-white font-bold mb-2">Kinetic Core: AI-Driven Particle Interface</h2>
                         <div class="flex flex-wrap gap-2 mb-4">
-                            <span class="px-2 py-1 border border-cyber-blue text-cyber-blue text-xs">THREE.JS</span>
-                            <span class="px-2 py-1 border border-cyber-blue text-cyber-blue text-xs">WEBGL</span>
-                            <span class="px-2 py-1 border border-cyber-blue text-cyber-blue text-xs">PYTHON</span>
+                            <span class="px-2 py-1 border border-cyber-blue text-cyber-blue text-xs">Three.js</span>
+                            <span class="px-2 py-1 border border-cyber-blue text-cyber-blue text-xs">MediaPipe</span>
+                            <span class="px-2 py-1 border border-cyber-blue text-cyber-blue text-xs">HTML5 & JavaScript</span>
+                            <span class="px-2 py-1 border border-cyber-blue text-cyber-blue text-xs">WebRTC</span>
+                            <span class="px-2 py-1 border border-cyber-blue text-cyber-blue text-xs">Canvas API</span>
                         </div>
                     </div>
                     <div class="text-gray-400 text-sm md:text-base mb-6 leading-relaxed border-l-2 border-cyber-blue/20 pl-4">
