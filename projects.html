@@ -107,7 +107,8 @@
 
     <!-- Navigation Header -->
     <header class="sticky top-0 z-40 bg-cyber-black/90 backdrop-blur-md border-b border-cyber-green/30 p-4">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <!-- CHANGED: max-w-7xl -> max-w-[90vw] -->
+        <div class="max-w-[90vw] mx-auto flex justify-between items-center">
             <div class="flex items-center gap-4">
                 <span class="text-cyber-green text-xl font-bold blink">>> DIRECTORY_LISTING</span>
                 <span class="text-cyber-pink text-sm hidden md:inline-block">// ACCESSING SECURE ARCHIVES</span>
@@ -120,10 +121,10 @@
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-24"> <!-- Increased spacing to space-y-24 for better scroll effect -->
+    <!-- CHANGED: max-w-7xl -> max-w-[90vw] -->
+    <main class="max-w-[90vw] mx-auto p-4 md:p-8 space-y-24"> 
 
         <!-- PROJECT 1 -->
-        <!-- Added 'cyber-reveal' class here -->
         <article class="cyber-reveal bg-transparent border border-cyber-green/30 p-1 md:p-6 relative group">
             <div class="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-cyber-green"></div>
             <div class="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-cyber-green"></div>
@@ -198,7 +199,6 @@
         </article>
 
         <!-- PROJECT 2 -->
-        <!-- Added 'cyber-reveal' class here -->
         <article class="cyber-reveal bg-transparent border border-cyber-pink/30 p-1 md:p-6 relative group">
             <div class="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-cyber-pink"></div>
             <div class="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-cyber-pink"></div>
@@ -274,7 +274,6 @@
         </article>
 
         <!-- PROJECT 3 -->
-        <!-- Added 'cyber-reveal' class here -->
         <article class="cyber-reveal bg-transparent border border-cyber-blue/30 p-1 md:p-6 relative group">
             <div class="absolute top-0 left-0 w-full h-[1px] bg-cyber-blue/30"></div>
             
@@ -336,7 +335,6 @@
         </article>
         
         <!-- PROJECT 4 -->
-        <!-- Added 'cyber-reveal' class here -->
         <article class="cyber-reveal bg-transparent border border-gray-700 p-1 md:p-6 relative group">
              <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                  <div class="flex flex-col h-full order-2 lg:order-1">
@@ -408,11 +406,10 @@
         document.head.appendChild(style);
 
         // --- SCROLL OBSERVER LOGIC ---
-        // This handles the "Out of the Box" 3D Scroll effect
         document.addEventListener("DOMContentLoaded", () => {
             const observerOptions = {
-                threshold: [0.1], // Trigger when 10% of the element is visible
-                rootMargin: "0px 0px -50px 0px" // Offset the trigger slightly from bottom
+                threshold: [0.1], 
+                rootMargin: "0px 0px -50px 0px" 
             };
 
             const observer = new IntersectionObserver((entries) => {
@@ -420,8 +417,6 @@
                     if (entry.isIntersecting) {
                         entry.target.classList.add('in-view');
                     } else {
-                        // Optional: Remove class to re-animate when scrolling back up
-                        // Comment this 'else' block out if you want them to stay visible once loaded
                         entry.target.classList.remove('in-view');
                     }
                 });
