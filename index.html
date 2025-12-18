@@ -272,21 +272,50 @@
         const logs = [ "INITIALIZING KERNEL...", "LOADING NEURAL INTERFACE...", "CHECKING SECURITY PROTOCOLS... OK", "ESTABLISHING CONNECTION...", "MOUNTING FILE SYSTEM...", "DECK ONLINE." ];
         let logIndex = 0;
         
-        // DOM
+        // DOM Elements
         const logContainer = document.getElementById('log-container');
         const bootScreen = document.getElementById('boot-screen');
         const startOverlay = document.getElementById('start-overlay');
-        const homeSection = document.getElementById('home-section');
         const music = document.getElementById('bg-music');
         const musicBtn = document.getElementById('music-btn');
         const input = document.getElementById('terminal-input');
         const helper = document.getElementById('terminal-helper');
 
+        // Set volume to 50% by default
+        if(music) music.volume = 0.5;
+
         // --- 2. AUDIO SYSTEM ---
         function playSFX(id) {
-            if (window.innerWidth < 768 && (id === 'sfx-hover' || id === 'sfx-type')) return; // No annoying sounds on mobile
+            if (window.innerWidth < 768 && (id === 'sfx-hover' || id === 'sfx-type')) return;
             const audio = document.getElementById(id);
             if (audio) { audio.volume = 0.3; audio.currentTime = 0; audio.play().catch(e => {}); }
+        }
+
+        function toggleMusic(turnOn) {
+            if (turnOn) {
+                // Try to play, only update button if success
+                music.play().then(() => {
+                    updateMusicBtnUI(true);
+                }).catch(e => {
+                    console.error("Music playback failed:", e);
+                    updateMusicBtnUI(false); // Revert to OFF if it failed
+                });
+            } else {
+                music.pause();
+                updateMusicBtnUI(false);
+            }
+        }
+
+        function updateMusicBtnUI(isOn) {
+            if (isOn) {
+                musicBtn.innerHTML = "[ MUSIC: <span class='animate-pulse'>ON</span> ]";
+                musicBtn.classList.add('text-cyber-pink', 'border-cyber-pink');
+                musicBtn.classList.remove('text-cyber-green', 'border-cyber-green');
+            } else {
+                musicBtn.innerHTML = "[ MUSIC: OFF ]";
+                musicBtn.classList.add('text-cyber-green', 'border-cyber-green');
+                musicBtn.classList.remove('text-cyber-pink', 'border-cyber-pink');
+            }
         }
 
         // --- 3. BOOT SEQUENCE ---
@@ -299,7 +328,7 @@
                 logIndex++;
                 setTimeout(runBootSequence, 500);
             } else {
-                sessionStorage.setItem('deck_booted', 'true'); // SAVE STATE
+                sessionStorage.setItem('deck_booted', 'true');
                 setTimeout(() => {
                     bootScreen.style.transition = "opacity 0.8s ease";
                     bootScreen.style.opacity = "0";
@@ -311,16 +340,14 @@
             }
         }
 
-        // --- 4. STARTUP LOGIC (Load Handling) ---
+        // --- 4. STARTUP LOGIC ---
         const isBooted = sessionStorage.getItem('deck_booted');
 
         if (isBooted === 'true') {
-            // RETURNING USER: Skip overlays, go straight to Home
             if (startOverlay) startOverlay.style.display = 'none';
             if (bootScreen) bootScreen.style.display = 'none';
             navigateTo('home-section');
         } else {
-            // NEW USER: Show Overlay -> Click -> Boot Logs -> Home
             if (startOverlay) {
                 startOverlay.addEventListener('click', () => {
                     sessionStorage.setItem('deck_booted', 'true');
@@ -330,7 +357,6 @@
                     
                     playSFX('sfx-boot');
                     
-                    // Show Black Screen for logs
                     bootScreen.style.display = 'flex';
                     logIndex = 0;
                     logContainer.innerHTML = '';
@@ -339,22 +365,18 @@
             }
         }
 
-        // --- 5. NAVIGATION SYSTEM ---
+        // --- 5. NAVIGATION ---
         function navigateTo(sectionId) {
             playSFX('sfx-enter');
-            
-            // Hide all sections
             document.querySelectorAll('.section-container').forEach(sec => {
                 sec.classList.remove('active-section');
                 sec.classList.add('hidden-section');
             });
-
-            // Show target
             const target = document.getElementById(sectionId);
             if (target) {
                 target.classList.remove('hidden-section');
                 target.classList.add('active-section');
-                window.scrollTo(0, 0); // Reset scroll
+                window.scrollTo(0, 0);
             }
         }
 
@@ -380,20 +402,15 @@
             event.currentTarget.classList.add('thumb-active');
         }
 
-        // --- 7. TERMINAL & MUSIC ---
+        // --- 7. INPUT & COMMANDS ---
         if (musicBtn) {
             musicBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
+                // Toggle Logic
                 if (music.paused) {
-                    music.play();
-                    musicBtn.innerHTML = "[ MUSIC: <span class='animate-pulse'>ON</span> ]";
-                    musicBtn.classList.add('text-cyber-pink', 'border-cyber-pink');
-                    musicBtn.classList.remove('text-cyber-green', 'border-cyber-green');
+                    toggleMusic(true);
                 } else {
-                    music.pause();
-                    musicBtn.innerHTML = "[ MUSIC: OFF ]";
-                    musicBtn.classList.add('text-cyber-green', 'border-cyber-green');
-                    musicBtn.classList.remove('text-cyber-pink', 'border-cyber-pink');
+                    toggleMusic(false);
                 }
             });
         }
@@ -416,22 +433,39 @@
             let msg = "";
             let action = null;
             switch(cmd) {
-                case "WHOAMI": case "ABOUT": action = () => navigateTo('about-section'); break;
-                case "LS": case "PROJECTS": action = () => navigateTo('projects-section'); break;
-                case "RECRUIT": case "CONTACT": action = () => navigateTo('recruit-section'); break;
-                case "HOME": case "CD ..": action = () => navigateTo('home-section'); break;
-                case "REBOOT": sessionStorage.removeItem('deck_booted'); action = () => window.location.reload(); break;
-                case "HELP": msg = "COMMANDS: HOME, LS, WHOAMI, RECRUIT, REBOOT"; break;
-                default: msg = `COMMAND '${cmd}' NOT RECOGNIZED.`;
+                case "WHOAMI": case "ABOUT": 
+                    msg = "NAVIGATING TO IDENTITY MATRIX..."; action = () => navigateTo('about-section'); break;
+                case "LS": case "PROJECTS": 
+                    msg = "LISTING PROJECT DIRECTORIES..."; action = () => navigateTo('projects-section'); break;
+                case "RECRUIT": case "CONTACT": 
+                    msg = "OPENING COMM CHANNELS..."; action = () => navigateTo('recruit-section'); break;
+                case "HOME": case "CD ..": 
+                    msg = "RETURNING TO ROOT..."; action = () => navigateTo('home-section'); break;
+                
+                // --- ADDED MISSING MUSIC COMMANDS ---
+                case "MUSIC ON":
+                    msg = "AUDIO STREAM ESTABLISHED.";
+                    action = () => toggleMusic(true);
+                    break;
+                case "MUSIC OFF":
+                    msg = "AUDIO STREAM DISCONNECTED.";
+                    action = () => toggleMusic(false);
+                    break;
+                // ------------------------------------
+
+                case "REBOOT": 
+                    sessionStorage.removeItem('deck_booted'); action = () => window.location.reload(); break;
+                case "HELP": 
+                    msg = "COMMANDS: HOME, LS, WHOAMI, RECRUIT, MUSIC ON/OFF, REBOOT"; break;
+                default: 
+                    msg = `COMMAND '${cmd}' NOT RECOGNIZED.`;
             }
             if (msg) { helper.innerHTML = `>> ${msg}`; helper.style.height = "auto"; }
             if (action) action();
         }
 
-        // Hover Sounds
         document.querySelectorAll('button').forEach(btn => btn.addEventListener('mouseenter', () => playSFX('sfx-hover')));
 
-        // Add Fade Animation
         const style = document.createElement('style');
         style.innerHTML = `@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }`;
         document.head.appendChild(style);
