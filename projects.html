@@ -102,6 +102,52 @@
 </head>
 <body class="bg-cyber-black min-h-screen pb-20">
 
+    <!-- iOS Motion Permission Overlay -->
+<div id="motion-overlay" class="fixed inset-0 z-50 bg-cyber-black/90 flex flex-col items-center justify-center transition-opacity duration-500">
+    <div class="text-cyber-green font-mono text-center space-y-4 p-6 border border-cyber-green/30 bg-black/50 backdrop-blur-md max-w-sm mx-4">
+        <h2 class="text-xl font-bold glitch-text">INITIALIZE SENSORS</h2>
+        <p class="text-gray-400 text-sm">Motion control requires access to your device's gyroscope.</p>
+        
+        <button onclick="enableMotion()" class="px-6 py-3 border border-cyber-green text-cyber-green hover:bg-cyber-green hover:text-black transition-all font-bold tracking-widest uppercase">
+            [ ENABLE ACCESS ]
+        </button>
+        
+        <button onclick="skipMotion()" class="text-xs text-gray-600 hover:text-gray-400 underline mt-4">
+            Skip (No Motion)
+        </button>
+    </div>
+</div>
+
+<script>
+    // Functions to handle the UI interaction
+    function enableMotion() {
+        // Call the function from background.js
+        if (typeof requestMotionPermission === 'function') {
+            requestMotionPermission();
+        } else {
+            // Fallback if background.js isn't ready
+            hidePermissionButton();
+        }
+    }
+
+    function skipMotion() {
+        hidePermissionButton();
+    }
+
+    function hidePermissionButton() {
+        const overlay = document.getElementById('motion-overlay');
+        overlay.style.opacity = '0';
+        setTimeout(() => {
+            overlay.style.display = 'none';
+        }, 500);
+    }
+
+    // Auto-hide on desktop (since they don't have gyroscopes usually)
+    if (!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        document.getElementById('motion-overlay').style.display = 'none';
+    }
+</script>
+
     <!-- Three.js Background Container -->
     <div id="canvas-container" class="fixed inset-0 z-[-1] pointer-events-none"></div>
 

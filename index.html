@@ -37,7 +37,7 @@
                     },
                     fontFamily: {
                         mono: ['"Share Tech Mono"', 'monospace'],
-                        russo: ['"Russo One"', 'sans-serif'], // <--- NEW FONT
+                        russo: ['"Russo One"', 'sans-serif'], 
                     },
                     backgroundImage: {
                         'grid-pattern': "linear-gradient(to right, #111 1px, transparent 1px), linear-gradient(to bottom, #111 1px, transparent 1px)",
@@ -56,28 +56,25 @@
             font-family: "Share Tech Mono", monospace;
         }
 
-        
-
         /* Glitch Effect on Hover */
-.glitch-hover:hover {
-    animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
-    color: #ff00ff; /* Changes text color to pink while glitching */
-}
+        .glitch-hover:hover {
+            animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+            color: #ff00ff; 
+        }
 
-@keyframes glitch-anim {
-    0% { transform: translate(0) }
-    20% { transform: translate(-2px, 2px) }
-    40% { transform: translate(-2px, -2px) }
-    60% { transform: translate(2px, 2px) }
-    80% { transform: translate(2px, -2px) }
-    100% { transform: translate(0) }
-}
+        @keyframes glitch-anim {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
 
         @keyframes scrollScanlines {
             0% { background-position: 0 0; }
             100% { background-position: 0 100%; }
         }
-
 
         /* Utility Glows */
         .neon-text-blue { text-shadow: 0 0 5px #00f0ff; }
@@ -103,99 +100,108 @@
         }
 
         /* --- ADVANCED RGB GLITCH EFFECT --- */
-.glitch-wrapper {
-    position: relative;
-    color: white; /* Main Text Color */
-    z-index: 1;
-}
+        .glitch-wrapper {
+            position: relative;
+            color: white; /* Main Text Color */
+            z-index: 1;
+        }
 
-/* Create the Red/Pink Layer */
-.glitch-wrapper::before {
-    content: attr(data-text);
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.8;
-    z-index: -1;
-    
-    /* Glitch Color 1 (Pink/Red) */
-    color: #ff00ff; 
-    background: #050505; /* Matches background to hide main text behind the slice */
-    
-    /* Animation */
-    animation: glitch-anim-1 2.5s infinite linear alternate-reverse;
-}
+        .glitch-wrapper::before {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+            z-index: -1;
+            color: #ff00ff; 
+            background: #050505; 
+            animation: glitch-anim-1 2.5s infinite linear alternate-reverse;
+        }
 
-/* Create the Blue/Cyan Layer */
-.glitch-wrapper::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.8;
-    z-index: -2;
-    
-    /* Glitch Color 2 (Cyan/Blue) */
-    color: #00f0ff;
-    background: #050505;
-    
-    /* Animation */
-    animation: glitch-anim-2 3s infinite linear alternate-reverse;
-}
+        .glitch-wrapper::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+            z-index: -2;
+            color: #00f0ff;
+            background: #050505;
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
 
-/* Animation Details: Slicing the text */
-@keyframes glitch-anim-1 {
-    0% { clip-path: inset(20% 0 80% 0); transform: translate(-2px, 1px); }
-    20% { clip-path: inset(60% 0 10% 0); transform: translate(2px, -1px); }
-    40% { clip-path: inset(40% 0 50% 0); transform: translate(-2px, 2px); }
-    60% { clip-path: inset(80% 0 5% 0); transform: translate(2px, -2px); }
-    80% { clip-path: inset(10% 0 70% 0); transform: translate(-1px, 1px); }
-    100% { clip-path: inset(30% 0 50% 0); transform: translate(1px, -1px); }
-}
+        @keyframes glitch-anim-1 {
+            0% { clip-path: inset(20% 0 80% 0); transform: translate(-2px, 1px); }
+            20% { clip-path: inset(60% 0 10% 0); transform: translate(2px, -1px); }
+            40% { clip-path: inset(40% 0 50% 0); transform: translate(-2px, 2px); }
+            60% { clip-path: inset(80% 0 5% 0); transform: translate(2px, -2px); }
+            80% { clip-path: inset(10% 0 70% 0); transform: translate(-1px, 1px); }
+            100% { clip-path: inset(30% 0 50% 0); transform: translate(1px, -1px); }
+        }
 
-@keyframes glitch-anim-2 {
-    0% { clip-path: inset(10% 0 60% 0); transform: translate(2px, -1px); }
-    20% { clip-path: inset(80% 0 5% 0); transform: translate(-2px, 2px); }
-    40% { clip-path: inset(30% 0 20% 0); transform: translate(2px, 1px); }
-    60% { clip-path: inset(10% 0 80% 0); transform: translate(-1px, -2px); }
-    80% { clip-path: inset(50% 0 30% 0); transform: translate(1px, 2px); }
-    100% { clip-path: inset(70% 0 10% 0); transform: translate(-2px, -1px); }
-}
+        @keyframes glitch-anim-2 {
+            0% { clip-path: inset(10% 0 60% 0); transform: translate(2px, -1px); }
+            20% { clip-path: inset(80% 0 5% 0); transform: translate(-2px, 2px); }
+            40% { clip-path: inset(30% 0 20% 0); transform: translate(2px, 1px); }
+            60% { clip-path: inset(10% 0 80% 0); transform: translate(-1px, -2px); }
+            80% { clip-path: inset(50% 0 30% 0); transform: translate(1px, 2px); }
+            100% { clip-path: inset(70% 0 10% 0); transform: translate(-2px, -1px); }
+        }
     </style>
 </head>
 <body class="bg-cyber-black min-h-screen relative pb-24">
 
-    <!-- CLICK TO START OVERLAY -->
-<div id="start-overlay" class="fixed inset-0 bg-cyber-black z-[200] flex items-center justify-center cursor-pointer">
-    <div class="text-center">
-        <div class="text-cyber-green text-2xl md:text-4xl font-mono tracking-widest animate-pulse border-b-2 border-cyber-green pb-2">
-            >> INITIALIZE SYSTEM <<
+    <!-- Three.js Background Container -->
+    <div id="canvas-container" class="fixed inset-0 z-[-1] pointer-events-none"></div>
+
+    <!-- 1. STANDARD START OVERLAY (Desktop) -->
+    <div id="start-overlay" class="fixed inset-0 bg-cyber-black z-[200] flex items-center justify-center cursor-pointer">
+        <div class="text-center">
+            <div class="text-cyber-green text-2xl md:text-4xl font-mono tracking-widest animate-pulse border-b-2 border-cyber-green pb-2">
+                >> INITIALIZE SYSTEM <<
+            </div>
+            <p class="text-cyber-blue mt-4 text-xs md:text-sm font-mono opacity-70">
+                [ CLICK ANYWHERE TO BOOT ]
+            </p>
         </div>
-        <p class="text-cyber-blue mt-4 text-xs md:text-sm font-mono opacity-70">
-            [ CLICK ANYWHERE TO BOOT ]
-        </p>
     </div>
-</div>
 
-    
+    <!-- 2. MOTION PERMISSION OVERLAY (Mobile/iOS) - NEW FEATURE RE-ADDED -->
+    <!-- This replaces the start-overlay on mobile devices -->
+    <div id="motion-overlay" class="hidden-force fixed inset-0 z-[210] bg-cyber-black/95 flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="text-cyber-green font-mono text-center space-y-6 p-8 border border-cyber-green/30 bg-black/50 backdrop-blur-md max-w-sm mx-4 relative">
+            <div class="absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 border-cyber-green"></div>
+            <div class="absolute bottom-0 right-0 w-3 h-3 border-r-2 border-b-2 border-cyber-green"></div>
 
-<!-- NEW: Three.js Background Container -->
-<div id="canvas-container" class="fixed inset-0 z-[-1] pointer-events-none"></div>
+            <h2 class="text-xl font-bold font-russo text-white tracking-wider">MOTION DETECTED</h2>
+            <p class="text-gray-400 text-xs font-mono leading-relaxed">
+                Enable gyroscope for immersive background control.
+            </p>
+            
+            <div class="flex flex-col gap-3 w-full">
+                <button onclick="enableMotion()" class="px-6 py-4 border border-cyber-green bg-cyber-green/10 text-cyber-green hover:bg-cyber-green hover:text-black transition-all font-bold tracking-widest uppercase text-xs">
+                    [ ENABLE SENSORS & BOOT ]
+                </button>
+                <button onclick="skipMotion()" class="text-[10px] text-gray-500 hover:text-white mt-2 uppercase tracking-wide">
+                    >> Bypass (No Motion)
+                </button>
+            </div>
+        </div>
+    </div>
 
-    <!-- 1. BOOT SEQUENCE OVERLAY -->
-    <div id="boot-screen" class="fixed inset-0 bg-cyber-black z-[100] flex flex-col justify-end p-8 text-cyber-green text-lg md:text-xl">
+    <!-- 3. BOOT SEQUENCE OVERLAY -->
+    <div id="boot-screen" class="fixed inset-0 bg-cyber-black z-[100] flex flex-col justify-end p-8 text-cyber-green text-lg md:text-xl hidden-force">
         <div class="max-w-2xl w-full mx-auto" id="log-container">
-            <!-- Logs will be injected here by JS -->
+            <!-- Logs injected here -->
         </div>
     </div>
 
-    <!-- 2. MAIN DASHBOARD (Initially Hidden) -->
-    <!-- Changed p-6 to px-6 pb-6 pt-24 (More space at the top for mobile) -->
-<main id="main-interface" class="hidden-force px-6 pb-6 pt-24 md:p-12 max-w-[1600px] mx-auto w-full z-10 relative">
+    <!-- 4. MAIN DASHBOARD (Initially Hidden) -->
+    <main id="main-interface" class="hidden-force px-6 pb-6 pt-24 md:p-12 max-w-[1600px] mx-auto w-full z-10 relative">
         
         <!-- Header -->
         <header class="mb-12 border-b border-cyber-green/30 pb-6 flex justify-between items-end fade-in">
@@ -203,26 +209,20 @@
                 <h2 class="text-cyber-green text-sm mb-2 tracking-widest">
                     SYSTEM: <span class="blink-hard">ONLINE</span>
                 </h2>
-                <!-- Added 'glitch-permanent' class -->
-                <!-- Removed 'font-bold', Added 'font-rubik' -->
-                <!-- Added 'data-text' attribute -->
                 <h1 class="text-3xl md:text-6xl font-russo text-white cursor-default glitch-wrapper" data-text="THE DEVELOPER'S DECK">
                     THE DEVELOPER'S DECK
                 </h1>
                 <p class="mt-2 text-cyber-pink max-w-lg">FILIPE // DEV OPERATIVE</p>
             </div>
             <div class="flex flex-col items-end gap-2">
-    <!-- Music Toggle Button -->
-    <button id="music-btn" class="border border-cyber-green text-cyber-green px-3 py-1 text-xs hover:bg-cyber-green hover:text-black transition-colors uppercase font-mono">
-        MUSIC: OFF
-    </button>
-
-    <!-- Version Info (Hidden on mobile to save space) -->
-    <div class="hidden md:block text-right">
-        <div class="text-cyber-pink text-xs">BUILD v.1.0</div>
-        <div class="text-cyber-blue text-xs">SECURE CONNECTION</div>
-    </div>
-</div>
+                <button id="music-btn" class="border border-cyber-green text-cyber-green px-3 py-1 text-xs hover:bg-cyber-green hover:text-black transition-colors uppercase font-mono">
+                    MUSIC: OFF
+                </button>
+                <div class="hidden md:block text-right">
+                    <div class="text-cyber-pink text-xs">BUILD v.1.0</div>
+                    <div class="text-cyber-blue text-xs">SECURE CONNECTION</div>
+                </div>
+            </div>
         </header>
 
         <!-- Dashboard Grid -->
@@ -262,8 +262,7 @@
 
                 <div class="bg-transparent border border-cyber-pink/30 p-6 relative overflow-hidden group hover:border-cyber-pink transition-colors duration-300">
                     <h3 class="text-xl text-cyber-pink mb-2">DEV_LOG_ENTRY_404</h3>
-                    <p class="text-gray-300">This Website was built on a lightweight, framework-free stack using HTML5, Vanilla JavaScript, and Tailwind CSS for a custom cyberpunk aesthetic.
-                                Powered by Three.js and Google Fonts, delivering a high-performance "zero-build" static website.</p>
+                    <p class="text-gray-300">This Website was built on a lightweight, framework-free stack using HTML5, Vanilla JavaScript, and Tailwind CSS for a custom cyberpunk aesthetic.</p>
                 </div>
             </section>
 
@@ -298,39 +297,38 @@
         </div>
     </main>
 
-    <!-- 3. TERMINAL COMPONENT -->
+    <!-- 5. TERMINAL COMPONENT -->
     <div class="fixed bottom-0 left-0 w-full bg-cyber-black/95 border-t border-cyber-green/30 p-4 backdrop-blur-sm z-40">
         <div class="max-w-7xl mx-auto w-full">
-            <!-- Helper Text Area -->
             <div id="terminal-helper" class="text-cyber-blue mb-2 overflow-hidden h-0 transition-all duration-300"></div>
-            
-            <!-- Input Line -->
-        <div class="flex items-center text-sm md:text-xl text-cyber-green">
-            <!-- Responsive Prompt: Shows 'admin@deck:~$' on PC, but just '~$' on Mobile -->
-            <span class="mr-2 md:mr-3 font-bold">
-                <span class="hidden md:inline">admin@deck:</span>~$
-            </span>
-            
-            <input 
-                id="terminal-input"
-                type="text" 
-                class="flex-1 bg-transparent border-none outline-none text-cyber-green placeholder-cyber-green/30 uppercase font-mono min-w-0"
-                placeholder="ENTER COMMAND..."
-                autocomplete="off"
-            >
-        </div>
+            <div class="flex items-center text-sm md:text-xl text-cyber-green">
+                <span class="mr-2 md:mr-3 font-bold">
+                    <span class="hidden md:inline">admin@deck:</span>~$
+                </span>
+                <input 
+                    id="terminal-input"
+                    type="text" 
+                    class="flex-1 bg-transparent border-none outline-none text-cyber-green placeholder-cyber-green/30 uppercase font-mono min-w-0"
+                    placeholder="ENTER COMMAND..."
+                    autocomplete="off"
+                >
+            </div>
         </div>
     </div>
 
-    <!-- Hidden Audio Player -->
-        <audio id="bg-music" loop>
-            <source src="factions.mp3" type="audio/mpeg">
-        </audio>
+    <!-- Hidden Audio -->
+    <audio id="bg-music" loop>
+        <source src="factions.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sfx-type" src="sfx-type1.mp3"></audio>
+    <audio id="sfx-enter" src="sfx-enter.mp3"></audio>
+    <audio id="sfx-hover" src="sfx-hover.mp3"></audio>
+    <audio id="sfx-boot" src="sfx-boot.mp3"></audio>
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
     // ==========================================
-    // 1. CONFIGURATION & VARIABLES
+    // 1. CONFIGURATION
     // ==========================================
     const logs = [
         "WAKE UP USER",
@@ -342,144 +340,138 @@
         "WELCOME"
     ];
     
-    // DOM Elements
+    // Elements
     const logContainer = document.getElementById('log-container');
     const bootScreen = document.getElementById('boot-screen');
     const mainInterface = document.getElementById('main-interface');
     const startOverlay = document.getElementById('start-overlay');
+    const motionOverlay = document.getElementById('motion-overlay'); // NEW
     const input = document.getElementById('terminal-input');
     const helper = document.getElementById('terminal-helper');
-    
-    // Audio Elements
     const music = document.getElementById('bg-music');
     const musicBtn = document.getElementById('music-btn');
 
-    // State
     let logIndex = 0;
 
     // ==========================================
-    // ==========================================
-    // 2. AUDIO SYSTEM (SFX) - UPDATED
+    // 2. AUDIO & MOTION HANDLERS (NEW)
     // ==========================================
     function playSFX(id) {
-        // Check if user is on mobile (Screen smaller than 768px)
-        const isMobile = window.innerWidth < 768;
-
-        // BLOCK SPECIFIC SOUNDS ON MOBILE
-        if (isMobile) {
-            if (id === 'sfx-hover') return; // Stop Hover Bleeps
-            if (id === 'sfx-type') return;  // Stop Typing Clicks
-        }
-
+        if (window.innerWidth < 768 && (id === 'sfx-hover' || id === 'sfx-type')) return;
         const audio = document.getElementById(id);
         if (audio) {
             audio.volume = 0.3; 
             audio.currentTime = 0; 
-            // Try to play
-            audio.play().catch(e => console.log("Audio waiting for interaction..."));
+            audio.play().catch(e => {});
+        }
+    }
+
+    // TRIGGER BOOT FROM MOBILE OVERLAY
+    function enableMotion() {
+        // 1. Request Permission (iOS 13+)
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            DeviceOrientationEvent.requestPermission()
+                .then(state => {
+                    if (state === 'granted') {
+                        // Background.js will pick up the event automatically if set up correctly
+                        // or we trigger the listener here
+                    }
+                })
+                .catch(console.error)
+                .finally(() => {
+                    initiateBoot(); // Start boot regardless of permission outcome
+                });
+        } else {
+            initiateBoot(); // Android/Others
+        }
+    }
+
+    function skipMotion() {
+        initiateBoot();
+    }
+
+    // Common function to start the visual sequence
+    function initiateBoot() {
+        sessionStorage.setItem('deck_booted', 'true');
+        
+        // Hide Overlays
+        if(motionOverlay) motionOverlay.style.display = 'none';
+        if(startOverlay) startOverlay.style.display = 'none';
+
+        // Play Sound & Start
+        playSFX('sfx-boot');
+        
+        bootScreen.classList.remove('hidden-force');
+        bootScreen.style.display = 'flex';
+        
+        logIndex = 0; 
+        logContainer.innerHTML = ''; 
+        runBootSequence();
+    }
+
+    // ==========================================
+    // 3. STARTUP LOGIC (DETECT MOBILE)
+    // ==========================================
+    const isBooted = sessionStorage.getItem('deck_booted');
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    if (isBooted === 'true') {
+        // Returning User
+        if(startOverlay) startOverlay.style.display = 'none';
+        if(motionOverlay) motionOverlay.style.display = 'none';
+        bootScreen.remove();
+        mainInterface.classList.remove('hidden-force');
+    } else {
+        // First Time User
+        if (isMobile) {
+            // SHOW MOTION OVERLAY, HIDE DEFAULT OVERLAY
+            if(startOverlay) startOverlay.style.display = 'none';
+            if(motionOverlay) motionOverlay.classList.remove('hidden-force');
+        } else {
+            // DESKTOP: STANDARD CLICK
+            startOverlay.addEventListener('click', () => {
+                initiateBoot();
+            });
         }
     }
 
     // ==========================================
-    // 3. BOOT SEQUENCE LOGIC
+    // 4. BOOT SEQUENCE
     // ==========================================
     function runBootSequence() {
         if (logIndex < logs.length) {
-            // Create a new log line
             const div = document.createElement('div');
             div.className = "mb-2 border-l-2 border-cyber-green pl-2 animate-pulse";
             div.innerHTML = `<span class="opacity-50 mr-2">[${new Date().toLocaleTimeString()}]</span> ${logs[logIndex]}`;
-            
-            // Add to screen
             logContainer.appendChild(div);
-            
-            // Play typing sound for every line (optional, maybe too noisy?)
-            // playSFX('sfx-type'); 
-
             logIndex++;
-            setTimeout(runBootSequence, 500); // Next line in 500ms
+            setTimeout(runBootSequence, 500);
         } else {
-            // Sequence Complete
-            sessionStorage.setItem('deck_booted', 'true'); // <--- ADD THIS LINE
-            
             setTimeout(() => {
-                // Fade out boot screen
                 bootScreen.style.transition = "opacity 0.8s ease";
                 bootScreen.style.opacity = "0";
-                
                 setTimeout(() => {
-                    bootScreen.remove(); // Remove from DOM
-                    mainInterface.classList.remove('hidden-force'); // Show Dashboard
-                    mainInterface.classList.add('fade-in'); // Trigger fade animation
+                    bootScreen.remove();
+                    mainInterface.classList.remove('hidden-force');
+                    mainInterface.classList.add('fade-in');
                 }, 800);
             }, 800);
         }
     }
 
     // ==========================================
-    // 4. START SCREEN INTERACTION (SCROLL FIX)
+    // 5. TERMINAL LOGIC
     // ==========================================
-    
-    // Check if we have been here before
-    const isBooted = sessionStorage.getItem('deck_booted');
-
-    if (isBooted === 'true') {
-        // --- RETURNING VISITOR ---
-        
-        // 1. Force Scroll to Top (Fixes the "Cut Off" issue)
-        window.scrollTo(0, 0);
-
-        if (startOverlay) startOverlay.style.display = 'none';
-        
-        if (bootScreen) {
-            bootScreen.style.display = 'flex';
-            bootScreen.style.opacity = '1';
-        }
-
-        logIndex = 0; 
-        logContainer.innerHTML = ''; 
-        runBootSequence();
-
-    } else {
-        // --- FIRST TIME VISITOR ---
-        if (startOverlay) {
-            startOverlay.addEventListener('click', () => {
-                sessionStorage.setItem('deck_booted', 'true');
-
-                // 1. Force Scroll to Top
-                window.scrollTo(0, 0);
-
-                startOverlay.style.transition = "opacity 0.5s ease";
-                startOverlay.style.opacity = '0';
-                setTimeout(() => startOverlay.remove(), 500);
-
-                playSFX('sfx-boot');
-
-                logIndex = 0; 
-                logContainer.innerHTML = ''; 
-                runBootSequence();
-            });
-        }
-    }
-
-    // ==========================================
-    // 5. TERMINAL & COMMAND LOGIC
-    // ==========================================
-    
-    // Focus Logic: Keep input focused unless clicking a button/link
     document.addEventListener('click', (e) => {
-        if (e.target.closest('button') || e.target.closest('a') || window.getSelection().toString().length > 0) {
-            return;
+        if (!e.target.closest('button') && !e.target.closest('a') && window.getSelection().toString().length === 0) {
+            input.focus();
         }
-        input.focus();
     });
 
-    // Keydown Logic
     input.addEventListener('keydown', function(e) {
-        playSFX('sfx-type'); // Typing sound
-
+        playSFX('sfx-type');
         if (e.key === 'Enter') {
-            playSFX('sfx-enter'); // Enter sound
+            playSFX('sfx-enter');
             const command = input.value.trim().toUpperCase();
             processCommand(command);
             input.value = ''; 
@@ -506,102 +498,56 @@
                 msg = "OPENING COMM CHANNELS...";
                 action = () => setTimeout(() => window.location.href = "contact.html", 1000);
                 break;
-            
-            // Music Commands
             case "MUSIC ON":
                 msg = "AUDIO STREAM ESTABLISHED.";
-                action = () => {
-                    music.play();
-                    updateMusicBtn(true);
-                };
+                action = () => { music.play(); updateMusicBtn(true); };
                 break;
             case "MUSIC OFF":
                 msg = "AUDIO STREAM DISCONNECTED.";
-                action = () => {
-                    music.pause();
-                    updateMusicBtn(false);
-                };
+                action = () => { music.pause(); updateMusicBtn(false); };
                 break;
-
-            // System Commands
             case "RESTART":
             case "REBOOT":
                 msg = "INITIATING SYSTEM REBOOT...";
-                // Clear the memory so the animation plays again
-                sessionStorage.removeItem('deck_booted'); // <--- ADD THIS LINE
+                sessionStorage.removeItem('deck_booted');
                 action = () => setTimeout(() => window.location.reload(), 1000);
                 break;
-
             case "HELP":
                 msg = "COMMANDS: WHOAMI, LS, RECRUIT, MUSIC ON/OFF, REBOOT";
                 break;
             case "CLEAR":
-                msg = "";
-                helper.style.height = "0";
-                helper.innerHTML = "";
-                return;
+                msg = ""; helper.style.height = "0"; helper.innerHTML = ""; return;
             default:
                 msg = `COMMAND '${cmd}' NOT RECOGNIZED. TRY 'HELP'.`;
         }
-
-        if (msg) {
-            helper.innerHTML = `>> ${msg}`;
-            helper.style.height = "auto";
-        }
+        if (msg) { helper.innerHTML = `>> ${msg}`; helper.style.height = "auto"; }
         if (action) action();
     }
 
-    // Dashboard Navigation Helper (Simulates Terminal)
-    function handleNav(destination) {
-        processCommand(destination); 
-    }
+    function handleNav(dest) { processCommand(dest); }
 
-    // ==========================================
-    // 6. MUSIC BUTTON LOGIC
-    // ==========================================
     function updateMusicBtn(isPlaying) {
         if (isPlaying) {
             musicBtn.innerHTML = "[ MUSIC: <span class='animate-pulse'>ON</span> ]";
-            musicBtn.classList.remove('border-cyber-green', 'text-cyber-green', 'hover:bg-cyber-green');
-            musicBtn.classList.add('border-cyber-pink', 'text-cyber-pink', 'hover:bg-cyber-pink');
+            musicBtn.classList.replace('text-cyber-green', 'text-cyber-pink');
+            musicBtn.classList.replace('border-cyber-green', 'border-cyber-pink');
         } else {
             musicBtn.innerHTML = "[ MUSIC: OFF ]";
-            musicBtn.classList.remove('border-cyber-pink', 'text-cyber-pink', 'hover:bg-cyber-pink');
-            musicBtn.classList.add('border-cyber-green', 'text-cyber-green', 'hover:bg-cyber-green');
+            musicBtn.classList.replace('text-cyber-pink', 'text-cyber-green');
+            musicBtn.classList.replace('border-cyber-pink', 'border-cyber-green');
         }
     }
 
-    if (musicBtn) {
-        musicBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent terminal focus
-            playSFX('sfx-click'); // Optional click sound
-            
-            if (music.paused) {
-                music.play();
-                updateMusicBtn(true);
-            } else {
-                music.pause();
-                updateMusicBtn(false);
-            }
-        });
-    }
-
-    // ==========================================
-    // 7. HOVER SOUNDS
-    // ==========================================
-    document.querySelectorAll('a, button').forEach(btn => {
-        btn.addEventListener('mouseenter', () => {
-            playSFX('sfx-hover');
-        });
+    musicBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        playSFX('sfx-click');
+        if (music.paused) { music.play(); updateMusicBtn(true); } 
+        else { music.pause(); updateMusicBtn(false); }
     });
 
-</script>
-
-    <!-- SOUND EFFECTS -->
-<!-- Note: volume="0.2" isn't valid HTML, we set volume in JS -->
-<audio id="sfx-type" src="sfx-type1.mp3"></audio>
-<audio id="sfx-enter" src="sfx-enter.mp3"></audio>
-<audio id="sfx-hover" src="sfx-hover.mp3"></audio>
-<audio id="sfx-boot" src="sfx-boot.mp3"></audio>
+    document.querySelectorAll('a, button').forEach(btn => {
+        btn.addEventListener('mouseenter', () => playSFX('sfx-hover'));
+    });
+    </script>
 </body>
 </html>
