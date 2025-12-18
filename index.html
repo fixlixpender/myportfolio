@@ -389,7 +389,7 @@
             }
         }
 
-        // --- 5. NAVIGATION ---
+        // --- 5. NAVIGATION SYSTEM ---
         function navigateTo(sectionId) {
             playSFX('sfx-enter');
             document.querySelectorAll('.section-container').forEach(sec => {
@@ -401,6 +401,12 @@
                 target.classList.remove('hidden-section');
                 target.classList.add('active-section');
                 window.scrollTo(0, 0);
+                
+                // *** ADD THIS: If going home, fix the gyro size ***
+                if (sectionId === 'home-section' && window.resizeGyro) {
+                    // Wait 50ms for the animation/display change to finish, then resize
+                    setTimeout(window.resizeGyro, 50); 
+                }
             }
         }
 
@@ -493,7 +499,7 @@
         document.head.appendChild(style);
 
         // ==========================================
-    // MINI-MAP GYRO SYSTEM (Interactive Terrain)
+    // MINI-MAP GYRO SYSTEM (FIXED)
     // ==========================================
     function initGyroSystem() {
         const container = document.getElementById('mini-map-container');
@@ -501,11 +507,10 @@
 
         // 1. Setup Scene
         const scene = new THREE.Scene();
-        // Cyberpunk grid fog
         scene.fog = new THREE.FogExp2(0x000000, 0.15); 
 
         const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 100);
-        camera.position.set(0, 3, 5); // Look down slightly
+        camera.position.set(0, 3, 5); 
         camera.lookAt(0, 0, 0);
 
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -513,91 +518,78 @@
         renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(renderer.domElement);
 
-        // 2. Create Moving Grid (The Terrain)
+        // 2. Create Terrain
         const geometry = new THREE.PlaneGeometry(40, 40, 40, 40);
-        
-        // Create a "mountainous" effect by randomizing vertices slightly
         const count = geometry.attributes.position.count;
-        const randoms = new Float32Array(count);
         for(let i = 0; i < count; i++) {
-            randoms[i] = Math.random();
-            // Pull edges down to create a "valley" look
             const x = geometry.attributes.position.getX(i);
             if (Math.abs(x) > 10) {
                  geometry.attributes.position.setZ(i, Math.random() * 2); 
             }
         }
-
-        const material = new THREE.MeshBasicMaterial({ 
-            color: 0xff00ff, // Cyber Pink
-            wireframe: true,
-            transparent: true,
-            opacity: 0.3
-        });
-
+        const material = new THREE.MeshBasicMaterial({ color: 0xff00ff, wireframe: true, transparent: true, opacity: 0.3 });
         const terrain = new THREE.Mesh(geometry, material);
-        terrain.rotation.x = -Math.PI / 2; // Lie flat
+        terrain.rotation.x = -Math.PI / 2; 
         scene.add(terrain);
 
-        // 3. Animation Loop variables
+        // 3. Variables
         let mouseX = 0;
         let mouseY = 0;
         let targetRotX = -Math.PI / 2;
         let targetRotZ = 0;
-
-        // UI Elements for "Pitch/Yaw" display
         const uiX = document.getElementById('gyro-x');
         const uiY = document.getElementById('gyro-y');
 
-        // Mouse Listener specific to this container (or global)
+        // 4. FIX: Mouse Listener with Safety Check
         document.addEventListener('mousemove', (e) => {
+            if (!container) return;
             const rect = container.getBoundingClientRect();
-            // Calculate mouse position relative to the center of the screen/container
-            // Range: -1 to 1
+            
+            // *** CRITICAL FIX: STOP IF HIDDEN (WIDTH IS 0) ***
+            if (rect.width === 0 || rect.height === 0) return;
+
             const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
             const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-
             mouseX = x;
             mouseY = y;
         });
 
+        // 5. Animation Loop
         const animate = () => {
             requestAnimationFrame(animate);
 
-            // A. Move Terrain Forward (Infinite Scroll illusion)
-            // We shift the texture or just move vertices, but a simple way is moving the object
-            // and resetting it. For wireframe, scrolling texture offset is hard.
-            // Let's just pulsate the terrain vertices for "engine rumble"
-            const time = Date.now() * 0.005;
-            
-            // B. Interaction: Tilt the terrain based on mouse
-            // Smoothly interpolate current rotation to target rotation
-            const tiltSensitivity = 0.3; 
-            targetRotX = (-Math.PI / 2) - (mouseY * tiltSensitivity); // Pitch
-            targetRotZ = -(mouseX * tiltSensitivity); // Roll/Bank
+            // Only animate if visible to save resources
+            if (container.offsetParent === null) return;
 
+            const tiltSensitivity = 0.3; 
+            targetRotX = (-Math.PI / 2) - (mouseY * tiltSensitivity); 
+            targetRotZ = -(mouseX * tiltSensitivity); 
+
+            // Smooth interpolation
             terrain.rotation.x += 0.05 * (targetRotX - terrain.rotation.x);
             terrain.rotation.z += 0.05 * (targetRotZ - terrain.rotation.z);
 
-            // Update UI Numbers
-            if (uiX) uiX.innerText = (terrain.rotation.x + 1.57).toFixed(2);
-            if (uiY) uiY.innerText = terrain.rotation.z.toFixed(2);
+            // Check against NaN before updating text
+            if (uiX && !isNaN(terrain.rotation.x)) uiX.innerText = (terrain.rotation.x + 1.57).toFixed(2);
+            if (uiY && !isNaN(terrain.rotation.z)) uiY.innerText = terrain.rotation.z.toFixed(2);
 
             renderer.render(scene, camera);
         };
-
         animate();
 
-        // Handle Resize
-        window.addEventListener('resize', () => {
+        // 6. FIX: Expose Resize Function Globally
+        window.resizeGyro = () => {
             if(!container) return;
-            camera.aspect = container.clientWidth / container.clientHeight;
+            const width = container.clientWidth || 100; // Fallback
+            const height = container.clientHeight || 100; // Fallback
+            camera.aspect = width / height;
             camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
-        });
+            renderer.setSize(width, height);
+        };
+
+        window.addEventListener('resize', window.resizeGyro);
     }
 
-    // Start the system when page loads
     window.addEventListener('load', initGyroSystem);
     </script>
 </body>
