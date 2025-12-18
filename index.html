@@ -103,7 +103,7 @@
     <div id="canvas-container" class="fixed inset-0 z-[-1] pointer-events-none"></div>
 
     <!-- AUDIO SYSTEM -->
-    <audio id="bg-music" loop><source src="cyberpunk-bg.mp3" type="audio/mpeg"></audio>
+    <audio id="bg-music" loop><source src="factions.mp3" type="audio/mpeg"></audio>
     <audio id="sfx-type" src="sfx-type.mp3"></audio>
     <audio id="sfx-enter" src="sfx-enter.mp3"></audio>
     <audio id="sfx-hover" src="sfx-hover.mp3"></audio>
@@ -130,7 +130,8 @@
     <section id="home-section" class="hidden-section section-container px-6 pb-6 pt-24 md:p-12 max-w-[1600px] mx-auto z-10 relative">
         
         <!-- HEADER -->
-        <header class="mb-12 border-b border-cyber-green/30 pb-6 flex justify-between items-end">
+        <!-- Added 'relative z-[60]' to force it above the scanlines -->
+        <header class="mb-12 border-b border-cyber-green/30 pb-6 flex justify-between items-end relative z-[60]">
             <div>
                 <h2 class="text-cyber-green text-sm mb-2 tracking-widest">SYSTEM: <span class="animate-pulse">ONLINE</span></h2>
                 <h1 class="text-3xl md:text-6xl font-russo text-white cursor-default glitch-wrapper" data-text="THE DEVELOPER'S DECK">THE DEVELOPER'S DECK</h1>
@@ -281,8 +282,15 @@
         const input = document.getElementById('terminal-input');
         const helper = document.getElementById('terminal-helper');
 
-        // Set volume to 50% by default
-        if(music) music.volume = 0.5;
+        // --- AUDIO DEBUGGER ---
+        // This will tell you if the MP3 file is missing
+        if (music) {
+            music.volume = 1.0; // Set to MAX volume to be sure
+            music.addEventListener('error', function(e) {
+                console.error("Audio Error:", e);
+                alert("SYSTEM ERROR: 'factions.mp3' not found or format unsupported. Check file name and folder.");
+            });
+        }
 
         // --- 2. AUDIO SYSTEM ---
         function playSFX(id) {
@@ -293,13 +301,19 @@
 
         function toggleMusic(turnOn) {
             if (turnOn) {
-                // Try to play, only update button if success
-                music.play().then(() => {
-                    updateMusicBtnUI(true);
-                }).catch(e => {
-                    console.error("Music playback failed:", e);
-                    updateMusicBtnUI(false); // Revert to OFF if it failed
-                });
+                // Try to play
+                const playPromise = music.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        // Success
+                        updateMusicBtnUI(true);
+                    }).catch(error => {
+                        // Failed (Browser policy or File missing)
+                        console.error("Playback failed:", error);
+                        updateMusicBtnUI(false);
+                    });
+                }
             } else {
                 music.pause();
                 updateMusicBtnUI(false);
@@ -406,7 +420,6 @@
         if (musicBtn) {
             musicBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                // Toggle Logic
                 if (music.paused) {
                     toggleMusic(true);
                 } else {
@@ -442,7 +455,7 @@
                 case "HOME": case "CD ..": 
                     msg = "RETURNING TO ROOT..."; action = () => navigateTo('home-section'); break;
                 
-                // --- ADDED MISSING MUSIC COMMANDS ---
+                // MUSIC COMMANDS
                 case "MUSIC ON":
                     msg = "AUDIO STREAM ESTABLISHED.";
                     action = () => toggleMusic(true);
@@ -451,7 +464,6 @@
                     msg = "AUDIO STREAM DISCONNECTED.";
                     action = () => toggleMusic(false);
                     break;
-                // ------------------------------------
 
                 case "REBOOT": 
                     sessionStorage.removeItem('deck_booted'); action = () => window.location.reload(); break;
