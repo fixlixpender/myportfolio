@@ -542,7 +542,7 @@
         document.head.appendChild(style);
 
         // ==========================================
-    // MINI-MAP GYRO SYSTEM v4.0 (SEAMLESS & SMOOTH)
+    // MINI-MAP GYRO SYSTEM v6.0 (TACTICAL GLOBE)
     // ==========================================
     function initGyroSystem() {
         const container = document.getElementById('mini-map-container');
@@ -550,88 +550,81 @@
 
         // 1. Setup Scene
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x000000, 0.12); // Slightly less fog for clarity
+        // No fog needed for the globe, clear view is better
 
-        const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 100);
-        camera.position.set(0, 3, 5); 
-        camera.lookAt(0, 0, 0);
+        const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 100);
+        camera.position.z = 8; // Move back to see the whole globe
 
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         renderer.setSize(container.clientWidth, container.clientHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(renderer.domElement);
 
-        // 2. Create Dynamic Terrain (The Fix)
-        // We use a mathematical curve based on X so it's consistent along Z (Seamless looping)
-        const geometry = new THREE.PlaneGeometry(60, 60, 40, 40);
-        
-        const count = geometry.attributes.position.count;
-        for(let i = 0; i < count; i++) {
-            const x = geometry.attributes.position.getX(i);
-            
-            // MATH FIX: Height depends ONLY on X, not Random.
-            // This creates a "Valley" or "Half-Pipe" shape that loops perfectly.
-            let z = 0;
-            if (Math.abs(x) > 5) {
-                // Curve up the edges smoothly
-                z = Math.pow(Math.abs(x) - 5, 1.5) * 0.15; 
-            }
-            
-            geometry.attributes.position.setZ(i, z);
-        }
-        
+        // 2. Create the "Core" (The Planet/Globe)
+        // Icosahedron looks more "Cyber" than a smooth sphere
+        const geometry = new THREE.IcosahedronGeometry(2.2, 2); 
         const material = new THREE.MeshBasicMaterial({ 
             color: 0xff00ff, 
             wireframe: true, 
             transparent: true, 
-            opacity: 0.3 
+            opacity: 0.5 
         });
-        
-        const terrain = new THREE.Mesh(geometry, material);
-        terrain.rotation.x = -Math.PI / 2; 
-        scene.add(terrain);
+        const globe = new THREE.Mesh(geometry, material);
+        scene.add(globe);
 
-        // 3. Variables
-        let baseSpeed = 0.02;     
-        let boostSpeed = 0.4;     // REDUCED from 0.8 to 0.4 for a smoother feel
-        let currentSpeed = baseSpeed;
-        
-        let gridOffset = 0;
+        // 3. Create the "Gyro Ring" (Orbital Ring)
+        const ringGeo = new THREE.TorusGeometry(3.5, 0.05, 16, 100);
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.3 });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.rotation.x = Math.PI / 2; // Flat ring
+        scene.add(ring);
+
+        // 4. Variables
         let boostMode = false;
-        let shakeIntensity = 0;
-        let targetFov = 60;       
+        let rotationSpeedX = 0.002;
+        let rotationSpeedY = 0.005;
         
         let mouseX = 0, mouseY = 0;
         const uiX = document.getElementById('gyro-x');
         const uiY = document.getElementById('gyro-y');
         let currentBaseColor = 0xff00ff; 
 
-        // 4. API & Interaction
+        // 5. API & Interaction
         window.gyroAPI = {
             boost: () => {
-                if (boostMode) return; // Prevent double clicking
+                if (boostMode) return; 
                 boostMode = true;
-                shakeIntensity = 0.15; // Slightly less shake
-                material.color.setHex(0xFFFFFF); 
+                
+                // Visual FX
+                material.color.setHex(0xFFFFFF); // Flash White
+                material.opacity = 0.8;
                 playSFX('sfx-enter'); 
                 
+                // After 2 seconds, slow down
                 setTimeout(() => {
                     boostMode = false;
                     material.color.setHex(currentBaseColor); 
-                }, 2000); // Longer boost duration (2s)
+                    material.opacity = 0.5;
+                }, 2000); 
             },
             setColor: (hex) => {
                 currentBaseColor = hex;
                 material.color.setHex(hex);
             },
             scan: () => {
-                const oldColor = material.color.getHex();
-                material.color.setHex(0x00ff41);
-                material.opacity = 0.8;
-                setTimeout(() => {
-                    material.color.setHex(oldColor);
-                    material.opacity = 0.3;
-                }, 500);
+                // Pulse size
+                const originalScale = globe.scale.x;
+                globe.scale.setScalar(0.1); // Shrink
+                material.wireframeLinewidth = 5; // Thicken (if supported)
+                
+                // Animate growth back
+                let growInterval = setInterval(() => {
+                    globe.scale.addScalar(0.1);
+                    if(globe.scale.x >= originalScale) {
+                        globe.scale.setScalar(originalScale);
+                        clearInterval(growInterval);
+                    }
+                }, 20);
             }
         };
 
@@ -640,56 +633,47 @@
             if (!container || container.offsetParent === null) return;
             const rect = container.getBoundingClientRect();
             if (rect.width === 0) return;
+            // Normalize -1 to 1
             mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
             mouseY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
         });
 
+        // Click to Boost
         container.addEventListener('mousedown', () => window.gyroAPI.boost());
 
-        // 5. Animation Loop
+        // 6. Animation Loop
         const animate = () => {
             requestAnimationFrame(animate);
             if (container.offsetParent === null) return;
 
-            // Speed & FOV
+            // --- ROTATION LOGIC ---
             if (boostMode) {
-                currentSpeed = THREE.MathUtils.lerp(currentSpeed, boostSpeed, 0.02); // Slower acceleration (0.05 -> 0.02)
-                targetFov = 85; 
+                // Hyper Spin!
+                globe.rotation.y += 0.2; 
+                globe.rotation.x += 0.05;
+                ring.rotation.z -= 0.1;
+                ring.scale.setScalar(1 + Math.random() * 0.1); // Jitter effect
             } else {
-                currentSpeed = THREE.MathUtils.lerp(currentSpeed, baseSpeed, 0.05); // Faster deceleration
-                targetFov = 60; 
+                // Normal Controlled Spin
+                // The mouse controls the DIRECTION of the spin
+                globe.rotation.y += rotationSpeedY + (mouseX * 0.05);
+                globe.rotation.x += rotationSpeedX - (mouseY * 0.05);
+                
+                // The ring slowly tumbles
+                ring.rotation.x += 0.005;
+                ring.rotation.y += 0.005;
+                ring.scale.setScalar(1); // Reset Jitter
             }
 
-            camera.fov = THREE.MathUtils.lerp(camera.fov, targetFov, 0.05);
-            camera.updateProjectionMatrix();
-
-            // Movement (Seamless Loop)
-            gridOffset += currentSpeed;
-            terrain.position.z = gridOffset % 1.5; // Modulo matches segment height
-
-            // Tilt & Bank
-            const targetRotX = (-Math.PI / 2) - (mouseY * 0.2); // Reduced tilt range
-            const targetRotZ = -(mouseX * 0.2); 
-
-            terrain.rotation.x += 0.05 * (targetRotX - terrain.rotation.x);
-            terrain.rotation.z += 0.05 * (targetRotZ - terrain.rotation.z);
-
-            // Camera Shake
-            if (shakeIntensity > 0.001) {
-                camera.position.x = (Math.random() - 0.5) * shakeIntensity;
-                camera.position.y = 3 + (Math.random() - 0.5) * shakeIntensity;
-                shakeIntensity = THREE.MathUtils.lerp(shakeIntensity, 0, 0.05);
-            } else {
-                camera.position.set(0, 3, 5);
-            }
-
-            if (uiX && !isNaN(terrain.rotation.x)) uiX.innerText = (terrain.rotation.x + 1.57).toFixed(2);
-            if (uiY && !isNaN(terrain.rotation.z)) uiY.innerText = terrain.rotation.z.toFixed(2);
+            // Update UI Numbers
+            if (uiX) uiX.innerText = (globe.rotation.x % 6.28).toFixed(2);
+            if (uiY) uiY.innerText = (globe.rotation.y % 6.28).toFixed(2);
 
             renderer.render(scene, camera);
         };
         animate();
 
+        // Resize Logic
         window.resizeGyro = () => {
             if(!container) return;
             const width = container.clientWidth || 100;
