@@ -53,276 +53,376 @@
         .glitch-wrapper::after { color: #00f0ff; animation: glitch-anim-2 3s infinite linear alternate-reverse; z-index: -2; }
         @keyframes glitch-anim-1 { 0% { clip-path: inset(20% 0 80% 0); transform: translate(-2px, 1px); } 100% { clip-path: inset(30% 0 50% 0); transform: translate(1px, -1px); } }
         @keyframes glitch-anim-2 { 0% { clip-path: inset(10% 0 60% 0); transform: translate(2px, -1px); } 100% { clip-path: inset(70% 0 10% 0); transform: translate(-2px, -1px); } }
+
+        /* --- SECTION TRANSITIONS --- */
+        .section-container {
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            width: 100%;
+        }
+
+        .hidden-section {
+            display: none;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px) scale(0.98);
+        }
+
+        .active-section {
+            display: block;
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0) scale(1);
+            animation: bootSection 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes bootSection {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
-<body class="bg-cyber-black min-h-screen relative pb-24">
+<body class="bg-cyber-black min-h-screen pb-24 relative selection:bg-cyber-pink selection:text-black">
 
+    <!-- FX LAYERS -->
+    <div class="scanlines"></div>
     <!-- Three.js Background -->
     <div id="canvas-container" class="fixed inset-0 z-[-1] pointer-events-none"></div>
 
-    <!-- 1. STANDARD START OVERLAY (Desktop) -->
-    <!-- FIX: Added onclick="initiateBoot()" directly here to ensure it works -->
-    <div id="start-overlay" onclick="initiateBoot()" class="fixed inset-0 bg-cyber-black z-[200] flex items-center justify-center cursor-pointer">
-        <div class="text-center pointer-events-none">
-            <div class="text-cyber-green text-2xl md:text-4xl font-mono tracking-widest animate-pulse border-b-2 border-cyber-green pb-2">
-                >> INITIALIZE SYSTEM <<
-            </div>
-            <p class="text-cyber-blue mt-4 text-xs md:text-sm font-mono opacity-70">
-                [ CLICK ANYWHERE TO BOOT ]
-            </p>
-        </div>
-    </div>
-
-    <!-- 2. MOTION PERMISSION OVERLAY (Mobile) -->
-    <div id="motion-overlay" class="hidden-force fixed inset-0 z-[210] bg-cyber-black/95 flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="text-cyber-green font-mono text-center space-y-6 p-8 border border-cyber-green/30 bg-black/50 backdrop-blur-md max-w-sm mx-4 relative">
-            <h2 class="text-xl font-bold font-russo text-white tracking-wider">MOTION DETECTED</h2>
-            <p class="text-gray-400 text-xs font-mono leading-relaxed">Enable gyroscope for immersive control.</p>
-            <div class="flex flex-col gap-3 w-full">
-                <button onclick="enableMotion()" class="px-6 py-4 border border-cyber-green bg-cyber-green/10 text-cyber-green hover:bg-cyber-green hover:text-black transition-all font-bold tracking-widest uppercase text-xs">
-                    [ ENABLE SENSORS & BOOT ]
-                </button>
-                <button onclick="skipMotion()" class="text-[10px] text-gray-500 hover:text-white mt-2 uppercase tracking-wide">
-                    >> Bypass (No Motion)
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 3. BOOT SEQUENCE OVERLAY -->
-    <div id="boot-screen" class="fixed inset-0 bg-cyber-black z-[100] flex flex-col justify-end p-8 text-cyber-green text-lg md:text-xl hidden-force">
-        <div class="max-w-2xl w-full mx-auto" id="log-container"></div>
-    </div>
-
-    <!-- 4. MAIN DASHBOARD -->
-    <main id="main-interface" class="hidden-force px-6 pb-6 pt-24 md:p-12 max-w-[1600px] mx-auto w-full z-10 relative">
-        <header class="mb-12 border-b border-cyber-green/30 pb-6 flex justify-between items-end fade-in">
-            <div>
-                <h2 class="text-cyber-green text-sm mb-2 tracking-widest">SYSTEM: <span class="blink-hard">ONLINE</span></h2>
-                <h1 class="text-3xl md:text-6xl font-russo text-white cursor-default glitch-wrapper" data-text="THE DEVELOPER'S DECK">THE DEVELOPER'S DECK</h1>
-                <p class="mt-2 text-cyber-pink max-w-lg">FILIPE // DEV OPERATIVE</p>
-            </div>
-            <div class="flex flex-col items-end gap-2">
-                <button id="music-btn" class="border border-cyber-green text-cyber-green px-3 py-1 text-xs hover:bg-cyber-green hover:text-black transition-colors uppercase font-mono">MUSIC: OFF</button>
-                <div class="hidden md:block text-right">
-                    <div class="text-cyber-pink text-xs">BUILD v.1.0</div>
-                    <div class="text-cyber-blue text-xs">SECURE CONNECTION</div>
-                </div>
-            </div>
-        </header>
-
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <nav class="lg:col-span-1 flex flex-col gap-4 slide-up" style="animation-delay: 0.2s;">
-                <a href="#" onclick="handleNav('PROJECTS')" class="bg-transparent border border-gray-800 p-6 text-center transition-all duration-300 neon-box-blue group"><span class="font-bold text-lg group-hover:text-cyber-blue">PROJECTS [LS]</span></a>
-                <a href="#" onclick="handleNav('ABOUT')" class="bg-transparent border border-gray-800 p-6 text-center transition-all duration-300 neon-box-green group"><span class="font-bold text-lg group-hover:text-cyber-green">IDENTITY [WHOAMI]</span></a>
-                <a href="#" onclick="handleNav('CONTACT')" class="bg-transparent border border-gray-800 p-6 text-center transition-all duration-300 neon-box-pink group"><span class="font-bold text-lg group-hover:text-cyber-pink">RECRUIT [RECRUIT]</span></a>
-                <div class="mt-auto p-4 border border-cyber-green/20 bg-transparent">
-                    <h3 class="text-cyber-green text-xs mb-2">SKILL_TREE</h3>
-                    <div class="flex flex-wrap gap-2 text-xs text-cyber-blue"><span>JavaScript</span>/<span>HTML5</span>/<span>TAILWIND</span>/<span>THREE.JS</span></div>
-                </div>
-            </nav>
-            <section class="lg:col-span-2 flex flex-col gap-6 slide-up" style="animation-delay: 0.4s;">
-                <div class="bg-transparent border border-cyber-green/30 p-6 relative overflow-hidden group hover:border-cyber-green transition-colors duration-300">
-                    <div class="absolute top-0 left-0 w-1 h-full bg-cyber-green/50 group-hover:h-full transition-all duration-500"></div>
-                    <h3 class="text-xl text-cyber-blue mb-2">LATEST_DEPLOYMENT</h3>
-                    <p class="text-gray-300 mb-4">Project "MY_JAVA_ROOM" deployed. An interactive 3D environment built with Three.js and WebGL.</p>
-                </div>
-                <div class="bg-transparent border border-cyber-pink/30 p-6 relative overflow-hidden group hover:border-cyber-pink transition-colors duration-300">
-                    <h3 class="text-xl text-cyber-pink mb-2">DEV_LOG_ENTRY_404</h3>
-                    <p class="text-gray-300">Website built on a lightweight, framework-free stack using HTML5, Vanilla JS, and Tailwind CSS.</p>
-                </div>
-            </section>
-            <aside class="lg:col-span-1 flex flex-col gap-4 slide-up" style="animation-delay: 0.6s;">
-                <div class="border border-cyber-green/30 p-4 bg-transparent">
-                    <h4 class="text-cyber-green text-xs border-b border-cyber-green/20 pb-2 mb-2">LOCATION_DATA</h4>
-                    <div class="flex justify-between items-center mb-2"><span class="text-gray-400">CITY:</span><span class="text-cyber-blue">COVENTRY</span></div>
-                    <div class="flex justify-between items-center"><span class="text-gray-400">REGION:</span><span class="text-cyber-blue">UK</span></div>
-                </div>
-                <div class="border border-cyber-blue/30 p-4 bg-transparent">
-                    <h4 class="text-cyber-blue text-xs border-b border-cyber-blue/20 pb-2 mb-2">SYSTEM_STATUS</h4>
-                    <div class="space-y-2">
-                        <div class="flex items-center gap-2"><div class="w-2 h-2 bg-cyber-green rounded-full animate-pulse"></div><span class="text-xs text-gray-300">SERVER: OPTIMAL</span></div>
-                        <div class="w-full bg-gray-800 h-1 mt-2"><div class="bg-cyber-blue h-full" style="width: 87%"></div></div>
-                        <div class="text-right text-[10px] text-cyber-blue">MEMORY_LOAD: 87%</div>
-                    </div>
-                </div>
-            </aside>
-        </div>
-    </main>
-
-    <!-- 5. TERMINAL -->
-    <div class="fixed bottom-0 left-0 w-full bg-cyber-black/95 border-t border-cyber-green/30 p-4 backdrop-blur-sm z-40">
-        <div class="max-w-7xl mx-auto w-full">
-            <div id="terminal-helper" class="text-cyber-blue mb-2 overflow-hidden h-0 transition-all duration-300"></div>
-            <div class="flex items-center text-sm md:text-xl text-cyber-green">
-                <span class="mr-2 md:mr-3 font-bold"><span class="hidden md:inline">admin@deck:</span>~$</span>
-                <input id="terminal-input" type="text" class="flex-1 bg-transparent border-none outline-none text-cyber-green placeholder-cyber-green/30 uppercase font-mono min-w-0" placeholder="ENTER COMMAND..." autocomplete="off">
-            </div>
-        </div>
-    </div>
-
-    <!-- Audio (Hidden) -->
-    <audio id="bg-music" loop><source src="factions.mp3" type="audio/mpeg"></audio>
-    <audio id="sfx-type" src="sfx-type1.mp3"></audio>
+    <!-- AUDIO SYSTEM -->
+    <audio id="bg-music" loop><source src="cyberpunk-bg.mp3" type="audio/mpeg"></audio>
+    <audio id="sfx-type" src="sfx-type.mp3"></audio>
     <audio id="sfx-enter" src="sfx-enter.mp3"></audio>
     <audio id="sfx-hover" src="sfx-hover.mp3"></audio>
     <audio id="sfx-boot" src="sfx-boot.mp3"></audio>
 
-    <script>
-    // 1. SAFE VARIABLES
-    const logs = ["WAKE UP USER", "LOADING NEURAL INTERFACE...", "ESTABLISHING CONNECTION...", "ACCESS GRANTED", "DECK ONLINE.", "WELCOME"];
-    const logContainer = document.getElementById('log-container');
-    const bootScreen = document.getElementById('boot-screen');
-    const mainInterface = document.getElementById('main-interface');
-    const startOverlay = document.getElementById('start-overlay');
-    const motionOverlay = document.getElementById('motion-overlay');
-    const input = document.getElementById('terminal-input');
-    const helper = document.getElementById('terminal-helper');
-    const music = document.getElementById('bg-music');
-    const musicBtn = document.getElementById('music-btn');
-    let logIndex = 0;
+    <!-- START OVERLAY (Keep existing code here, not repeating for brevity) -->
+    <!-- ... (Use the Start Overlay code from previous steps) ... -->
 
-    // 2. SAFETY HELPERS
-    function setStorage(key, val) { try { sessionStorage.setItem(key, val); } catch(e){} }
-    function getStorage(key) { try { return sessionStorage.getItem(key); } catch(e){ return null; } }
-    function playSFX(id) {
-        if (window.innerWidth < 768 && (id === 'sfx-hover' || id === 'sfx-type')) return;
-        const audio = document.getElementById(id);
-        if (audio) { audio.volume = 0.3; audio.currentTime = 0; audio.play().catch(e=>{}); }
-    }
-
-    // 3. BOOT FUNCTIONS
-    function initiateBoot() {
-        setStorage('deck_booted', 'true');
+    <!-- ================================================================= -->
+    <!-- SECTION 1: HOME DASHBOARD (ID: home-section)                      -->
+    <!-- ================================================================= -->
+    <section id="home-section" class="section-container active-section px-6 pb-6 pt-24 md:p-12 max-w-[1600px] mx-auto z-10 relative">
         
-        // Hide Overlays
-        if(motionOverlay) motionOverlay.style.display = 'none';
-        if(startOverlay) startOverlay.style.display = 'none';
+        <!-- HEADER -->
+        <header class="mb-12 border-b border-cyber-green/30 pb-6 flex justify-between items-end">
+            <div>
+                <h2 class="text-cyber-green text-sm mb-2 tracking-widest">
+                    SYSTEM: <span class="animate-pulse">ONLINE</span>
+                </h2>
+                <!-- RGB GLITCH TITLE -->
+                <h1 class="text-3xl md:text-6xl font-russo text-white cursor-default glitch-wrapper" data-text="THE DEVELOPER'S DECK">
+                    THE DEVELOPER'S DECK
+                </h1>
+                <p class="mt-2 text-gray-400 max-w-lg font-mono">FILIPE OLIVEIRA // FULL-STACK OPERATIVE</p>
+            </div>
+            
+            <div class="flex flex-col items-end gap-2">
+                <button id="music-btn" class="border border-cyber-green text-cyber-green px-3 py-1 text-xs hover:bg-cyber-green hover:text-black transition-colors uppercase font-mono">
+                    [ MUSIC: OFF ]
+                </button>
+            </div>
+        </header>
 
-        // Start Sequence
-        playSFX('sfx-boot');
-        bootScreen.classList.remove('hidden-force');
-        bootScreen.style.display = 'flex';
-        logIndex = 0; 
-        logContainer.innerHTML = ''; 
-        runBootSequence();
-    }
+        <!-- DASHBOARD GRID -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- NAV COLUMN -->
+            <nav class="lg:col-span-1 flex flex-col gap-4">
+                <button onclick="navigateTo('projects-section')" class="bg-transparent border border-gray-800 p-6 text-center transition-all duration-300 neon-box-blue group hover:bg-cyber-blue/10">
+                    <span class="font-bold text-lg group-hover:text-cyber-blue font-mono">PROJECTS [LS]</span>
+                </button>
+                <button onclick="navigateTo('about-section')" class="bg-transparent border border-gray-800 p-6 text-center transition-all duration-300 neon-box-green group hover:bg-cyber-green/10">
+                    <span class="font-bold text-lg group-hover:text-cyber-green font-mono">IDENTITY [WHOAMI]</span>
+                </button>
+                <button onclick="navigateTo('recruit-section')" class="bg-transparent border border-gray-800 p-6 text-center transition-all duration-300 neon-box-pink group hover:bg-cyber-pink/10">
+                    <span class="font-bold text-lg group-hover:text-cyber-pink font-mono">RECRUIT [RECRUIT]</span>
+                </button>
+                
+                <div class="mt-auto p-4 border border-cyber-green/20 bg-transparent">
+                    <h3 class="text-cyber-green text-xs mb-2 font-mono">SKILL_TREE</h3>
+                    <div class="flex flex-wrap gap-2 text-xs text-gray-400 font-mono">
+                        <span>JavaScript</span>/<span>HTML5</span>/<span>Tailwind</span>/<span>Three.js</span>
+                    </div>
+                </div>
+            </nav>
 
-    function enableMotion() {
-        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-            DeviceOrientationEvent.requestPermission().then(s => initiateBoot()).catch(e => initiateBoot());
-        } else {
-            initiateBoot();
-        }
-    }
-    
-    function skipMotion() { initiateBoot(); }
+            <!-- MAIN FEED -->
+            <section class="lg:col-span-2 flex flex-col gap-6">
+                <div class="bg-cyber-dark/80 border border-cyber-green/30 p-6 relative overflow-hidden group hover:border-cyber-green transition-colors duration-300">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-cyber-green/50 group-hover:h-full transition-all duration-500"></div>
+                    <h3 class="text-xl text-cyber-blue mb-2 font-mono">LATEST_DEPLOYMENT</h3>
+                    <p class="text-gray-300 mb-4 font-mono">Project "Kinetic Core" deployed. An interactive AI particle interface.</p>
+                </div>
+            </section>
 
-    function runBootSequence() {
-        if (logIndex < logs.length) {
-            const div = document.createElement('div');
-            div.className = "mb-2 border-l-2 border-cyber-green pl-2 animate-pulse";
-            div.innerHTML = `<span class="opacity-50 mr-2">[${new Date().toLocaleTimeString()}]</span> ${logs[logIndex]}`;
-            logContainer.appendChild(div);
-            logIndex++;
-            setTimeout(runBootSequence, 500);
-        } else {
-            setTimeout(() => {
-                bootScreen.style.transition = "opacity 0.8s ease";
-                bootScreen.style.opacity = "0";
-                setTimeout(() => {
-                    bootScreen.remove();
-                    mainInterface.classList.remove('hidden-force');
-                    mainInterface.classList.add('fade-in');
-                }, 800);
-            }, 800);
-        }
-    }
+            <!-- STATUS -->
+            <aside class="lg:col-span-1 flex flex-col gap-4">
+                <div class="border border-cyber-blue/30 p-4 bg-cyber-black">
+                    <h4 class="text-cyber-blue text-xs border-b border-cyber-blue/20 pb-2 mb-2 font-mono">SYSTEM_STATUS</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 bg-cyber-green rounded-full animate-pulse"></div>
+                            <span class="text-xs text-gray-300 font-mono">SERVER: OPTIMAL</span>
+                        </div>
+                        <div class="w-full bg-gray-800 h-1 mt-2">
+                            <div class="bg-cyber-blue h-full" style="width: 87%"></div>
+                        </div>
+                        <div class="text-right text-[10px] text-cyber-blue font-mono">MEMORY_LOAD: 87%</div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </section>
 
-    // 4. INIT LOGIC
-    // Move logic inside DOMContentLoaded to be safe
-    document.addEventListener("DOMContentLoaded", () => {
-        const isBooted = getStorage('deck_booted');
-        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    <!-- ================================================================= -->
+    <!-- SECTION 2: PROJECTS DIRECTORY (ID: projects-section)              -->
+    <!-- ================================================================= -->
+    <section id="projects-section" class="hidden-section section-container max-w-[90vw] mx-auto p-4 md:p-8 space-y-24 z-10 relative">
+        
+        <!-- SUB-HEADER -->
+        <header class="sticky top-0 z-40 bg-cyber-black/95 backdrop-blur-md border-b border-cyber-green/30 p-4 mb-8 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <span class="text-cyber-green text-xl font-bold blink font-mono">>> DIRECTORY_LISTING</span>
+            </div>
+            <button onclick="navigateTo('home-section')" class="px-4 py-2 border border-cyber-blue text-cyber-blue hover:bg-cyber-blue hover:text-black transition-colors text-sm uppercase font-mono">
+                [ < BACK TO ROOT ]
+            </button>
+        </header>
 
-        if (isBooted === 'true') {
-            // Returning User
-            if(startOverlay) startOverlay.style.display = 'none';
-            if(motionOverlay) motionOverlay.style.display = 'none';
-            if(bootScreen) bootScreen.remove();
-            mainInterface.classList.remove('hidden-force');
-        } else {
-            // New User
-            if (isMobile) {
-                if(startOverlay) startOverlay.style.display = 'none';
-                if(motionOverlay) motionOverlay.classList.remove('hidden-force');
+        <!-- PROJECT 1 (Java Room) -->
+        <article class="bg-transparent border border-cyber-green/30 p-1 md:p-6 relative group">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Media -->
+                <div class="space-y-4">
+                    <div id="p1-viewer" class="aspect-video bg-black border border-cyber-green/50 relative overflow-hidden flex items-center justify-center">
+                        <video class="w-full h-full object-cover" autoplay loop muted playsinline poster="https://placehold.co/600x400/000000/00ff41/png?text=Loading...">
+                            <source src="demo.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                    <div class="flex gap-3 overflow-x-auto pb-2">
+                        <!-- Buttons for P1... -->
+                        <button onclick="switchMedia('p1', 'video', 'demo.mp4')" class="w-20 h-12 border border-cyber-green/30 hover:border-cyber-green thumb-active shrink-0 bg-gray-900 flex items-center justify-center"><span class="text-[10px] text-cyber-green font-mono">VIDEO</span></button>
+                        <button onclick="switchMedia('p1', 'image', 'room1.PNG')" class="w-20 h-12 border border-cyber-green/30 hover:border-cyber-green shrink-0"><img src="room1.PNG" class="w-full h-full object-cover opacity-70 hover:opacity-100"></button>
+                    </div>
+                </div>
+                <!-- Text -->
+                <div class="flex flex-col h-full font-mono">
+                    <h2 class="text-3xl md:text-4xl text-white font-bold mb-2 glitch-text">MY_JAVA_ROOM</h2>
+                    <p class="text-gray-400 text-sm mb-6 border-l-2 border-cyber-green/20 pl-4">An interactive 3D environment built with Three.js.</p>
+                </div>
+            </div>
+        </article>
+
+        <!-- PROJECT 2 (Touchless) -->
+        <article class="bg-transparent border border-cyber-pink/30 p-1 md:p-6 relative group">
+             <!-- (Insert your Project 2 content here, copy-pasted from your projects.html) -->
+             <!-- Make sure to use switchMedia('p2', ...) -->
+             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Text Left -->
+                <div class="flex flex-col h-full order-2 lg:order-1 font-mono">
+                    <h2 class="text-3xl md:text-4xl text-white font-bold mb-2">TOUCHLESS WEBSITE</h2>
+                    <p class="text-gray-400 text-sm mb-6 border-l-2 border-cyber-pink/20 pl-4">Controlled entirely with hand gestures via webcam.</p>
+                </div>
+                <!-- Media Right -->
+                <div class="space-y-4 order-1 lg:order-2">
+                    <div id="p2-viewer" class="aspect-video bg-black border border-cyber-pink/50 relative overflow-hidden flex items-center justify-center">
+                        <video class="w-full h-full object-contain" autoplay loop muted playsinline><source src="websitevid.mp4" type="video/mp4"></video>
+                    </div>
+                    <!-- P2 Buttons... -->
+                     <div class="flex gap-3 overflow-x-auto pb-2">
+                        <button onclick="switchMedia('p2', 'video', 'websitevid.mp4')" class="w-20 h-12 border border-cyber-pink/30 hover:border-cyber-pink thumb-active shrink-0 bg-gray-900 flex items-center justify-center"><span class="text-[10px] text-cyber-pink font-mono">VIDEO</span></button>
+                        <button onclick="switchMedia('p2', 'image', 'website1.png')" class="w-20 h-12 border border-cyber-pink/30 hover:border-cyber-pink shrink-0"><img src="website1.png" class="w-full h-full object-cover opacity-70 hover:opacity-100"></button>
+                        <button onclick="switchMedia('p2', 'image', 'website2.png')" class="w-20 h-12 border border-cyber-pink/30 hover:border-cyber-pink shrink-0"><img src="website2.png" class="w-full h-full object-cover opacity-70 hover:opacity-100"></button>
+                     </div>
+                </div>
+            </div>
+        </article>
+
+        <!-- PROJECT 3 (Kinetic Core - NEW LAYOUT: VIDEO LEFT) -->
+        <article class="bg-transparent border border-cyber-blue/30 p-1 md:p-6 relative group">
+            <div class="absolute top-0 left-0 w-full h-[1px] bg-cyber-blue/30"></div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- LEFT COLUMN: VIDEO/IMAGES (Swapped from Right) -->
+                <div class="space-y-4">
+                    <!-- Main Viewer -->
+                    <div id="p3-viewer" class="aspect-video bg-black border border-cyber-blue/50 relative overflow-hidden flex items-center justify-center">
+                        <video class="w-full h-full object-contain" autoplay loop muted playsinline>
+                            <source src="ball.mp4" type="video/mp4">
+                        </video>
+                    </div>
+
+                    <!-- Thumbnails -->
+                    <div class="flex gap-3 overflow-x-auto pb-2">
+                        <button onclick="switchMedia('p3', 'video', 'ball.mp4')" class="w-20 h-12 border border-cyber-blue/30 hover:border-cyber-blue thumb-active shrink-0 bg-gray-900 flex items-center justify-center"><span class="text-[10px] text-cyber-blue font-mono">VIDEO</span></button>
+                        <button onclick="switchMedia('p3', 'image', 'ball1.PNG')" class="w-20 h-12 border border-cyber-blue/30 hover:border-cyber-blue shrink-0"><img src="ball1.PNG" class="w-full h-full object-cover opacity-70 hover:opacity-100"></button>
+                        <button onclick="switchMedia('p3', 'image', 'ball2.PNG')" class="w-20 h-12 border border-cyber-blue/30 hover:border-cyber-blue shrink-0"><img src="ball2.PNG" class="w-full h-full object-cover opacity-70 hover:opacity-100"></button>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: TEXT (Swapped from Left) -->
+                <div class="flex flex-col h-full font-mono">
+                    <div class="mb-4">
+                        <h2 class="text-3xl md:text-4xl text-white font-bold mb-2">Kinetic Core</h2>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="px-2 py-1 border border-cyber-blue text-cyber-blue text-xs">Three.js</span>
+                            <span class="px-2 py-1 border border-cyber-blue text-cyber-blue text-xs">MediaPipe</span>
+                        </div>
+                    </div>
+                    <div class="text-gray-400 text-sm md:text-base mb-6 leading-relaxed border-l-2 border-cyber-blue/20 pl-4">
+                        <p class="mb-4">
+                            <strong style="color: #FF10F0;">Kinetic Core</strong> is an immersive particle interface.
+                            Uses WebGL to create a "digital organism" reacting to hand movements.
+                        </p>
+                    </div>
+                    <div class="mt-auto flex gap-4">
+                        <a href="#" class="flex-1 text-center py-3 bg-cyber-blue/10 border border-cyber-blue text-cyber-blue hover:bg-cyber-blue hover:text-black transition-all font-bold">LAUNCH_DEMO</a>
+                    </div>
+                </div>
+
+            </div>
+        </article>
+
+    </section>
+
+    <!-- Placeholder for Identity/Recruit Sections (Hidden) -->
+    <section id="about-section" class="hidden-section section-container text-center pt-24"><h1 class="text-4xl text-cyber-green font-mono">IDENTITY MATRIX LOADING...</h1></section>
+    <section id="recruit-section" class="hidden-section section-container text-center pt-24"><h1 class="text-4xl text-cyber-pink font-mono">COMM CHANNELS OPENING...</h1></section>
+
+    <!-- TERMINAL (Fixed at bottom) -->
+    <div class="fixed bottom-0 left-0 w-full bg-cyber-black/95 border-t border-cyber-green/30 p-4 backdrop-blur-sm z-50">
+        <div class="max-w-7xl mx-auto w-full">
+            <div id="terminal-helper" class="text-cyber-blue mb-2 overflow-hidden h-0 transition-all duration-300 font-mono"></div>
+            <div class="flex items-center text-sm md:text-xl text-cyber-green font-mono">
+                <span class="mr-2 md:mr-3 font-bold"><span class="hidden md:inline">admin@deck:</span>~$</span>
+                <input id="terminal-input" type="text" class="flex-1 bg-transparent border-none outline-none text-cyber-green placeholder-cyber-green/30 uppercase min-w-0" placeholder="ENTER COMMAND..." autocomplete="off">
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- NAVIGATION SYSTEM ---
+        function navigateTo(sectionId) {
+            // 1. Play Sound
+            playSFX('sfx-enter');
+
+            // 2. Hide all sections
+            const sections = document.querySelectorAll('.section-container');
+            sections.forEach(sec => {
+                sec.classList.remove('active-section');
+                sec.classList.add('hidden-section');
+            });
+
+            // 3. Show Target Section
+            const target = document.getElementById(sectionId);
+            if (target) {
+                target.classList.remove('hidden-section');
+                target.classList.add('active-section');
+                // Scroll to top to ensure visibility
+                window.scrollTo(0, 0);
             }
-            // If desktop, standard overlay is already visible by default CSS
         }
-    });
 
-    // 5. TERMINAL & INTERACTION
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('button') && !e.target.closest('a') && !e.target.closest('#start-overlay') && !e.target.closest('#motion-overlay') && window.getSelection().toString().length === 0) {
-            if(input) input.focus();
-        }
-    });
-
-    if(input) {
-        input.addEventListener('keydown', function(e) {
-            playSFX('sfx-type');
-            if (e.key === 'Enter') {
-                playSFX('sfx-enter');
-                const command = input.value.trim().toUpperCase();
-                processCommand(command);
-                input.value = ''; 
+        // --- MEDIA SWITCHER (For Projects) ---
+        function switchMedia(projectId, type, source) {
+            const viewer = document.getElementById(`${projectId}-viewer`);
+            viewer.innerHTML = '';
+            if (type === 'video') {
+                const video = document.createElement('video');
+                video.src = source;
+                video.className = 'w-full h-full object-contain'; // Fixed Object Contain
+                video.controls = true;
+                video.autoplay = true;
+                video.muted = false; // Allow sound on click if desired
+                viewer.appendChild(video);
+            } else {
+                const img = document.createElement('img');
+                img.src = source;
+                img.className = 'w-full h-full object-contain animate-fade-in';
+                img.style.animation = 'fadeIn 0.5s ease-out';
+                viewer.appendChild(img);
             }
-        });
-    }
-
-    function processCommand(cmd) {
-        let msg = "", action = null;
-        switch(cmd) {
-            case "WHOAMI": case "ABOUT": msg = "NAVIGATING TO IDENTITY MATRIX..."; action = () => setTimeout(() => window.location.href = "about.html", 1000); break;
-            case "LS": case "PROJECTS": msg = "LISTING PROJECT DIRECTORIES..."; action = () => setTimeout(() => window.location.href = "projects.html", 1000); break;
-            case "RECRUIT": case "CONTACT": msg = "OPENING COMM CHANNELS..."; action = () => setTimeout(() => window.location.href = "contact.html", 1000); break;
-            case "MUSIC ON": msg = "AUDIO STREAM ESTABLISHED."; action = () => { music.play(); updateMusicBtn(true); }; break;
-            case "MUSIC OFF": msg = "AUDIO STREAM DISCONNECTED."; action = () => { music.pause(); updateMusicBtn(false); }; break;
-            case "RESTART": case "REBOOT": msg = "INITIATING SYSTEM REBOOT..."; try{sessionStorage.removeItem('deck_booted');}catch(e){} action = () => setTimeout(() => window.location.reload(), 1000); break;
-            case "HELP": msg = "COMMANDS: WHOAMI, LS, RECRUIT, MUSIC ON/OFF, REBOOT"; break;
-            case "CLEAR": msg = ""; helper.style.height = "0"; helper.innerHTML = ""; return;
-            default: msg = `COMMAND '${cmd}' NOT RECOGNIZED. TRY 'HELP'.`;
+            // Update Active State
+            const buttons = event.currentTarget.parentElement.querySelectorAll('button');
+            buttons.forEach(btn => btn.classList.remove('thumb-active'));
+            event.currentTarget.classList.add('thumb-active');
         }
-        if (msg) { helper.innerHTML = `>> ${msg}`; helper.style.height = "auto"; }
-        if (action) action();
-    }
 
-    function handleNav(dest) { processCommand(dest); }
+        // --- TERMINAL COMMAND UPDATES ---
+        function processCommand(cmd) {
+            let msg = "";
+            let action = null;
+            const music = document.getElementById('bg-music');
+            const musicBtn = document.getElementById('music-btn');
 
-    function updateMusicBtn(isPlaying) {
-        if (isPlaying) {
-            musicBtn.innerHTML = "[ MUSIC: <span class='animate-pulse'>ON</span> ]";
-            musicBtn.classList.replace('text-cyber-green', 'text-cyber-pink');
-            musicBtn.classList.replace('border-cyber-green', 'border-cyber-pink');
-        } else {
-            musicBtn.innerHTML = "[ MUSIC: OFF ]";
-            musicBtn.classList.replace('text-cyber-pink', 'text-cyber-green');
-            musicBtn.classList.replace('border-cyber-pink', 'border-cyber-green');
+            switch(cmd) {
+                case "WHOAMI":
+                case "ABOUT":
+                    msg = "NAVIGATING TO IDENTITY MATRIX...";
+                    action = () => navigateTo('about-section');
+                    break;
+                case "LS":
+                case "PROJECTS":
+                    msg = "LISTING PROJECT DIRECTORIES...";
+                    action = () => navigateTo('projects-section');
+                    break;
+                case "RECRUIT":
+                case "CONTACT":
+                    msg = "OPENING COMM CHANNELS...";
+                    action = () => navigateTo('recruit-section');
+                    break;
+                case "CD ..":
+                case "HOME":
+                    msg = "RETURNING TO ROOT...";
+                    action = () => navigateTo('home-section');
+                    break;
+                
+                // ... (Keep your Music/Restart/Help commands here) ...
+                 case "MUSIC ON":
+                    msg = "AUDIO STREAM ESTABLISHED.";
+                    action = () => {
+                        music.play();
+                        musicBtn.innerHTML = "[ MUSIC: <span class='animate-pulse'>ON</span> ]";
+                        musicBtn.classList.remove('border-cyber-green', 'text-cyber-green', 'hover:bg-cyber-green');
+                        musicBtn.classList.add('border-cyber-pink', 'text-cyber-pink', 'hover:bg-cyber-pink');
+                    };
+                    break;
+                case "MUSIC OFF":
+                    msg = "AUDIO STREAM DISCONNECTED.";
+                    action = () => {
+                        music.pause();
+                        musicBtn.innerHTML = "[ MUSIC: OFF ]";
+                        musicBtn.classList.remove('border-cyber-pink', 'text-cyber-pink', 'hover:bg-cyber-pink');
+                        musicBtn.classList.add('border-cyber-green', 'text-cyber-green', 'hover:bg-cyber-green');
+                    };
+                    break;
+                
+                case "HELP":
+                    msg = "COMMANDS: HOME, LS, WHOAMI, RECRUIT, MUSIC ON/OFF, REBOOT";
+                    break;
+                
+                // ... Keep Default ...
+                default: msg = `COMMAND '${cmd}' NOT RECOGNIZED.`;
+            }
+
+            if (msg) {
+                const helper = document.getElementById('terminal-helper');
+                helper.innerHTML = `>> ${msg}`;
+                helper.style.height = "auto";
+            }
+            if (action) action();
         }
-    }
 
-    if(musicBtn) {
-        musicBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            playSFX('sfx-click');
-            if (music.paused) { music.play(); updateMusicBtn(true); } 
-            else { music.pause(); updateMusicBtn(false); }
-        });
-    }
+        // --- REST OF YOUR LOGIC (Boot Sequence, Sound Effects) ---
+        // (Copy paste your existing Audio/Boot logic here)
+        // Ensure playSFX handles mobile checks as discussed previously.
 
-    document.querySelectorAll('a, button').forEach(btn => {
-        btn.addEventListener('mouseenter', () => playSFX('sfx-hover'));
-    });
+        // ADD FadeIn Keyframe dynamically
+        const style = document.createElement('style');
+        style.innerHTML = `@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }`;
+        document.head.appendChild(style);
+
     </script>
 </body>
 </html>
