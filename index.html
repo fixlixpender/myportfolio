@@ -174,7 +174,7 @@
                             <!-- Interactive Hint -->
                             <div class="absolute bottom-2 right-2 z-20 pointer-events-none">
                                 <span class="text-[10px] text-cyber-pink/70 bg-black/50 px-1 font-mono blink">
-                                    [CLICK TO ENGAGE THRUSTERS]
+                                    [CLICK TO ENHANCE / ZOOM]
                                 </span>
                             </div>
                         </div>
@@ -477,37 +477,41 @@
                 case "HOME": case "CD ..": 
                     msg = "RETURNING TO ROOT..."; action = () => navigateTo('home-section'); break;
                 
-                // --- GYRO COMMANDS ---
-                case "BOOST":
-                    msg = "ENGAGING THRUSTERS...";
+                /// --- GYRO COMMANDS (UPDATED) ---
+                case "ZOOM":
+                case "ZOOM IN":
+                case "ENHANCE":
+                    msg = "ENHANCING OPTICAL SENSORS...";
                     action = () => {
-                        if (window.gyroAPI) window.gyroAPI.boost();
+                        // We check if it's already zoomed in? 
+                        // The toggle function handles both, but let's just trigger it.
+                        if (window.gyroAPI) window.gyroAPI.toggleZoom();
+                    };
+                    break;
+                case "ZOOM OUT":
+                    msg = "RESETTING OPTICAL SENSORS...";
+                    action = () => {
+                        if (window.gyroAPI) window.gyroAPI.toggleZoom();
                     };
                     break;
                 case "SCAN":
-                    msg = "PERFORMING TERRAIN SCAN...";
+                    msg = "PERFORMING STRUCTURAL SCAN...";
                     action = () => {
                         if (window.gyroAPI) window.gyroAPI.scan();
                     };
                     break;
                 case "MODE RED":
                     msg = "SWITCHING HUD TO: TACTICAL RED";
-                    action = () => {
-                        if (window.gyroAPI) window.gyroAPI.setColor(0xff0000);
-                    };
+                    action = () => { if (window.gyroAPI) window.gyroAPI.setColor(0xff0000); };
                     break;
                 case "MODE BLUE":
                     msg = "SWITCHING HUD TO: OCEANIC BLUE";
-                    action = () => {
-                        if (window.gyroAPI) window.gyroAPI.setColor(0x00f0ff);
-                    };
+                    action = () => { if (window.gyroAPI) window.gyroAPI.setColor(0x00f0ff); };
                     break;
-                case "MODE PINK":
-                    msg = "SWITCHING HUD TO: NEON PINK";
-                    action = () => {
-                        if (window.gyroAPI) window.gyroAPI.setColor(0xff00ff);
-                    };
-                    break;
+                
+                // Update HELP
+                case "HELP": 
+                    msg = "COMMANDS: HOME, PROJECTS, ZOOM, SCAN, MODE [RED/BLUE], MUSIC ON/OFF"; break;
                 
                 // Update HELP to show new commands
                 case "HELP": 
@@ -542,7 +546,7 @@
         document.head.appendChild(style);
 
         // ==========================================
-    // MINI-MAP GYRO SYSTEM v6.0 (TACTICAL GLOBE)
+    // MINI-MAP GYRO SYSTEM v7.0 (DEEP DATA CORE)
     // ==========================================
     function initGyroSystem() {
         const container = document.getElementById('mini-map-container');
@@ -550,78 +554,103 @@
 
         // 1. Setup Scene
         const scene = new THREE.Scene();
-        // No fog needed for the globe, clear view is better
-
+        
         const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 100);
-        camera.position.z = 8; // Move back to see the whole globe
+        camera.position.z = 8; // Start Zoomed Out
 
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         renderer.setSize(container.clientWidth, container.clientHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(renderer.domElement);
 
-        // 2. Create the "Core" (The Planet/Globe)
-        // Icosahedron looks more "Cyber" than a smooth sphere
+        // 2. The Outer Shell (Wireframe Globe)
         const geometry = new THREE.IcosahedronGeometry(2.2, 2); 
         const material = new THREE.MeshBasicMaterial({ 
             color: 0xff00ff, 
             wireframe: true, 
             transparent: true, 
-            opacity: 0.5 
+            opacity: 0.4 // Base opacity
         });
         const globe = new THREE.Mesh(geometry, material);
         scene.add(globe);
 
-        // 3. Create the "Gyro Ring" (Orbital Ring)
-        const ringGeo = new THREE.TorusGeometry(3.5, 0.05, 16, 100);
-        const ringMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.3 });
+        // 3. The Inner Core (Data Particles) - HIDDEN AT START
+        const particleGeo = new THREE.BufferGeometry();
+        const particleCount = 1500;
+        const posArray = new Float32Array(particleCount * 3);
+        
+        for(let i = 0; i < particleCount * 3; i++) {
+            // Random points inside a smaller sphere (radius 1.8)
+            posArray[i] = (Math.random() - 0.5) * 3.6;
+        }
+        
+        particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        
+        const particleMat = new THREE.PointsMaterial({
+            size: 0.03,
+            color: 0x00f0ff, // Cyan Core
+            transparent: true,
+            opacity: 0.0, // Start Invisible
+            blending: THREE.AdditiveBlending
+        });
+        
+        const core = new THREE.Points(particleGeo, particleMat);
+        scene.add(core);
+
+        // 4. Orbital Ring (Decoration)
+        const ringGeo = new THREE.TorusGeometry(3.5, 0.02, 16, 100);
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.2 });
         const ring = new THREE.Mesh(ringGeo, ringMat);
-        ring.rotation.x = Math.PI / 2; // Flat ring
+        ring.rotation.x = Math.PI / 2;
         scene.add(ring);
 
-        // 4. Variables
-        let boostMode = false;
-        let rotationSpeedX = 0.002;
-        let rotationSpeedY = 0.005;
+        // 5. Variables
+        let isZoomed = false;
+        let targetZ = 8;       // Camera Distance
+        let targetOpacity = 0.0; // Core Opacity
+        let targetWireOpacity = 0.4;
         
+        // SLOWER ROTATION SETTINGS
         let mouseX = 0, mouseY = 0;
+        let autoRotateX = 0.001; // Very slow idle spin
+        let autoRotateY = 0.002;
+
         const uiX = document.getElementById('gyro-x');
         const uiY = document.getElementById('gyro-y');
         let currentBaseColor = 0xff00ff; 
 
-        // 5. API & Interaction
+        // 6. API
         window.gyroAPI = {
-            boost: () => {
-                if (boostMode) return; 
-                boostMode = true;
-                
-                // Visual FX
-                material.color.setHex(0xFFFFFF); // Flash White
-                material.opacity = 0.8;
-                playSFX('sfx-enter'); 
-                
-                // After 2 seconds, slow down
-                setTimeout(() => {
-                    boostMode = false;
-                    material.color.setHex(currentBaseColor); 
-                    material.opacity = 0.5;
-                }, 2000); 
+            toggleZoom: () => {
+                isZoomed = !isZoomed;
+                playSFX('sfx-enter');
+
+                if (isZoomed) {
+                    // ZOOM IN SETTINGS
+                    targetZ = 2.5;         // Fly inside
+                    targetOpacity = 0.8;   // Show Particles
+                    targetWireOpacity = 0.1; // Fade wireframe so it doesn't block view
+                } else {
+                    // ZOOM OUT SETTINGS
+                    targetZ = 8;
+                    targetOpacity = 0.0;   // Hide Particles
+                    targetWireOpacity = 0.4;
+                }
             },
             setColor: (hex) => {
                 currentBaseColor = hex;
                 material.color.setHex(hex);
+                // Also color the core particles slightly
+                core.material.color.setHex(hex);
             },
             scan: () => {
-                // Pulse size
-                const originalScale = globe.scale.x;
-                globe.scale.setScalar(0.1); // Shrink
-                material.wireframeLinewidth = 5; // Thicken (if supported)
-                
-                // Animate growth back
+                // Pulse the Ring
+                const originalScale = ring.scale.x;
+                ring.scale.setScalar(0.1);
                 let growInterval = setInterval(() => {
-                    globe.scale.addScalar(0.1);
-                    if(globe.scale.x >= originalScale) {
-                        globe.scale.setScalar(originalScale);
+                    ring.scale.addScalar(0.1);
+                    if(ring.scale.x >= originalScale) {
+                        ring.scale.setScalar(originalScale);
                         clearInterval(growInterval);
                     }
                 }, 20);
@@ -633,39 +662,41 @@
             if (!container || container.offsetParent === null) return;
             const rect = container.getBoundingClientRect();
             if (rect.width === 0) return;
-            // Normalize -1 to 1
             mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
             mouseY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
         });
 
-        // Click to Boost
-        container.addEventListener('mousedown', () => window.gyroAPI.boost());
+        // CLICK TO TOGGLE ZOOM
+        container.addEventListener('mousedown', () => window.gyroAPI.toggleZoom());
 
-        // 6. Animation Loop
+        // 7. Animation Loop
         const animate = () => {
             requestAnimationFrame(animate);
             if (container.offsetParent === null) return;
 
-            // --- ROTATION LOGIC ---
-            if (boostMode) {
-                // Hyper Spin!
-                globe.rotation.y += 0.2; 
-                globe.rotation.x += 0.05;
-                ring.rotation.z -= 0.1;
-                ring.scale.setScalar(1 + Math.random() * 0.1); // Jitter effect
-            } else {
-                // Normal Controlled Spin
-                // The mouse controls the DIRECTION of the spin
-                globe.rotation.y += rotationSpeedY + (mouseX * 0.05);
-                globe.rotation.x += rotationSpeedX - (mouseY * 0.05);
-                
-                // The ring slowly tumbles
-                ring.rotation.x += 0.005;
-                ring.rotation.y += 0.005;
-                ring.scale.setScalar(1); // Reset Jitter
-            }
+            // --- SMOOTH CAMERA MOVE (ZOOM) ---
+            camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetZ, 0.05);
+            
+            // --- FADE EFFECTS ---
+            // Fade Core In/Out
+            core.material.opacity = THREE.MathUtils.lerp(core.material.opacity, targetOpacity, 0.05);
+            // Fade Shell Out/In
+            globe.material.opacity = THREE.MathUtils.lerp(globe.material.opacity, targetWireOpacity, 0.05);
 
-            // Update UI Numbers
+            // --- ROTATION (Controlled by Mouse + Slow Idle) ---
+            // Reduced mouse sensitivity (0.05 -> 0.02)
+            globe.rotation.y += autoRotateY + (mouseX * 0.02);
+            globe.rotation.x += autoRotateX - (mouseY * 0.02);
+            
+            // Core rotates slightly faster for depth effect
+            core.rotation.y = globe.rotation.y * 1.2;
+            core.rotation.x = globe.rotation.x * 1.2;
+
+            // Ring Tumble
+            ring.rotation.x += 0.002;
+            ring.rotation.y += 0.002;
+
+            // Update UI
             if (uiX) uiX.innerText = (globe.rotation.x % 6.28).toFixed(2);
             if (uiY) uiY.innerText = (globe.rotation.y % 6.28).toFixed(2);
 
@@ -673,7 +704,6 @@
         };
         animate();
 
-        // Resize Logic
         window.resizeGyro = () => {
             if(!container) return;
             const width = container.clientWidth || 100;
