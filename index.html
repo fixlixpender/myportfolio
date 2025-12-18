@@ -9,10 +9,10 @@
 
     <link rel="icon" type="image/png" href="skull.png">
     
-    <!-- Tailwind CSS (via CDN for standalone use) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts (Share Tech Mono + Russo One) -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -20,147 +20,50 @@
     <!-- Three.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
 
-    <!-- Configuration for Tailwind Colors -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        cyber: {
-                            black: "#050505",
-                            dark: "#0a0a0a",
-                            blue: "#00f0ff",
-                            pink: "#ff00ff",
-                            green: "#00ff41",
-                            red: "#ff2a2a",
-                        },
+                        cyber: { black: "#050505", dark: "#0a0a0a", blue: "#00f0ff", pink: "#ff00ff", green: "#00ff41", red: "#ff2a2a" },
                     },
-                    fontFamily: {
-                        mono: ['"Share Tech Mono"', 'monospace'],
-                        russo: ['"Russo One"', 'sans-serif'], 
-                    },
-                    backgroundImage: {
-                        'grid-pattern': "linear-gradient(to right, #111 1px, transparent 1px), linear-gradient(to bottom, #111 1px, transparent 1px)",
-                    }
+                    fontFamily: { mono: ['"Share Tech Mono"', 'monospace'], russo: ['"Russo One"', 'sans-serif'] },
                 }
             }
         }
     </script>
 
-    <!-- Custom CSS for Animations & CRT Effects -->
     <style>
-        body {
-            background-color: #050505;
-            color: #e0e0e0;
-            overflow-x: hidden;
-            font-family: "Share Tech Mono", monospace;
-        }
-
-        /* Glitch Effect on Hover */
-        .glitch-hover:hover {
-            animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
-            color: #ff00ff; 
-        }
-
-        @keyframes glitch-anim {
-            0% { transform: translate(0) }
-            20% { transform: translate(-2px, 2px) }
-            40% { transform: translate(-2px, -2px) }
-            60% { transform: translate(2px, 2px) }
-            80% { transform: translate(2px, -2px) }
-            100% { transform: translate(0) }
-        }
-
-        @keyframes scrollScanlines {
-            0% { background-position: 0 0; }
-            100% { background-position: 0 100%; }
-        }
-
-        /* Utility Glows */
-        .neon-text-blue { text-shadow: 0 0 5px #00f0ff; }
-        .neon-box-green:hover { box-shadow: 0 0 10px #00ff41, inset 0 0 5px #00ff41; border-color: #00ff41; }
+        body { background-color: #050505; color: #e0e0e0; overflow-x: hidden; font-family: "Share Tech Mono", monospace; }
+        .glitch-hover:hover { animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both infinite; color: #ff00ff; }
+        @keyframes glitch-anim { 0% { transform: translate(0) } 20% { transform: translate(-2px, 2px) } 40% { transform: translate(-2px, -2px) } 60% { transform: translate(2px, 2px) } 80% { transform: translate(2px, -2px) } 100% { transform: translate(0) } }
         .neon-box-blue:hover { box-shadow: 0 0 10px #00f0ff, inset 0 0 5px #00f0ff; border-color: #00f0ff; }
+        .neon-box-green:hover { box-shadow: 0 0 10px #00ff41, inset 0 0 5px #00ff41; border-color: #00ff41; }
         .neon-box-pink:hover { box-shadow: 0 0 10px #ff00ff, inset 0 0 5px #ff00ff; border-color: #ff00ff; }
-
-        /* Animation Classes */
         .fade-in { animation: fadeIn 1s forwards; opacity: 0; }
         .slide-up { animation: slideUp 0.8s forwards; opacity: 0; transform: translateY(20px); }
-        
         @keyframes fadeIn { to { opacity: 1; } }
         @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
-
-        /* Hidden Utility */
         .hidden-force { display: none !important; }
-
-        .blink-hard {
-            animation: blinker 1s step-end infinite;
-        }
-        @keyframes blinker {
-            50% { opacity: 0; }
-        }
-
-        /* --- ADVANCED RGB GLITCH EFFECT --- */
-        .glitch-wrapper {
-            position: relative;
-            color: white; /* Main Text Color */
-            z-index: 1;
-        }
-
-        .glitch-wrapper::before {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.8;
-            z-index: -1;
-            color: #ff00ff; 
-            background: #050505; 
-            animation: glitch-anim-1 2.5s infinite linear alternate-reverse;
-        }
-
-        .glitch-wrapper::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.8;
-            z-index: -2;
-            color: #00f0ff;
-            background: #050505;
-            animation: glitch-anim-2 3s infinite linear alternate-reverse;
-        }
-
-        @keyframes glitch-anim-1 {
-            0% { clip-path: inset(20% 0 80% 0); transform: translate(-2px, 1px); }
-            20% { clip-path: inset(60% 0 10% 0); transform: translate(2px, -1px); }
-            40% { clip-path: inset(40% 0 50% 0); transform: translate(-2px, 2px); }
-            60% { clip-path: inset(80% 0 5% 0); transform: translate(2px, -2px); }
-            80% { clip-path: inset(10% 0 70% 0); transform: translate(-1px, 1px); }
-            100% { clip-path: inset(30% 0 50% 0); transform: translate(1px, -1px); }
-        }
-
-        @keyframes glitch-anim-2 {
-            0% { clip-path: inset(10% 0 60% 0); transform: translate(2px, -1px); }
-            20% { clip-path: inset(80% 0 5% 0); transform: translate(-2px, 2px); }
-            40% { clip-path: inset(30% 0 20% 0); transform: translate(2px, 1px); }
-            60% { clip-path: inset(10% 0 80% 0); transform: translate(-1px, -2px); }
-            80% { clip-path: inset(50% 0 30% 0); transform: translate(1px, 2px); }
-            100% { clip-path: inset(70% 0 10% 0); transform: translate(-2px, -1px); }
-        }
+        .blink-hard { animation: blinker 1s step-end infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+        .glitch-wrapper { position: relative; color: white; z-index: 1; }
+        .glitch-wrapper::before, .glitch-wrapper::after { content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.8; background: #050505; z-index: -1; }
+        .glitch-wrapper::before { color: #ff00ff; animation: glitch-anim-1 2.5s infinite linear alternate-reverse; }
+        .glitch-wrapper::after { color: #00f0ff; animation: glitch-anim-2 3s infinite linear alternate-reverse; z-index: -2; }
+        @keyframes glitch-anim-1 { 0% { clip-path: inset(20% 0 80% 0); transform: translate(-2px, 1px); } 100% { clip-path: inset(30% 0 50% 0); transform: translate(1px, -1px); } }
+        @keyframes glitch-anim-2 { 0% { clip-path: inset(10% 0 60% 0); transform: translate(2px, -1px); } 100% { clip-path: inset(70% 0 10% 0); transform: translate(-2px, -1px); } }
     </style>
 </head>
 <body class="bg-cyber-black min-h-screen relative pb-24">
 
-    <!-- Three.js Background Container -->
+    <!-- Three.js Background -->
     <div id="canvas-container" class="fixed inset-0 z-[-1] pointer-events-none"></div>
 
     <!-- 1. STANDARD START OVERLAY (Desktop) -->
-    <div id="start-overlay" class="fixed inset-0 bg-cyber-black z-[200] flex items-center justify-center cursor-pointer">
-        <div class="text-center">
+    <!-- FIX: Added onclick="initiateBoot()" directly here to ensure it works -->
+    <div id="start-overlay" onclick="initiateBoot()" class="fixed inset-0 bg-cyber-black z-[200] flex items-center justify-center cursor-pointer">
+        <div class="text-center pointer-events-none">
             <div class="text-cyber-green text-2xl md:text-4xl font-mono tracking-widest animate-pulse border-b-2 border-cyber-green pb-2">
                 >> INITIALIZE SYSTEM <<
             </div>
@@ -170,18 +73,11 @@
         </div>
     </div>
 
-    <!-- 2. MOTION PERMISSION OVERLAY (Mobile/iOS) - NEW FEATURE RE-ADDED -->
-    <!-- This replaces the start-overlay on mobile devices -->
+    <!-- 2. MOTION PERMISSION OVERLAY (Mobile) -->
     <div id="motion-overlay" class="hidden-force fixed inset-0 z-[210] bg-cyber-black/95 flex flex-col items-center justify-center transition-opacity duration-500">
         <div class="text-cyber-green font-mono text-center space-y-6 p-8 border border-cyber-green/30 bg-black/50 backdrop-blur-md max-w-sm mx-4 relative">
-            <div class="absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 border-cyber-green"></div>
-            <div class="absolute bottom-0 right-0 w-3 h-3 border-r-2 border-b-2 border-cyber-green"></div>
-
             <h2 class="text-xl font-bold font-russo text-white tracking-wider">MOTION DETECTED</h2>
-            <p class="text-gray-400 text-xs font-mono leading-relaxed">
-                Enable gyroscope for immersive background control.
-            </p>
-            
+            <p class="text-gray-400 text-xs font-mono leading-relaxed">Enable gyroscope for immersive control.</p>
             <div class="flex flex-col gap-3 w-full">
                 <button onclick="enableMotion()" class="px-6 py-4 border border-cyber-green bg-cyber-green/10 text-cyber-green hover:bg-cyber-green hover:text-black transition-all font-bold tracking-widest uppercase text-xs">
                     [ ENABLE SENSORS & BOOT ]
@@ -195,29 +91,19 @@
 
     <!-- 3. BOOT SEQUENCE OVERLAY -->
     <div id="boot-screen" class="fixed inset-0 bg-cyber-black z-[100] flex flex-col justify-end p-8 text-cyber-green text-lg md:text-xl hidden-force">
-        <div class="max-w-2xl w-full mx-auto" id="log-container">
-            <!-- Logs injected here -->
-        </div>
+        <div class="max-w-2xl w-full mx-auto" id="log-container"></div>
     </div>
 
-    <!-- 4. MAIN DASHBOARD (Initially Hidden) -->
+    <!-- 4. MAIN DASHBOARD -->
     <main id="main-interface" class="hidden-force px-6 pb-6 pt-24 md:p-12 max-w-[1600px] mx-auto w-full z-10 relative">
-        
-        <!-- Header -->
         <header class="mb-12 border-b border-cyber-green/30 pb-6 flex justify-between items-end fade-in">
             <div>
-                <h2 class="text-cyber-green text-sm mb-2 tracking-widest">
-                    SYSTEM: <span class="blink-hard">ONLINE</span>
-                </h2>
-                <h1 class="text-3xl md:text-6xl font-russo text-white cursor-default glitch-wrapper" data-text="THE DEVELOPER'S DECK">
-                    THE DEVELOPER'S DECK
-                </h1>
+                <h2 class="text-cyber-green text-sm mb-2 tracking-widest">SYSTEM: <span class="blink-hard">ONLINE</span></h2>
+                <h1 class="text-3xl md:text-6xl font-russo text-white cursor-default glitch-wrapper" data-text="THE DEVELOPER'S DECK">THE DEVELOPER'S DECK</h1>
                 <p class="mt-2 text-cyber-pink max-w-lg">FILIPE // DEV OPERATIVE</p>
             </div>
             <div class="flex flex-col items-end gap-2">
-                <button id="music-btn" class="border border-cyber-green text-cyber-green px-3 py-1 text-xs hover:bg-cyber-green hover:text-black transition-colors uppercase font-mono">
-                    MUSIC: OFF
-                </button>
+                <button id="music-btn" class="border border-cyber-green text-cyber-green px-3 py-1 text-xs hover:bg-cyber-green hover:text-black transition-colors uppercase font-mono">MUSIC: OFF</button>
                 <div class="hidden md:block text-right">
                     <div class="text-cyber-pink text-xs">BUILD v.1.0</div>
                     <div class="text-cyber-blue text-xs">SECURE CONNECTION</div>
@@ -225,71 +111,38 @@
             </div>
         </header>
 
-        <!-- Dashboard Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            
-            <!-- Col 1: Navigation -->
             <nav class="lg:col-span-1 flex flex-col gap-4 slide-up" style="animation-delay: 0.2s;">
-                <a href="#" onclick="handleNav('PROJECTS')" class="bg-transparent border border-gray-800 p-6 text-center transition-all duration-300 neon-box-blue group">
-                    <span class="font-bold text-lg group-hover:text-cyber-blue">PROJECTS [LS]</span>
-                </a>
-                <a href="#" onclick="handleNav('ABOUT')" class="bg-transparent border border-gray-800 p-6 text-center transition-all duration-300 neon-box-green group">
-                    <span class="font-bold text-lg group-hover:text-cyber-green">IDENTITY [WHOAMI]</span>
-                </a>
-                <a href="#" onclick="handleNav('CONTACT')" class="bg-transparent border border-gray-800 p-6 text-center transition-all duration-300 neon-box-pink group">
-                    <span class="font-bold text-lg group-hover:text-cyber-pink">RECRUIT [RECRUIT]</span>
-                </a>
-
+                <a href="#" onclick="handleNav('PROJECTS')" class="bg-transparent border border-gray-800 p-6 text-center transition-all duration-300 neon-box-blue group"><span class="font-bold text-lg group-hover:text-cyber-blue">PROJECTS [LS]</span></a>
+                <a href="#" onclick="handleNav('ABOUT')" class="bg-transparent border border-gray-800 p-6 text-center transition-all duration-300 neon-box-green group"><span class="font-bold text-lg group-hover:text-cyber-green">IDENTITY [WHOAMI]</span></a>
+                <a href="#" onclick="handleNav('CONTACT')" class="bg-transparent border border-gray-800 p-6 text-center transition-all duration-300 neon-box-pink group"><span class="font-bold text-lg group-hover:text-cyber-pink">RECRUIT [RECRUIT]</span></a>
                 <div class="mt-auto p-4 border border-cyber-green/20 bg-transparent">
                     <h3 class="text-cyber-green text-xs mb-2">SKILL_TREE</h3>
-                    <div class="flex flex-wrap gap-2 text-xs text-cyber-blue">
-                        <span>JavaScript</span>/<span>HTML5</span>/<span>TAILWIND</span>/<span>THREE.JS</span>
-                    </div>
+                    <div class="flex flex-wrap gap-2 text-xs text-cyber-blue"><span>JavaScript</span>/<span>HTML5</span>/<span>TAILWIND</span>/<span>THREE.JS</span></div>
                 </div>
             </nav>
-
-            <!-- Col 2: Main Feed -->
             <section class="lg:col-span-2 flex flex-col gap-6 slide-up" style="animation-delay: 0.4s;">
                 <div class="bg-transparent border border-cyber-green/30 p-6 relative overflow-hidden group hover:border-cyber-green transition-colors duration-300">
                     <div class="absolute top-0 left-0 w-1 h-full bg-cyber-green/50 group-hover:h-full transition-all duration-500"></div>
                     <h3 class="text-xl text-cyber-blue mb-2">LATEST_DEPLOYMENT</h3>
                     <p class="text-gray-300 mb-4">Project "MY_JAVA_ROOM" deployed. An interactive 3D environment built with Three.js and WebGL.</p>
-                    <div class="flex gap-2">
-                        <span class="px-2 py-1 bg-cyber-blue/10 text-cyber-blue text-xs border border-cyber-blue/30">3D environment</span>
-                        <span class="px-2 py-1 bg-cyber-blue/10 text-cyber-blue text-xs border border-cyber-blue/30">Design</span>
-                    </div>
                 </div>
-
                 <div class="bg-transparent border border-cyber-pink/30 p-6 relative overflow-hidden group hover:border-cyber-pink transition-colors duration-300">
                     <h3 class="text-xl text-cyber-pink mb-2">DEV_LOG_ENTRY_404</h3>
-                    <p class="text-gray-300">This Website was built on a lightweight, framework-free stack using HTML5, Vanilla JavaScript, and Tailwind CSS for a custom cyberpunk aesthetic.</p>
+                    <p class="text-gray-300">Website built on a lightweight, framework-free stack using HTML5, Vanilla JS, and Tailwind CSS.</p>
                 </div>
             </section>
-
-            <!-- Col 3: Status -->
             <aside class="lg:col-span-1 flex flex-col gap-4 slide-up" style="animation-delay: 0.6s;">
                 <div class="border border-cyber-green/30 p-4 bg-transparent">
                     <h4 class="text-cyber-green text-xs border-b border-cyber-green/20 pb-2 mb-2">LOCATION_DATA</h4>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-gray-400">CITY:</span>
-                        <span class="text-cyber-blue">COVENTRY</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-400">REGION:</span>
-                        <span class="text-cyber-blue">UK</span>
-                    </div>
+                    <div class="flex justify-between items-center mb-2"><span class="text-gray-400">CITY:</span><span class="text-cyber-blue">COVENTRY</span></div>
+                    <div class="flex justify-between items-center"><span class="text-gray-400">REGION:</span><span class="text-cyber-blue">UK</span></div>
                 </div>
-
                 <div class="border border-cyber-blue/30 p-4 bg-transparent">
                     <h4 class="text-cyber-blue text-xs border-b border-cyber-blue/20 pb-2 mb-2">SYSTEM_STATUS</h4>
                     <div class="space-y-2">
-                        <div class="flex items-center gap-2">
-                            <div class="w-2 h-2 bg-cyber-green rounded-full animate-pulse"></div>
-                            <span class="text-xs text-gray-300">SERVER: OPTIMAL</span>
-                        </div>
-                        <div class="w-full bg-gray-800 h-1 mt-2">
-                            <div class="bg-cyber-blue h-full" style="width: 87%"></div>
-                        </div>
+                        <div class="flex items-center gap-2"><div class="w-2 h-2 bg-cyber-green rounded-full animate-pulse"></div><span class="text-xs text-gray-300">SERVER: OPTIMAL</span></div>
+                        <div class="w-full bg-gray-800 h-1 mt-2"><div class="bg-cyber-blue h-full" style="width: 87%"></div></div>
                         <div class="text-right text-[10px] text-cyber-blue">MEMORY_LOAD: 87%</div>
                     </div>
                 </div>
@@ -297,147 +150,74 @@
         </div>
     </main>
 
-    <!-- 5. TERMINAL COMPONENT -->
+    <!-- 5. TERMINAL -->
     <div class="fixed bottom-0 left-0 w-full bg-cyber-black/95 border-t border-cyber-green/30 p-4 backdrop-blur-sm z-40">
         <div class="max-w-7xl mx-auto w-full">
             <div id="terminal-helper" class="text-cyber-blue mb-2 overflow-hidden h-0 transition-all duration-300"></div>
             <div class="flex items-center text-sm md:text-xl text-cyber-green">
-                <span class="mr-2 md:mr-3 font-bold">
-                    <span class="hidden md:inline">admin@deck:</span>~$
-                </span>
-                <input 
-                    id="terminal-input"
-                    type="text" 
-                    class="flex-1 bg-transparent border-none outline-none text-cyber-green placeholder-cyber-green/30 uppercase font-mono min-w-0"
-                    placeholder="ENTER COMMAND..."
-                    autocomplete="off"
-                >
+                <span class="mr-2 md:mr-3 font-bold"><span class="hidden md:inline">admin@deck:</span>~$</span>
+                <input id="terminal-input" type="text" class="flex-1 bg-transparent border-none outline-none text-cyber-green placeholder-cyber-green/30 uppercase font-mono min-w-0" placeholder="ENTER COMMAND..." autocomplete="off">
             </div>
         </div>
     </div>
 
-    <!-- Hidden Audio -->
-    <audio id="bg-music" loop>
-        <source src="factions.mp3" type="audio/mpeg">
-    </audio>
+    <!-- Audio (Hidden) -->
+    <audio id="bg-music" loop><source src="factions.mp3" type="audio/mpeg"></audio>
     <audio id="sfx-type" src="sfx-type1.mp3"></audio>
     <audio id="sfx-enter" src="sfx-enter.mp3"></audio>
     <audio id="sfx-hover" src="sfx-hover.mp3"></audio>
     <audio id="sfx-boot" src="sfx-boot.mp3"></audio>
 
-    <!-- JAVASCRIPT LOGIC -->
     <script>
-    // ==========================================
-    // 1. CONFIGURATION
-    // ==========================================
-    const logs = [
-        "WAKE UP USER",
-        "LOADING NEURAL INTERFACE...",
-        "ESTABLISHING CONNECTION TO COVENTRY UK SERVER...",
-        "FIREWALL LOGS AUDITED: NO BREACHES DETECTED",
-        "ACCESS GRANTED",
-        "DECK ONLINE.",
-        "WELCOME"
-    ];
-    
-    // Elements
+    // 1. SAFE VARIABLES
+    const logs = ["WAKE UP USER", "LOADING NEURAL INTERFACE...", "ESTABLISHING CONNECTION...", "ACCESS GRANTED", "DECK ONLINE.", "WELCOME"];
     const logContainer = document.getElementById('log-container');
     const bootScreen = document.getElementById('boot-screen');
     const mainInterface = document.getElementById('main-interface');
     const startOverlay = document.getElementById('start-overlay');
-    const motionOverlay = document.getElementById('motion-overlay'); // NEW
+    const motionOverlay = document.getElementById('motion-overlay');
     const input = document.getElementById('terminal-input');
     const helper = document.getElementById('terminal-helper');
     const music = document.getElementById('bg-music');
     const musicBtn = document.getElementById('music-btn');
-
     let logIndex = 0;
 
-    // ==========================================
-    // 2. AUDIO & MOTION HANDLERS (NEW)
-    // ==========================================
+    // 2. SAFETY HELPERS
+    function setStorage(key, val) { try { sessionStorage.setItem(key, val); } catch(e){} }
+    function getStorage(key) { try { return sessionStorage.getItem(key); } catch(e){ return null; } }
     function playSFX(id) {
         if (window.innerWidth < 768 && (id === 'sfx-hover' || id === 'sfx-type')) return;
         const audio = document.getElementById(id);
-        if (audio) {
-            audio.volume = 0.3; 
-            audio.currentTime = 0; 
-            audio.play().catch(e => {});
-        }
+        if (audio) { audio.volume = 0.3; audio.currentTime = 0; audio.play().catch(e=>{}); }
     }
 
-    // TRIGGER BOOT FROM MOBILE OVERLAY
-    function enableMotion() {
-        // 1. Request Permission (iOS 13+)
-        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-            DeviceOrientationEvent.requestPermission()
-                .then(state => {
-                    if (state === 'granted') {
-                        // Background.js will pick up the event automatically if set up correctly
-                        // or we trigger the listener here
-                    }
-                })
-                .catch(console.error)
-                .finally(() => {
-                    initiateBoot(); // Start boot regardless of permission outcome
-                });
-        } else {
-            initiateBoot(); // Android/Others
-        }
-    }
-
-    function skipMotion() {
-        initiateBoot();
-    }
-
-    // Common function to start the visual sequence
+    // 3. BOOT FUNCTIONS
     function initiateBoot() {
-        sessionStorage.setItem('deck_booted', 'true');
+        setStorage('deck_booted', 'true');
         
         // Hide Overlays
         if(motionOverlay) motionOverlay.style.display = 'none';
         if(startOverlay) startOverlay.style.display = 'none';
 
-        // Play Sound & Start
+        // Start Sequence
         playSFX('sfx-boot');
-        
         bootScreen.classList.remove('hidden-force');
         bootScreen.style.display = 'flex';
-        
         logIndex = 0; 
         logContainer.innerHTML = ''; 
         runBootSequence();
     }
 
-    // ==========================================
-    // 3. STARTUP LOGIC (DETECT MOBILE)
-    // ==========================================
-    const isBooted = sessionStorage.getItem('deck_booted');
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-    if (isBooted === 'true') {
-        // Returning User
-        if(startOverlay) startOverlay.style.display = 'none';
-        if(motionOverlay) motionOverlay.style.display = 'none';
-        bootScreen.remove();
-        mainInterface.classList.remove('hidden-force');
-    } else {
-        // First Time User
-        if (isMobile) {
-            // SHOW MOTION OVERLAY, HIDE DEFAULT OVERLAY
-            if(startOverlay) startOverlay.style.display = 'none';
-            if(motionOverlay) motionOverlay.classList.remove('hidden-force');
+    function enableMotion() {
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            DeviceOrientationEvent.requestPermission().then(s => initiateBoot()).catch(e => initiateBoot());
         } else {
-            // DESKTOP: STANDARD CLICK
-            startOverlay.addEventListener('click', () => {
-                initiateBoot();
-            });
+            initiateBoot();
         }
     }
+    
+    function skipMotion() { initiateBoot(); }
 
-    // ==========================================
-    // 4. BOOT SEQUENCE
-    // ==========================================
     function runBootSequence() {
         if (logIndex < logs.length) {
             const div = document.createElement('div');
@@ -459,66 +239,59 @@
         }
     }
 
-    // ==========================================
-    // 5. TERMINAL LOGIC
-    // ==========================================
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('button') && !e.target.closest('a') && window.getSelection().toString().length === 0) {
-            input.focus();
+    // 4. INIT LOGIC
+    // Move logic inside DOMContentLoaded to be safe
+    document.addEventListener("DOMContentLoaded", () => {
+        const isBooted = getStorage('deck_booted');
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+        if (isBooted === 'true') {
+            // Returning User
+            if(startOverlay) startOverlay.style.display = 'none';
+            if(motionOverlay) motionOverlay.style.display = 'none';
+            if(bootScreen) bootScreen.remove();
+            mainInterface.classList.remove('hidden-force');
+        } else {
+            // New User
+            if (isMobile) {
+                if(startOverlay) startOverlay.style.display = 'none';
+                if(motionOverlay) motionOverlay.classList.remove('hidden-force');
+            }
+            // If desktop, standard overlay is already visible by default CSS
         }
     });
 
-    input.addEventListener('keydown', function(e) {
-        playSFX('sfx-type');
-        if (e.key === 'Enter') {
-            playSFX('sfx-enter');
-            const command = input.value.trim().toUpperCase();
-            processCommand(command);
-            input.value = ''; 
+    // 5. TERMINAL & INTERACTION
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('button') && !e.target.closest('a') && !e.target.closest('#start-overlay') && !e.target.closest('#motion-overlay') && window.getSelection().toString().length === 0) {
+            if(input) input.focus();
         }
     });
+
+    if(input) {
+        input.addEventListener('keydown', function(e) {
+            playSFX('sfx-type');
+            if (e.key === 'Enter') {
+                playSFX('sfx-enter');
+                const command = input.value.trim().toUpperCase();
+                processCommand(command);
+                input.value = ''; 
+            }
+        });
+    }
 
     function processCommand(cmd) {
-        let msg = "";
-        let action = null;
-
+        let msg = "", action = null;
         switch(cmd) {
-            case "WHOAMI":
-            case "ABOUT":
-                msg = "NAVIGATING TO IDENTITY MATRIX...";
-                action = () => setTimeout(() => window.location.href = "about.html", 1000);
-                break;
-            case "LS":
-            case "PROJECTS":
-                msg = "LISTING PROJECT DIRECTORIES...";
-                action = () => setTimeout(() => window.location.href = "projects.html", 1000);
-                break;
-            case "RECRUIT":
-            case "CONTACT":
-                msg = "OPENING COMM CHANNELS...";
-                action = () => setTimeout(() => window.location.href = "contact.html", 1000);
-                break;
-            case "MUSIC ON":
-                msg = "AUDIO STREAM ESTABLISHED.";
-                action = () => { music.play(); updateMusicBtn(true); };
-                break;
-            case "MUSIC OFF":
-                msg = "AUDIO STREAM DISCONNECTED.";
-                action = () => { music.pause(); updateMusicBtn(false); };
-                break;
-            case "RESTART":
-            case "REBOOT":
-                msg = "INITIATING SYSTEM REBOOT...";
-                sessionStorage.removeItem('deck_booted');
-                action = () => setTimeout(() => window.location.reload(), 1000);
-                break;
-            case "HELP":
-                msg = "COMMANDS: WHOAMI, LS, RECRUIT, MUSIC ON/OFF, REBOOT";
-                break;
-            case "CLEAR":
-                msg = ""; helper.style.height = "0"; helper.innerHTML = ""; return;
-            default:
-                msg = `COMMAND '${cmd}' NOT RECOGNIZED. TRY 'HELP'.`;
+            case "WHOAMI": case "ABOUT": msg = "NAVIGATING TO IDENTITY MATRIX..."; action = () => setTimeout(() => window.location.href = "about.html", 1000); break;
+            case "LS": case "PROJECTS": msg = "LISTING PROJECT DIRECTORIES..."; action = () => setTimeout(() => window.location.href = "projects.html", 1000); break;
+            case "RECRUIT": case "CONTACT": msg = "OPENING COMM CHANNELS..."; action = () => setTimeout(() => window.location.href = "contact.html", 1000); break;
+            case "MUSIC ON": msg = "AUDIO STREAM ESTABLISHED."; action = () => { music.play(); updateMusicBtn(true); }; break;
+            case "MUSIC OFF": msg = "AUDIO STREAM DISCONNECTED."; action = () => { music.pause(); updateMusicBtn(false); }; break;
+            case "RESTART": case "REBOOT": msg = "INITIATING SYSTEM REBOOT..."; try{sessionStorage.removeItem('deck_booted');}catch(e){} action = () => setTimeout(() => window.location.reload(), 1000); break;
+            case "HELP": msg = "COMMANDS: WHOAMI, LS, RECRUIT, MUSIC ON/OFF, REBOOT"; break;
+            case "CLEAR": msg = ""; helper.style.height = "0"; helper.innerHTML = ""; return;
+            default: msg = `COMMAND '${cmd}' NOT RECOGNIZED. TRY 'HELP'.`;
         }
         if (msg) { helper.innerHTML = `>> ${msg}`; helper.style.height = "auto"; }
         if (action) action();
@@ -538,12 +311,14 @@
         }
     }
 
-    musicBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        playSFX('sfx-click');
-        if (music.paused) { music.play(); updateMusicBtn(true); } 
-        else { music.pause(); updateMusicBtn(false); }
-    });
+    if(musicBtn) {
+        musicBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            playSFX('sfx-click');
+            if (music.paused) { music.play(); updateMusicBtn(true); } 
+            else { music.pause(); updateMusicBtn(false); }
+        });
+    }
 
     document.querySelectorAll('a, button').forEach(btn => {
         btn.addEventListener('mouseenter', () => playSFX('sfx-hover'));
