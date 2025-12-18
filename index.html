@@ -156,6 +156,26 @@
                     <div class="absolute top-0 left-0 w-1 h-full bg-cyber-green/50 group-hover:h-full transition-all duration-500"></div>
                     <h3 class="text-xl text-cyber-blue mb-2 font-mono">LATEST_DEPLOYMENT</h3>
                     <p class="text-gray-300 mb-4 font-mono">Project "Kinetic Core" deployed. An interactive AI particle interface.</p>
+                    <!-- NAV GYRO CONTAINER -->
+                    <div class="bg-cyber-dark/80 border border-cyber-pink/30 relative overflow-hidden group h-64 flex flex-col">
+                        <!-- Header -->
+                        <div class="absolute top-0 left-0 w-full p-2 z-10 flex justify-between pointer-events-none">
+                            <h3 class="text-xs text-cyber-pink font-mono tracking-widest bg-black/50 px-2">NAV_GYRO_SYSTEM</h3>
+                            <div class="text-[10px] text-cyber-blue font-mono">
+                                PITCH: <span id="gyro-x">0</span> // YAW: <span id="gyro-y">0</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Crosshair Overlay -->
+                        <div class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center opacity-30">
+                            <div class="w-64 h-[1px] bg-cyber-pink/50"></div>
+                            <div class="h-32 w-[1px] bg-cyber-pink/50 absolute"></div>
+                            <div class="w-16 h-16 border border-cyber-pink/50 rounded-full absolute"></div>
+                        </div>
+
+                        <!-- The 3D Canvas lives here -->
+                        <div id="mini-map-container" class="w-full h-full cursor-crosshair"></div>
+                    </div>
                 </div>
             </section>
             <!-- STATUS -->
@@ -471,6 +491,114 @@
         const style = document.createElement('style');
         style.innerHTML = `@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }`;
         document.head.appendChild(style);
+
+        // ==========================================
+    // MINI-MAP GYRO SYSTEM (Interactive Terrain)
+    // ==========================================
+    function initGyroSystem() {
+        const container = document.getElementById('mini-map-container');
+        if (!container) return;
+
+        // 1. Setup Scene
+        const scene = new THREE.Scene();
+        // Cyberpunk grid fog
+        scene.fog = new THREE.FogExp2(0x000000, 0.15); 
+
+        const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 100);
+        camera.position.set(0, 3, 5); // Look down slightly
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        // 2. Create Moving Grid (The Terrain)
+        const geometry = new THREE.PlaneGeometry(40, 40, 40, 40);
+        
+        // Create a "mountainous" effect by randomizing vertices slightly
+        const count = geometry.attributes.position.count;
+        const randoms = new Float32Array(count);
+        for(let i = 0; i < count; i++) {
+            randoms[i] = Math.random();
+            // Pull edges down to create a "valley" look
+            const x = geometry.attributes.position.getX(i);
+            if (Math.abs(x) > 10) {
+                 geometry.attributes.position.setZ(i, Math.random() * 2); 
+            }
+        }
+
+        const material = new THREE.MeshBasicMaterial({ 
+            color: 0xff00ff, // Cyber Pink
+            wireframe: true,
+            transparent: true,
+            opacity: 0.3
+        });
+
+        const terrain = new THREE.Mesh(geometry, material);
+        terrain.rotation.x = -Math.PI / 2; // Lie flat
+        scene.add(terrain);
+
+        // 3. Animation Loop variables
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetRotX = -Math.PI / 2;
+        let targetRotZ = 0;
+
+        // UI Elements for "Pitch/Yaw" display
+        const uiX = document.getElementById('gyro-x');
+        const uiY = document.getElementById('gyro-y');
+
+        // Mouse Listener specific to this container (or global)
+        document.addEventListener('mousemove', (e) => {
+            const rect = container.getBoundingClientRect();
+            // Calculate mouse position relative to the center of the screen/container
+            // Range: -1 to 1
+            const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+            mouseX = x;
+            mouseY = y;
+        });
+
+        const animate = () => {
+            requestAnimationFrame(animate);
+
+            // A. Move Terrain Forward (Infinite Scroll illusion)
+            // We shift the texture or just move vertices, but a simple way is moving the object
+            // and resetting it. For wireframe, scrolling texture offset is hard.
+            // Let's just pulsate the terrain vertices for "engine rumble"
+            const time = Date.now() * 0.005;
+            
+            // B. Interaction: Tilt the terrain based on mouse
+            // Smoothly interpolate current rotation to target rotation
+            const tiltSensitivity = 0.3; 
+            targetRotX = (-Math.PI / 2) - (mouseY * tiltSensitivity); // Pitch
+            targetRotZ = -(mouseX * tiltSensitivity); // Roll/Bank
+
+            terrain.rotation.x += 0.05 * (targetRotX - terrain.rotation.x);
+            terrain.rotation.z += 0.05 * (targetRotZ - terrain.rotation.z);
+
+            // Update UI Numbers
+            if (uiX) uiX.innerText = (terrain.rotation.x + 1.57).toFixed(2);
+            if (uiY) uiY.innerText = terrain.rotation.z.toFixed(2);
+
+            renderer.render(scene, camera);
+        };
+
+        animate();
+
+        // Handle Resize
+        window.addEventListener('resize', () => {
+            if(!container) return;
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+    }
+
+    // Start the system when page loads
+    window.addEventListener('load', initGyroSystem);
     </script>
 </body>
 </html>
