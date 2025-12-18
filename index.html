@@ -56,15 +56,6 @@
             font-family: "Share Tech Mono", monospace;
         }
 
-        /* Scanlines */
-        .scanlines {
-            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
-            background-size: 100% 4px;
-            position: fixed; inset: 0; z-index: 50; pointer-events: none;
-            animation: scrollScanlines 10s linear infinite;
-        }
-        @keyframes scrollScanlines { 0% { background-position: 0 0; } 100% { background-position: 0 100%; } }
-
         /* RGB Text Glitch */
         .glitch-wrapper { position: relative; color: white; z-index: 1; }
         .glitch-wrapper::before, .glitch-wrapper::after {
@@ -99,7 +90,6 @@
 <body class="bg-cyber-black min-h-screen pb-24 relative selection:bg-cyber-pink selection:text-black">
 
     <!-- FX LAYERS -->
-    <div class="scanlines"></div>
     <div id="canvas-container" class="fixed inset-0 z-[-1] pointer-events-none"></div>
 
     <!-- AUDIO SYSTEM -->
