@@ -542,7 +542,7 @@
         document.head.appendChild(style);
 
         // ==========================================
-    // MINI-MAP GYRO SYSTEM v3.0 (SMOOTH WARP)
+    // MINI-MAP GYRO SYSTEM v4.0 (SEAMLESS & SMOOTH)
     // ==========================================
     function initGyroSystem() {
         const container = document.getElementById('mini-map-container');
@@ -550,7 +550,7 @@
 
         // 1. Setup Scene
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x000000, 0.15); 
+        scene.fog = new THREE.FogExp2(0x000000, 0.12); // Slightly less fog for clarity
 
         const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 100);
         camera.position.set(0, 3, 5); 
@@ -561,16 +561,22 @@
         renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(renderer.domElement);
 
-        // 2. Create Dynamic Terrain
-        // Width: 60, Height: 60, Segments: 40
-        // Segment size = 60 / 40 = 1.5 units (Important for looping)
+        // 2. Create Dynamic Terrain (The Fix)
+        // We use a mathematical curve based on X so it's consistent along Z (Seamless looping)
         const geometry = new THREE.PlaneGeometry(60, 60, 40, 40);
         
         const count = geometry.attributes.position.count;
         for(let i = 0; i < count; i++) {
             const x = geometry.attributes.position.getX(i);
+            
+            // MATH FIX: Height depends ONLY on X, not Random.
+            // This creates a "Valley" or "Half-Pipe" shape that loops perfectly.
             let z = 0;
-            if (Math.abs(x) > 10) z = Math.random() * 2.5; // Mountains on sides
+            if (Math.abs(x) > 5) {
+                // Curve up the edges smoothly
+                z = Math.pow(Math.abs(x) - 5, 1.5) * 0.15; 
+            }
+            
             geometry.attributes.position.setZ(i, z);
         }
         
@@ -585,35 +591,34 @@
         terrain.rotation.x = -Math.PI / 2; 
         scene.add(terrain);
 
-        // 3. State Variables
-        let baseSpeed = 0.02;     // Normal cruising speed
-        let boostSpeed = 0.8;     // Warp speed
+        // 3. Variables
+        let baseSpeed = 0.02;     
+        let boostSpeed = 0.4;     // REDUCED from 0.8 to 0.4 for a smoother feel
         let currentSpeed = baseSpeed;
         
-        let gridOffset = 0;       // Track distance traveled smoothly
+        let gridOffset = 0;
         let boostMode = false;
         let shakeIntensity = 0;
-        let targetFov = 60;       // Field of View
+        let targetFov = 60;       
         
         let mouseX = 0, mouseY = 0;
         const uiX = document.getElementById('gyro-x');
         const uiY = document.getElementById('gyro-y');
-        
         let currentBaseColor = 0xff00ff; 
 
         // 4. API & Interaction
         window.gyroAPI = {
             boost: () => {
+                if (boostMode) return; // Prevent double clicking
                 boostMode = true;
-                shakeIntensity = 0.2;
-                material.color.setHex(0xFFFFFF); // Flash White
+                shakeIntensity = 0.15; // Slightly less shake
+                material.color.setHex(0xFFFFFF); 
                 playSFX('sfx-enter'); 
                 
-                // End boost after 1.5 seconds
                 setTimeout(() => {
                     boostMode = false;
                     material.color.setHex(currentBaseColor); 
-                }, 1500);
+                }, 2000); // Longer boost duration (2s)
             },
             setColor: (hex) => {
                 currentBaseColor = hex;
@@ -630,7 +635,7 @@
             }
         };
 
-        // Input Listeners
+        // Inputs
         document.addEventListener('mousemove', (e) => {
             if (!container || container.offsetParent === null) return;
             const rect = container.getBoundingClientRect();
@@ -646,37 +651,31 @@
             requestAnimationFrame(animate);
             if (container.offsetParent === null) return;
 
-            // --- SMOOTH SPEED & FOV ---
+            // Speed & FOV
             if (boostMode) {
-                // Accelerate smoothly
-                currentSpeed = THREE.MathUtils.lerp(currentSpeed, boostSpeed, 0.05);
-                targetFov = 90; // Widen view for speed effect
+                currentSpeed = THREE.MathUtils.lerp(currentSpeed, boostSpeed, 0.02); // Slower acceleration (0.05 -> 0.02)
+                targetFov = 85; 
             } else {
-                // Decelerate smoothly
-                currentSpeed = THREE.MathUtils.lerp(currentSpeed, baseSpeed, 0.05);
-                targetFov = 60; // Normal view
+                currentSpeed = THREE.MathUtils.lerp(currentSpeed, baseSpeed, 0.05); // Faster deceleration
+                targetFov = 60; 
             }
 
-            // Apply FOV change
             camera.fov = THREE.MathUtils.lerp(camera.fov, targetFov, 0.05);
             camera.updateProjectionMatrix();
 
-            // --- MOVEMENT MATH (THE FIX) ---
-            // Instead of multiplying Date.now() (which jumps), we add to an accumulator
+            // Movement (Seamless Loop)
             gridOffset += currentSpeed;
-            
-            // Loop the grid every 1.5 units (segment size) so it looks infinite
-            terrain.position.z = gridOffset % 1.5;
+            terrain.position.z = gridOffset % 1.5; // Modulo matches segment height
 
-            // --- TILT & BANK ---
-            const targetRotX = (-Math.PI / 2) - (mouseY * 0.3); 
-            const targetRotZ = -(mouseX * 0.3); 
+            // Tilt & Bank
+            const targetRotX = (-Math.PI / 2) - (mouseY * 0.2); // Reduced tilt range
+            const targetRotZ = -(mouseX * 0.2); 
 
             terrain.rotation.x += 0.05 * (targetRotX - terrain.rotation.x);
             terrain.rotation.z += 0.05 * (targetRotZ - terrain.rotation.z);
 
-            // --- CAMERA SHAKE ---
-            if (boostMode || shakeIntensity > 0.001) {
+            // Camera Shake
+            if (shakeIntensity > 0.001) {
                 camera.position.x = (Math.random() - 0.5) * shakeIntensity;
                 camera.position.y = 3 + (Math.random() - 0.5) * shakeIntensity;
                 shakeIntensity = THREE.MathUtils.lerp(shakeIntensity, 0, 0.05);
@@ -684,7 +683,6 @@
                 camera.position.set(0, 3, 5);
             }
 
-            // Update UI
             if (uiX && !isNaN(terrain.rotation.x)) uiX.innerText = (terrain.rotation.x + 1.57).toFixed(2);
             if (uiY && !isNaN(terrain.rotation.z)) uiY.innerText = terrain.rotation.z.toFixed(2);
 
@@ -692,7 +690,6 @@
         };
         animate();
 
-        // Resize Logic
         window.resizeGyro = () => {
             if(!container) return;
             const width = container.clientWidth || 100;
