@@ -586,7 +586,7 @@
         document.head.appendChild(style);
 
         // ==========================================
-    // MINI-MAP GYRO SYSTEM v7.0 (DEEP DATA CORE)
+    // MINI-MAP GYRO SYSTEM v7.1 (SLOW & HEAVY)
     // ==========================================
     function initGyroSystem() {
         const container = document.getElementById('mini-map-container');
@@ -594,50 +594,46 @@
 
         // 1. Setup Scene
         const scene = new THREE.Scene();
-        
         const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 100);
-        camera.position.z = 8; // Start Zoomed Out
+        camera.position.z = 8; 
 
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         renderer.setSize(container.clientWidth, container.clientHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(renderer.domElement);
 
-        // 2. The Outer Shell (Wireframe Globe)
+        // 2. The Outer Shell
         const geometry = new THREE.IcosahedronGeometry(2.2, 2); 
         const material = new THREE.MeshBasicMaterial({ 
             color: 0xff00ff, 
             wireframe: true, 
             transparent: true, 
-            opacity: 0.4 // Base opacity
+            opacity: 0.4 
         });
         const globe = new THREE.Mesh(geometry, material);
         scene.add(globe);
 
-        // 3. The Inner Core (Data Particles) - HIDDEN AT START
+        // 3. The Inner Core (Data Particles)
         const particleGeo = new THREE.BufferGeometry();
         const particleCount = 1500;
         const posArray = new Float32Array(particleCount * 3);
         
         for(let i = 0; i < particleCount * 3; i++) {
-            // Random points inside a smaller sphere (radius 1.8)
             posArray[i] = (Math.random() - 0.5) * 3.6;
         }
         
         particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        
         const particleMat = new THREE.PointsMaterial({
             size: 0.03,
-            color: 0x00f0ff, // Cyan Core
+            color: 0x00f0ff, 
             transparent: true,
-            opacity: 0.0, // Start Invisible
+            opacity: 0.0, 
             blending: THREE.AdditiveBlending
         });
-        
         const core = new THREE.Points(particleGeo, particleMat);
         scene.add(core);
 
-        // 4. Orbital Ring (Decoration)
+        // 4. Orbital Ring
         const ringGeo = new THREE.TorusGeometry(3.5, 0.02, 16, 100);
         const ringMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.2 });
         const ring = new THREE.Mesh(ringGeo, ringMat);
@@ -646,20 +642,21 @@
 
         // 5. Variables
         let isZoomed = false;
-        let targetZ = 8;       // Camera Distance
-        let targetOpacity = 0.0; // Core Opacity
+        let targetZ = 8;       
+        let targetOpacity = 0.0; 
         let targetWireOpacity = 0.4;
         
-        // SLOWER ROTATION SETTINGS
+        // --- NEW SLOWER SPEEDS ---
         let mouseX = 0, mouseY = 0;
-        let autoRotateX = 0.001; // Very slow idle spin
-        let autoRotateY = 0.002;
+        let autoRotateX = 0.0002; // Was 0.001 (5x slower)
+        let autoRotateY = 0.0005; // Was 0.002 (4x slower)
+        const mouseSensitivity = 0.005; // Was 0.02 (4x slower)
 
         const uiX = document.getElementById('gyro-x');
         const uiY = document.getElementById('gyro-y');
         let currentBaseColor = 0xff00ff; 
 
-        // 4. API & Interaction
+        // 6. API
         window.gyroAPI = {
             toggleZoom: () => {
                 isZoomed = !isZoomed;
@@ -680,15 +677,11 @@
                 material.color.setHex(hex);
                 core.material.color.setHex(hex);
             },
-            // --- NEW: RESET FUNCTION ---
             reset: () => {
-                // Reset Color to Default Pink
                 const defaultPink = 0xff00ff;
                 currentBaseColor = defaultPink;
                 material.color.setHex(defaultPink);
                 core.material.color.setHex(defaultPink);
-                
-                // Reset Zoom if needed (Optional, but "Original Form" implies unzoomed)
                 if (isZoomed) {
                      isZoomed = false;
                      targetZ = 8;
@@ -718,45 +711,44 @@
             mouseY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
         });
 
-        // Handle Mouse Click
-        container.addEventListener('mousedown', (e) => {
-            e.stopPropagation(); // Stop event from bubbling up
+        // Handle Click (Zoom) - With Mobile Fix
+        const handleClick = (e) => {
+            e.stopPropagation();
+            // Optional: Prevent default if you want to stop scrolling on mobile, 
+            // but usually we want to allow scrolling unless dragging.
             window.gyroAPI.toggleZoom();
-        });
+        };
 
-        // Handle Touch (Mobile)
+        container.addEventListener('mousedown', handleClick);
         container.addEventListener('touchstart', (e) => {
-            e.stopPropagation(); // Stop event from bubbling up
-            e.preventDefault();  // Stop browser from zooming/scrolling page while touching this box
+            e.stopPropagation();
+            e.preventDefault(); // Stop keyboard popping up / scrolling on globe
             window.gyroAPI.toggleZoom();
         }, { passive: false });
+
 
         // 7. Animation Loop
         const animate = () => {
             requestAnimationFrame(animate);
             if (container.offsetParent === null) return;
 
-            // --- SMOOTH CAMERA MOVE (ZOOM) ---
+            // Camera Move
             camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetZ, 0.05);
             
-            // --- FADE EFFECTS ---
-            // Fade Core In/Out
+            // Fades
             core.material.opacity = THREE.MathUtils.lerp(core.material.opacity, targetOpacity, 0.05);
-            // Fade Shell Out/In
             globe.material.opacity = THREE.MathUtils.lerp(globe.material.opacity, targetWireOpacity, 0.05);
 
-            // --- ROTATION (Controlled by Mouse + Slow Idle) ---
-            // Reduced mouse sensitivity (0.05 -> 0.02)
-            globe.rotation.y += autoRotateY + (mouseX * 0.02);
-            globe.rotation.x += autoRotateX - (mouseY * 0.02);
+            // --- ROTATION (SLOWED DOWN) ---
+            globe.rotation.y += autoRotateY + (mouseX * mouseSensitivity);
+            globe.rotation.x += autoRotateX - (mouseY * mouseSensitivity);
             
-            // Core rotates slightly faster for depth effect
-            core.rotation.y = globe.rotation.y * 1.2;
-            core.rotation.x = globe.rotation.x * 1.2;
+            core.rotation.y = globe.rotation.y * 1.1; // Core moves slightly faster for depth
+            core.rotation.x = globe.rotation.x * 1.1;
 
             // Ring Tumble
-            ring.rotation.x += 0.002;
-            ring.rotation.y += 0.002;
+            ring.rotation.x += 0.001; // Slower ring
+            ring.rotation.y += 0.001;
 
             // Update UI
             if (uiX) uiX.innerText = (globe.rotation.x % 6.28).toFixed(2);
