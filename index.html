@@ -128,8 +128,16 @@
                 <p class="mt-2 text-cyber-pink max-w-lg font-mono">FILIPE OLIVEIRA // FULL-STACK OPERATIVE</p>
             </div>
             <div class="flex flex-col items-end gap-2">
-                <button id="music-btn" class="border border-cyber-green text-cyber-green px-3 py-1 text-xs hover:bg-cyber-green hover:text-black transition-colors uppercase font-mono">[ MUSIC: OFF ]</button>
-            </div>
+            <!-- New Help Button -->
+            <button onclick="processCommand('HELP')" class="border border-cyber-blue text-cyber-blue px-3 py-1 text-xs hover:bg-cyber-blue hover:text-black transition-colors uppercase font-mono">
+                [ CMD_LIST ]
+            </button>
+            
+            <!-- Existing Music Button -->
+            <button id="music-btn" class="border border-cyber-green text-cyber-green px-3 py-1 text-xs hover:bg-cyber-green hover:text-black transition-colors uppercase font-mono">
+                [ MUSIC: OFF ]
+            </button>
+        </div>
         </header>
 
         <!-- DASHBOARD GRID -->
@@ -476,6 +484,16 @@
                     msg = "OPENING COMM CHANNELS..."; action = () => navigateTo('recruit-section'); break;
                 case "HOME": case "CD ..": 
                     msg = "RETURNING TO ROOT..."; action = () => navigateTo('home-section'); break;
+
+                    // ... inside switch(cmd) ...
+
+                case "GYRO REFRESH":
+                case "RESET GYRO":
+                    msg = "RESTORING DEFAULT CONFIGURATION...";
+                    action = () => {
+                        if (window.gyroAPI) window.gyroAPI.reset();
+                    };
+                    break;
                 
                 /// --- GYRO COMMANDS (UPDATED) ---
                 case "ZOOM":
@@ -510,8 +528,14 @@
                     break;
                 
                 // Update HELP
-                case "HELP": 
-                    msg = "COMMANDS: HOME, PROJECTS, ZOOM, SCAN, MODE [RED/BLUE], MUSIC ON/OFF"; break;
+                case "HELP":
+                case "CMDS": // Added shortcut
+                    // Broken into lines for better readability in the terminal
+                    msg = `AVAILABLE COMMANDS: <br>
+                           > NAVIGATION: HOME, PROJECTS, ABOUT, RECRUIT <br>
+                           > GYRO: ZOOM, SCAN, GYRO REFRESH, MODE [RED/BLUE] <br>
+                           > SYSTEM: MUSIC ON/OFF, REBOOT, CLEAR`;
+                    break;
                 
                 // Update HELP to show new commands
                 case "HELP": 
@@ -619,32 +643,44 @@
         const uiY = document.getElementById('gyro-y');
         let currentBaseColor = 0xff00ff; 
 
-        // 6. API
+        // 4. API & Interaction
         window.gyroAPI = {
             toggleZoom: () => {
                 isZoomed = !isZoomed;
                 playSFX('sfx-enter');
 
                 if (isZoomed) {
-                    // ZOOM IN SETTINGS
-                    targetZ = 2.5;         // Fly inside
-                    targetOpacity = 0.8;   // Show Particles
-                    targetWireOpacity = 0.1; // Fade wireframe so it doesn't block view
+                    targetZ = 2.5;         
+                    targetOpacity = 0.8;   
+                    targetWireOpacity = 0.1; 
                 } else {
-                    // ZOOM OUT SETTINGS
                     targetZ = 8;
-                    targetOpacity = 0.0;   // Hide Particles
+                    targetOpacity = 0.0;   
                     targetWireOpacity = 0.4;
                 }
             },
             setColor: (hex) => {
                 currentBaseColor = hex;
                 material.color.setHex(hex);
-                // Also color the core particles slightly
                 core.material.color.setHex(hex);
             },
+            // --- NEW: RESET FUNCTION ---
+            reset: () => {
+                // Reset Color to Default Pink
+                const defaultPink = 0xff00ff;
+                currentBaseColor = defaultPink;
+                material.color.setHex(defaultPink);
+                core.material.color.setHex(defaultPink);
+                
+                // Reset Zoom if needed (Optional, but "Original Form" implies unzoomed)
+                if (isZoomed) {
+                     isZoomed = false;
+                     targetZ = 8;
+                     targetOpacity = 0.0;
+                     targetWireOpacity = 0.4;
+                }
+            },
             scan: () => {
-                // Pulse the Ring
                 const originalScale = ring.scale.x;
                 ring.scale.setScalar(0.1);
                 let growInterval = setInterval(() => {
