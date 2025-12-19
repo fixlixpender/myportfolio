@@ -556,6 +556,18 @@
                     sessionStorage.removeItem('deck_booted'); action = () => window.location.reload(); break;
                 case "HELP": 
                     msg = "COMMANDS: HOME, LS, WHOAMI, RECRUIT, MUSIC ON/OFF, REBOOT"; break;
+                // CLEAR COMMAND
+                case "CLEAR":
+                case "CLS":
+                    // No message string, just an action to wipe the DOM
+                    action = () => {
+                        const helper = document.getElementById('terminal-helper');
+                        helper.style.height = "0";
+                        helper.innerHTML = "";
+                    };
+                    break;
+
+                // ... default ...
                 default: 
                     msg = `COMMAND '${cmd}' NOT RECOGNIZED.`;
             }
