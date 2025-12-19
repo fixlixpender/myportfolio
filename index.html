@@ -458,8 +458,12 @@
             });
         }
 
+        // Focus Logic: Keep input focused unless clicking specific UI elements
         document.addEventListener('click', (e) => {
-            if (e.target.closest('button') || e.target.closest('a') || window.getSelection().toString().length > 0) return;
+            // Ignore Buttons, Links, Text Selection, AND the 3D Globe Container
+            if (e.target.closest('#mini-map-container') || e.target.closest('button') || e.target.closest('a') || window.getSelection().toString().length > 0) {
+                return;
+            }
             input.focus();
         });
 
@@ -714,8 +718,18 @@
             mouseY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
         });
 
-        // CLICK TO TOGGLE ZOOM
-        container.addEventListener('mousedown', () => window.gyroAPI.toggleZoom());
+        // Handle Mouse Click
+        container.addEventListener('mousedown', (e) => {
+            e.stopPropagation(); // Stop event from bubbling up
+            window.gyroAPI.toggleZoom();
+        });
+
+        // Handle Touch (Mobile)
+        container.addEventListener('touchstart', (e) => {
+            e.stopPropagation(); // Stop event from bubbling up
+            e.preventDefault();  // Stop browser from zooming/scrolling page while touching this box
+            window.gyroAPI.toggleZoom();
+        }, { passive: false });
 
         // 7. Animation Loop
         const animate = () => {
