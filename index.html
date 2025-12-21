@@ -73,12 +73,72 @@
             100% { clip-path: inset(70% 0 10% 0); transform: translate(-2px, -1px); }
         }
 
-        /* SPA Transitions */
-        .section-container { transition: opacity 0.5s ease, transform 0.5s ease; width: 100%; }
-        .hidden-section { display: none; opacity: 0; pointer-events: none; }
-        .active-section { display: block; opacity: 1; pointer-events: all; animation: bootSection 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        /* --- ADVANCED DECK TRANSFORMATIONS --- */
         
-        @keyframes bootSection { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        /* 1. Set the stage for 3D effects */
+        body {
+            perspective: 1000px; /* Essential for the 3D zoom effect */
+            overflow-x: hidden; /* Prevents scrollbars during zoom */
+        }
+
+        .section-container {
+            /* Base state */
+            width: 100%;
+            backface-visibility: hidden;
+            will-change: transform, opacity, filter;
+        }
+
+        /* 2. Class for HIDING (The Exit) */
+        /* The old page zooms toward you and blurs out */
+        .deck-exit {
+            animation: transformOut 0.5s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
+            position: absolute; /* Take it out of flow so new page can overlap */
+            top: 100px; /* Adjust based on your padding */
+            left: 0;
+            right: 0;
+            z-index: 0;
+        }
+
+        /* 3. Class for SHOWING (The Enter) */
+        /* The new page zooms in from the back */
+        .deck-enter {
+            display: block;
+            animation: transformIn 0.6s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+            z-index: 10;
+        }
+
+        /* 4. Utility to hide completely */
+        .hidden-section {
+            display: none;
+        }
+
+        /* --- KEYFRAMES --- */
+
+        @keyframes transformOut {
+            0% {
+                opacity: 1;
+                transform: scale(1) translateZ(0);
+                filter: blur(0) brightness(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.2) translateZ(100px); /* Zooms 'into' the camera */
+                filter: blur(10px) brightness(2); /* Flashes bright before vanishing */
+            }
+        }
+
+        @keyframes transformIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.8) translateZ(-100px); /* Starts small/far away */
+                filter: blur(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateZ(0);
+                filter: blur(0);
+            }
+        }
         
         /* Thumbnails */
         .thumb-active { border-color: #00ff41 !important; box-shadow: 0 0 8px #00ff41; }
@@ -479,23 +539,48 @@
             }
         }
 
-        // --- 5. NAVIGATION SYSTEM ---
+        // --- 5. NAVIGATION SYSTEM (TRANSFORMING DECK) ---
         function navigateTo(sectionId) {
+            // 1. Audio Feedback
             playSFX('sfx-enter');
-            document.querySelectorAll('.section-container').forEach(sec => {
-                sec.classList.remove('active-section');
-                sec.classList.add('hidden-section');
-            });
-            const target = document.getElementById(sectionId);
-            if (target) {
-                target.classList.remove('hidden-section');
-                target.classList.add('active-section');
-                window.scrollTo(0, 0);
+
+            // 2. Identify Current and Target
+            // Find which section is currently active (not hidden)
+            const currentSection = document.querySelector('.section-container:not(.hidden-section)');
+            const targetSection = document.getElementById(sectionId);
+
+            // Safety: If clicking the same link, do nothing
+            if (currentSection && currentSection.id === sectionId) return;
+
+            // 3. The Transformation Sequence
+            if (currentSection) {
+                // A. Animate Old Section OUT
+                currentSection.classList.remove('deck-enter'); // Clean up
+                currentSection.classList.add('deck-exit');
+
+                // B. Wait for animation, then hide it and show new one
+                setTimeout(() => {
+                    currentSection.classList.add('hidden-section');
+                    currentSection.classList.remove('deck-exit');
+                    
+                    // C. Animate New Section IN
+                    if (targetSection) {
+                        window.scrollTo(0, 0); // Reset scroll
+                        targetSection.classList.remove('hidden-section');
+                        targetSection.classList.add('deck-enter');
+                        
+                        // Optional: Trigger Gyro Resize if going Home
+                        if (sectionId === 'home-section' && window.resizeGyro) {
+                            setTimeout(window.resizeGyro, 50);
+                        }
+                    }
+                }, 400); // Wait 400ms (slightly less than CSS 0.5s to overlap slightly)
                 
-                // *** ADD THIS: If going home, fix the gyro size ***
-                if (sectionId === 'home-section' && window.resizeGyro) {
-                    // Wait 50ms for the animation/display change to finish, then resize
-                    setTimeout(window.resizeGyro, 50); 
+            } else {
+                // Fallback (First load): Just show the target
+                if (targetSection) {
+                    targetSection.classList.remove('hidden-section');
+                    targetSection.classList.add('deck-enter');
                 }
             }
         }
