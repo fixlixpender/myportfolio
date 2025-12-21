@@ -1,4 +1,4 @@
-// background.js
+// background.js - Updated with Warp Speed Logic
 
 const initThreeJS = () => {
     const container = document.getElementById('canvas-container');
@@ -33,7 +33,7 @@ const initThreeJS = () => {
         color: 0x00f0ff,
         size: 2,
         transparent: true,
-        opacity: 0.6, // Adjust transparency here
+        opacity: 0.6,
     });
 
     const starField = new THREE.Points(geometry, material);
@@ -42,10 +42,6 @@ const initThreeJS = () => {
     // --- 3. MOUSE INTERACTION VARIABLES ---
     let mouseX = 0;
     let mouseY = 0;
-    let targetX = 0;
-    let targetY = 0;
-
-    // Center of the screen
     let windowHalfX = window.innerWidth / 2;
     let windowHalfY = window.innerHeight / 2;
 
@@ -54,14 +50,34 @@ const initThreeJS = () => {
         mouseY = (event.clientY - windowHalfY);
     });
 
-    // --- 4. ANIMATION LOOP ---
+    // --- 4. SPEED CONTROL VARIABLES (NEW) ---
+    let currentSpeed = 2;    // Default cruising speed
+    let targetSpeed = 2;     // The speed we want to reach
+    const normalSpeed = 2;
+    const warpSpeed = 40;    // How fast is "Engines On"?
+
+    // EXPOSE GLOBAL FUNCTION TO CHANGE SPEED
+    window.setWarpSpeed = (isActive) => {
+        if (isActive) {
+            targetSpeed = warpSpeed;
+        } else {
+            targetSpeed = normalSpeed;
+        }
+    };
+
+    // --- 5. ANIMATION LOOP ---
     const animate = () => {
         requestAnimationFrame(animate);
 
-        // A. Move Stars Forward (Z-Axis)
+        // A. Smooth Acceleration/Deceleration
+        // Lerp current speed towards target speed (0.02 is the acceleration factor)
+        currentSpeed += (targetSpeed - currentSpeed) * 0.02;
+
+        // B. Move Stars Forward
         const positions = starField.geometry.attributes.position.array;
         for (let i = 2; i < count * 3; i += 3) {
-            positions[i] += 2; // SPEED: Change this number to go faster/slower
+            
+            positions[i] += currentSpeed; // Use dynamic speed
             
             if (positions[i] > 1000) {
                 positions[i] = -1000;
@@ -69,20 +85,29 @@ const initThreeJS = () => {
         }
         starField.geometry.attributes.position.needsUpdate = true;
 
-        // B. Mouse Follow Rotation
-        targetX = mouseX * 0.0001;
-        targetY = mouseY * 0.0001;
+        // C. Mouse Follow Rotation (Reduced slightly at high speeds for stability)
+        const targetX = mouseX * 0.0001;
+        const targetY = mouseY * 0.0001;
 
-        // Smoothly rotate towards mouse position
-        starField.rotation.y += 0.09 * (targetX - starField.rotation.y);
-        starField.rotation.x += 0.09 * (targetY - starField.rotation.x);
+        starField.rotation.y += 0.05 * (targetX - starField.rotation.y);
+        starField.rotation.x += 0.05 * (targetY - starField.rotation.x);
+
+        // Optional: Stretch stars slightly when moving fast (Warp effect)
+        // This requires custom shaders usually, but we can simulate intensity by opacity
+        if (currentSpeed > 5) {
+             material.opacity = 0.8;
+             material.color.setHex(0xFFFFFF); // Turn stars white at warp
+        } else {
+             material.opacity = 0.6;
+             material.color.setHex(0x00f0ff); // Back to blue
+        }
 
         renderer.render(scene, camera);
     };
 
     animate();
 
-    // --- 5. HANDLE RESIZE ---
+    // --- 6. HANDLE RESIZE ---
     window.addEventListener('resize', () => {
         windowHalfX = window.innerWidth / 2;
         windowHalfY = window.innerHeight / 2;
@@ -92,72 +117,4 @@ const initThreeJS = () => {
     });
 }
 
-// Run when page loads
 window.addEventListener('load', initThreeJS);
-
-// --- 1. GLOBAL VARIABLES ---
-let moveX = 0; // Will hold our left/right tilt value
-let isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-// --- 2. SETUP EVENT LISTENERS ---
-
-// Logic: If user tilts right (gamma > 0), stars move left. 
-// We smooth the value to prevent jitter.
-function handleOrientation(event) {
-    const tilt = event.gamma; // Gamma is left/right tilt (-90 to 90)
-    
-    // Limits: Clamp tilt to -45 and 45 degrees so extreme tilting doesn't break it
-    const clampedTilt = Math.max(-45, Math.min(45, tilt));
-    
-    // Normalize: Convert -45...45 to -1...1
-    // We reverse the sign (-) so tilting Right makes stars move Left (opposite way)
-    moveX = -(clampedTilt / 45); 
-}
-
-// --- 3. iOS PERMISSION HANDLER ---
-// iOS 13+ requires a button click to access motion sensors.
-function requestMotionPermission() {
-    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-        // iOS 13+
-        DeviceOrientationEvent.requestPermission()
-            .then(permissionState => {
-                if (permissionState === 'granted') {
-                    window.addEventListener('deviceorientation', handleOrientation);
-                    hidePermissionButton(); // Helper to remove button
-                }
-            })
-            .catch(console.error);
-    } else {
-        // Android or older iOS (No permission needed)
-        window.addEventListener('deviceorientation', handleOrientation);
-        hidePermissionButton();
-    }
-}
-
-// --- 4. INTEGRATE INTO YOUR ANIMATION LOOP ---
-// Find your existing animate() function and add the 'moveX' logic
-
-/* 
-   EXAMPLE ANIMATION LOOP 
-   (Copy the logic inside this function to your actual loop)
-*/
-function animate() {
-    requestAnimationFrame(animate);
-
-    // Existing rotation or movement...
-    // starSystem.rotation.y += 0.001; 
-
-    // --- NEW: APPLY TILT ---
-    if (isMobile) {
-        // 'moveX' is between -1 and 1.
-        // Multiply by a speed factor (e.g., 0.05)
-        
-        // Option A: Rotate the whole system (Best for "looking around")
-        starSystem.rotation.y += moveX * 0.02; 
-        
-        // Option B: Slide stars sideways (Best for "parallax")
-        // starSystem.position.x += moveX * 0.1;
-    }
-
-    renderer.render(scene, camera);
-}

@@ -887,14 +887,23 @@
                     btn.classList.add('border-cyber-blue', 'text-cyber-blue', 'shadow-[0_0_10px_#00f0ff]');
                     btn.innerHTML = `${sys.toUpperCase()}: ONLINE`;
                     playSFX('sfx-enter');
-                    if(sys === 'engines') targetVelocity = 8500; // Warp speed
+                    
+                    if(sys === 'engines') {
+                        targetVelocity = 8500; // Update Dashboard Number
+                        if (window.setWarpSpeed) window.setWarpSpeed(true); // *** TRIGGER STARFIELD ***
+                    }
+
                 } else {
                     // Turn OFF
                     btn.classList.add('border-gray-700', 'text-gray-500');
                     btn.classList.remove('border-cyber-blue', 'text-cyber-blue', 'shadow-[0_0_10px_#00f0ff]');
                     btn.innerHTML = `${sys.toUpperCase()}: OFF`;
                     playSFX('sfx-type');
-                    if(sys === 'engines') targetVelocity = 1200; // Idle speed
+                    
+                    if(sys === 'engines') {
+                        targetVelocity = 1200; // Update Dashboard Number
+                        if (window.setWarpSpeed) window.setWarpSpeed(false); // *** TRIGGER STARFIELD ***
+                    }
                 }
             }
         };
