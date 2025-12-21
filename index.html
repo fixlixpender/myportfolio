@@ -147,7 +147,7 @@
         .hidden-force { display: none !important; }
     </style>
 </head>
-<body class="bg-cyber-black min-h-screen pb-24 relative selection:bg-cyber-pink selection:text-black">
+<body class="bg-cyber-black min-h-screen pb-32 relative selection:bg-cyber-pink selection:text-black"></body>
 
     <!-- FX LAYERS -->
     <div id="canvas-container" class="fixed inset-0 z-[-1] pointer-events-none"></div>
@@ -406,13 +406,25 @@
     <section id="about-section" class="hidden-section section-container text-center pt-24"><h1 class="text-4xl text-cyber-green font-mono">IDENTITY MATRIX LOADING...</h1></section>
     <section id="recruit-section" class="hidden-section section-container text-center pt-24"><h1 class="text-4xl text-cyber-pink font-mono">COMM CHANNELS OPENING...</h1></section>
 
-    <!-- TERMINAL -->
-    <div class="fixed bottom-0 left-0 w-full bg-cyber-black/95 border-t border-cyber-green/30 p-4 backdrop-blur-sm z-50">
+    <!-- TERMINAL (FIXED BOTTOM) -->
+    <div class="fixed bottom-0 left-0 w-full bg-cyber-black/95 border-t border-cyber-green/30 p-4 backdrop-blur-md z-[100]">
         <div class="max-w-7xl mx-auto w-full">
-            <div id="terminal-helper" class="text-cyber-blue mb-2 overflow-hidden h-0 transition-all duration-300 font-mono"></div>
+            <!-- Helper Text (Slide Up Animation) -->
+            <div id="terminal-helper" class="text-cyber-blue mb-2 overflow-hidden h-0 transition-all duration-300 font-mono text-xs md:text-sm"></div>
+            
+            <!-- Input Line -->
             <div class="flex items-center text-sm md:text-xl text-cyber-green font-mono">
-                <span class="mr-2 md:mr-3 font-bold"><span class="hidden md:inline">admin@deck:</span>~$</span>
-                <input id="terminal-input" type="text" class="flex-1 bg-transparent border-none outline-none text-cyber-green placeholder-cyber-green/30 uppercase min-w-0" placeholder="ENTER COMMAND..." autocomplete="off">
+                <span class="mr-2 md:mr-3 font-bold">
+                    <span class="hidden md:inline">admin@deck:</span>~$
+                </span>
+                <input 
+                    id="terminal-input" 
+                    type="text" 
+                    class="flex-1 bg-transparent border-none outline-none text-cyber-green placeholder-cyber-green/30 uppercase min-w-0" 
+                    placeholder="ENTER COMMAND..." 
+                    autocomplete="off"
+                    spellcheck="false"
+                >
             </div>
         </div>
     </div>
