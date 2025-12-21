@@ -204,6 +204,65 @@
                 <div class="border border-cyber-blue/30 p-4 bg-cyber-black">
                     <h4 class="text-cyber-blue text-xs border-b border-cyber-blue/20 pb-2 mb-2 font-mono">SYSTEM_STATUS</h4>
                     <div class="space-y-2">
+                        <!-- FLIGHT DECK CONTROL PANEL -->
+    <!-- h-full ensures it fills the space down to the bottom -->
+    <div class="border border-cyber-pink/30 p-4 bg-cyber-black flex flex-col gap-5 h-full relative overflow-hidden">
+        <h4 class="text-cyber-pink text-xs border-b border-cyber-pink/20 pb-2 font-mono">FLIGHT_DECK // CONTROLS</h4>
+
+        <!-- 1. VELOCITY GAUGE -->
+        <div>
+            <div class="flex justify-between text-[10px] text-gray-400 font-mono mb-1">
+                <span>HYPER_VELOCITY</span>
+                <span id="velocity-val" class="text-cyber-blue">0 KM/S</span>
+            </div>
+            <!-- Visual Bar -->
+            <div class="w-full bg-gray-900 h-2 overflow-hidden flex">
+                 <div id="velocity-bar" class="h-full bg-cyber-blue w-0 shadow-[0_0_10px_#00f0ff] transition-all duration-300"></div>
+            </div>
+        </div>
+
+        <!-- 2. LIFE SUPPORT (INTERACTIVE) -->
+        <div class="cursor-pointer group" onclick="deckAPI.refillO2()">
+            <div class="flex justify-between text-[10px] text-gray-400 font-mono mb-1">
+                <span>O2_RESERVE</span>
+                <span id="o2-val" class="text-cyber-green">100%</span>
+            </div>
+            <div class="w-full bg-gray-900 h-6 border border-gray-700 relative overflow-hidden">
+                <!-- Progress Bar -->
+                <div id="o2-bar" class="h-full bg-cyber-green/40 w-full transition-all duration-1000"></div>
+                <!-- Warning Overlay -->
+                <div id="o2-warning" class="absolute inset-0 bg-red-500/20 hidden animate-pulse"></div>
+                <!-- Interactive Hover Text -->
+                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span class="text-[9px] bg-black/80 text-cyber-green border border-cyber-green px-2 py-0.5 tracking-widest">[ REPRESSURIZE ]</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. NAVIGATIONAL DATA -->
+        <div class="border border-gray-800 p-3 bg-gray-900/30">
+            <div class="flex justify-between items-start">
+                <div>
+                    <div class="text-[9px] text-gray-500 mb-1">TARGET_SECTOR</div>
+                    <div id="dest-text" class="text-sm text-white font-mono font-bold">ORION_NEBULA</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-[9px] text-gray-500 mb-1">DISTANCE</div>
+                    <div class="text-xs text-cyber-pink font-mono"><span id="dist-val">40.2</span> LY</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. MANUAL TOGGLES -->
+        <div class="grid grid-cols-2 gap-3 mt-auto">
+            <button id="btn-shields" onclick="deckAPI.toggle('shields')" class="border border-gray-700 text-gray-500 text-[10px] py-3 hover:border-cyber-blue hover:text-cyber-blue transition-all duration-300 font-mono">
+                SHIELDS: OFF
+            </button>
+            <button id="btn-engines" onclick="deckAPI.toggle('engines')" class="border border-gray-700 text-gray-500 text-[10px] py-3 hover:border-cyber-blue hover:text-cyber-blue transition-all duration-300 font-mono">
+                ENGINES: OFF
+            </button>
+        </div>
+    </div>
                         <div class="flex items-center gap-2"><div class="w-2 h-2 bg-cyber-green rounded-full animate-pulse"></div><span class="text-xs text-gray-300 font-mono">SERVER: OPTIMAL</span></div>
                         <div class="w-full bg-gray-800 h-1 mt-2"><div class="bg-cyber-blue h-full" style="width: 87%"></div></div>
                         <div class="text-right text-[10px] text-cyber-blue font-mono">MEMORY_LOAD: 87%</div>
@@ -787,6 +846,106 @@
     }
 
     window.addEventListener('load', initGyroSystem);
+
+    // ==========================================
+    // FLIGHT DECK LOGIC (DASHBOARD)
+    // ==========================================
+    function initFlightDeck() {
+        // Elements
+        const velBar = document.getElementById('velocity-bar');
+        const velVal = document.getElementById('velocity-val');
+        const o2Bar = document.getElementById('o2-bar');
+        const o2Val = document.getElementById('o2-val');
+        const o2Warn = document.getElementById('o2-warning');
+        const destText = document.getElementById('dest-text');
+        
+        // State
+        let o2Level = 100;
+        let currentVelocity = 0;
+        let targetVelocity = 1200; // Cruising speed
+        const destinations = ["ORION_NEBULA", "KEPLER-186F", "ANDROMEDA", "CYGNUS_X-1", "VOID_SECTOR", "EARTH_STATION"];
+
+        // API
+        window.deckAPI = {
+            refillO2: () => {
+                o2Level = 100;
+                o2Bar.style.width = '100%';
+                o2Bar.classList.remove('bg-red-500/60');
+                o2Bar.classList.add('bg-cyber-green/40');
+                o2Val.classList.remove('text-red-500');
+                o2Val.classList.add('text-cyber-green');
+                o2Warn.classList.add('hidden');
+                playSFX('sfx-enter');
+            },
+            toggle: (sys) => {
+                const btn = document.getElementById(`btn-${sys}`);
+                const isActive = btn.classList.contains('border-cyber-blue');
+                
+                if (!isActive) {
+                    // Turn ON
+                    btn.classList.remove('border-gray-700', 'text-gray-500');
+                    btn.classList.add('border-cyber-blue', 'text-cyber-blue', 'shadow-[0_0_10px_#00f0ff]');
+                    btn.innerHTML = `${sys.toUpperCase()}: ONLINE`;
+                    playSFX('sfx-enter');
+                    if(sys === 'engines') targetVelocity = 8500; // Warp speed
+                } else {
+                    // Turn OFF
+                    btn.classList.add('border-gray-700', 'text-gray-500');
+                    btn.classList.remove('border-cyber-blue', 'text-cyber-blue', 'shadow-[0_0_10px_#00f0ff]');
+                    btn.innerHTML = `${sys.toUpperCase()}: OFF`;
+                    playSFX('sfx-type');
+                    if(sys === 'engines') targetVelocity = 1200; // Idle speed
+                }
+            }
+        };
+
+        // 1. O2 Decay Loop
+        setInterval(() => {
+            if (o2Level > 0) {
+                o2Level -= 0.5; // Drain rate
+                o2Bar.style.width = `${o2Level}%`;
+                o2Val.innerText = `${Math.floor(o2Level)}%`;
+
+                // Critical Warning (< 20%)
+                if (o2Level < 20) {
+                    o2Bar.classList.remove('bg-cyber-green/40');
+                    o2Bar.classList.add('bg-red-500/60');
+                    o2Val.classList.remove('text-cyber-green');
+                    o2Val.classList.add('text-red-500');
+                    o2Warn.classList.remove('hidden');
+                }
+            }
+        }, 500);
+
+        // 2. Velocity Fluctuation Loop
+        setInterval(() => {
+            // Random fluctuation
+            const noise = (Math.random() - 0.5) * 200;
+            const target = targetVelocity + noise;
+            
+            // Smooth lerp
+            currentVelocity += (target - currentVelocity) * 0.1;
+            
+            // Update UI
+            velVal.innerText = `${Math.floor(currentVelocity)} KM/S`;
+            // Clamp bar width between 0 and 100%
+            const percentage = Math.min((currentVelocity / 10000) * 100, 100);
+            velBar.style.width = `${percentage}%`;
+        }, 100);
+
+        // 3. Destination Glitch Loop (Every 10 seconds)
+        setInterval(() => {
+            const randomDest = destinations[Math.floor(Math.random() * destinations.length)];
+            destText.innerText = randomDest;
+            destText.classList.add('glitch-text'); // Re-trigger glitch CSS if you have it
+            
+            // Random Distance
+            document.getElementById('dist-val').innerText = (Math.random() * 100).toFixed(1);
+        }, 10000);
+    }
+
+    // Initialize
+    window.addEventListener('load', initFlightDeck);
     </script>
 </body>
 </html>
