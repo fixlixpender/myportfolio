@@ -218,7 +218,8 @@
                 </button>
 
                 <!-- VOICE MESSAGE PLAYER -->
-                <div onclick="toggleVoiceMessage()" class="border-[3px] border-cyber-blue p-4 bg-cyber-dark/30 cursor-pointer relative overflow-hidden group hover:border-white transition-colors duration-300">
+                <!-- Added '(event)' inside the function call -->
+                <div onclick="toggleVoiceMessage(event)" class="border-[5px] border-cyber-blue p-4 bg-cyber-dark/30 cursor-pointer relative overflow-hidden group hover:border-white transition-colors duration-300">
                     <div class="absolute top-0 left-0 w-full h-[2px] bg-cyber-blue/50 animate-[scan_3s_linear_infinite] opacity-50 pointer-events-none"></div>
                     <div class="flex items-center justify-between">
                         <div>
@@ -841,9 +842,12 @@
         document.head.appendChild(style2);
 
         // ==========================================
-    // VOICE MESSAGE LOGIC
+    // VOICE MESSAGE LOGIC (FIXED FOR MOBILE)
     // ==========================================
-    function toggleVoiceMessage() {
+    function toggleVoiceMessage(e) {
+        // 1. STOP THE TERMINAL FROM OPENING
+        if (e) e.stopPropagation(); 
+
         const audio = document.getElementById('voice-msg');
         const status = document.getElementById('voice-status');
         const viz = document.getElementById('voice-visualizer');
@@ -852,34 +856,34 @@
         if (!audio) return;
 
         if (audio.paused) {
-            // 1. Play Voice
-            audio.play();
+            // Play Voice
+            audio.play().catch(err => console.log("Audio Playback Error:", err));
             
-            // 2. Lower Background Music Volume (Ducking effect)
+            // Lower Background Music
             if (bgMusic && !bgMusic.paused) bgMusic.volume = 0.2;
 
-            // 3. Update UI
+            // Update UI
             status.innerText = "[ STOP_LOG ]";
             status.classList.remove('animate-pulse');
             status.classList.add('text-white');
-            viz.classList.add('playing'); // Starts animation
+            viz.classList.add('playing');
             
         } else {
-            // 1. Stop Voice
+            // Stop Voice
             audio.pause();
-            audio.currentTime = 0; // Reset to start
+            audio.currentTime = 0; 
 
-            // 2. Restore Music Volume
+            // Restore Music
             if (bgMusic) bgMusic.volume = 1.0;
 
-            // 3. Reset UI
+            // Reset UI
             status.innerText = "[ PLAY_LOG ]";
             status.classList.add('animate-pulse');
             status.classList.remove('text-white');
             viz.classList.remove('playing');
         }
 
-        // Auto-Reset when audio finishes
+        // Auto-Reset when finished
         audio.onended = () => {
             if (bgMusic) bgMusic.volume = 1.0;
             status.innerText = "[ PLAY_LOG ]";
