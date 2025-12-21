@@ -305,7 +305,14 @@
     <section id="projects-section" class="hidden-section section-container max-w-[90vw] mx-auto p-4 md:p-8 space-y-24 z-10 relative">
         <header class="sticky top-0 z-40 bg-cyber-black/95 backdrop-blur-md border-b border-cyber-green/30 p-4 mb-8 flex justify-between items-center">
             <span class="text-cyber-green text-xl font-bold blink font-mono">>> DIRECTORY_LISTING</span>
-            <button onclick="navigateTo('home-section')" class="px-4 py-2 border border-cyber-blue text-cyber-blue hover:bg-cyber-blue hover:text-black transition-colors text-sm uppercase font-mono">[ < BACK TO ROOT ]</button>
+            
+            <!-- HOME / RETURN ICON -->
+            <button onclick="navigateTo('home-section')" title="RETURN TO ROOT" class="w-12 h-12 border border-cyber-blue text-cyber-blue flex items-center justify-center hover:bg-cyber-blue hover:text-black transition-all duration-300 group">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </button>
         </header>
 
         <!-- Project 1 -->
