@@ -200,30 +200,31 @@
         <!-- DASHBOARD GRID -->
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
             
-            <!-- 1. NAVIGATION -->
+            <!-- 1. NAVIGATION COLUMN -->
             <nav class="lg:col-span-1 flex flex-col gap-4">
-                <button onclick="navigateTo('projects-section')" class="bg-transparent border border-gray-800 p-6 text-center transition-all duration-300 neon-box-blue group hover:bg-cyber-blue/10">
+                <!-- Project Button -->
+                <button onclick="navigateTo('projects-section')" class="bg-transparent border-[3px] border-gray-800 p-6 text-center transition-all duration-300 neon-box-blue group hover:bg-cyber-blue/10 hover:border-cyber-blue">
                     <span class="font-bold text-lg group-hover:text-cyber-blue font-mono">PROJECTS [LS]</span>
                 </button>
-                <button onclick="navigateTo('about-section')" class="bg-transparent border border-gray-800 p-6 text-center transition-all duration-300 neon-box-green group hover:bg-cyber-green/10">
+                
+                <!-- Identity Button -->
+                <button onclick="navigateTo('about-section')" class="bg-transparent border-[3px] border-gray-800 p-6 text-center transition-all duration-300 neon-box-green group hover:bg-cyber-green/10 hover:border-cyber-green">
                     <span class="font-bold text-lg group-hover:text-cyber-green font-mono">IDENTITY [WHOAMI]</span>
                 </button>
-                <button onclick="navigateTo('recruit-section')" class="bg-transparent border border-gray-800 p-6 text-center transition-all duration-300 neon-box-pink group hover:bg-cyber-pink/10">
+                
+                <!-- Recruit Button -->
+                <button onclick="navigateTo('recruit-section')" class="bg-transparent border-[3px] border-gray-800 p-6 text-center transition-all duration-300 neon-box-pink group hover:bg-cyber-pink/10 hover:border-cyber-pink">
                     <span class="font-bold text-lg group-hover:text-cyber-pink font-mono">RECRUIT [RECRUIT]</span>
                 </button>
-                <!-- VOICE MESSAGE PLAYER -->
-                <div onclick="toggleVoiceMessage()" class="border border-cyber-blue p-4 bg-cyber-dark/30 cursor-pointer relative overflow-hidden group hover:border-white transition-colors duration-300">
-                    
-                    <!-- Scanning Line Effect (Animation) -->
-                    <div class="absolute top-0 left-0 w-full h-[2px] bg-cyber-blue/50 animate-[scan_3s_linear_infinite] opacity-50 pointer-events-none"></div>
 
+                <!-- VOICE MESSAGE PLAYER -->
+                <div onclick="toggleVoiceMessage()" class="border-[3px] border-cyber-blue p-4 bg-cyber-dark/30 cursor-pointer relative overflow-hidden group hover:border-white transition-colors duration-300">
+                    <div class="absolute top-0 left-0 w-full h-[2px] bg-cyber-blue/50 animate-[scan_3s_linear_infinite] opacity-50 pointer-events-none"></div>
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="text-[9px] text-gray-400 font-mono mb-1">INCOMING_TRANSMISSION</h3>
                             <div id="voice-status" class="text-cyber-blue font-bold text-sm tracking-wider font-mono animate-pulse">[ PLAY_LOG ]</div>
                         </div>
-                        
-                        <!-- Visualizer Bars -->
                         <div id="voice-visualizer" class="flex items-end gap-1 h-6 w-8">
                             <div class="viz-bar w-1.5 h-1 bg-cyber-blue"></div>
                             <div class="viz-bar w-1.5 h-3 bg-cyber-blue"></div>
@@ -232,7 +233,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-auto p-4 border border-cyber-green/20 bg-transparent">
+                
+                <!-- SKILL TREE -->
+                <div class="mt-auto p-4 border-[3px] border-cyber-green bg-transparent">
                     <h3 class="text-cyber-green text-xs mb-2 font-mono">SKILL_TREE</h3>
                     <div class="flex flex-wrap gap-2 text-xs text-gray-400 font-mono"><span>JavaScript</span>/<span>HTML5</span>/<span>Tailwind</span>/<span>Three.js</span></div>
                 </div>
@@ -240,7 +243,8 @@
 
             <!-- 2. CENTER FEED (GYRO) -->
             <section class="lg:col-span-2 h-full">
-                <div class="bg-transparent border border-cyber-pink/30 relative overflow-hidden group h-[500px] flex flex-col w-full">
+                <!-- Increased border thickness to 5px -->
+                <div class="bg-transparent border-[3px] border-cyber-pink relative overflow-hidden group h-[500px] flex flex-col w-full">
                     <div class="absolute top-0 left-0 w-full p-2 z-10 flex justify-between pointer-events-none">
                         <h3 class="text-xs text-cyber-pink font-mono tracking-widest bg-black/50 px-2">NAV_GYRO_SYSTEM // TACTICAL_VIEW</h3>
                         <div class="text-[10px] text-cyber-blue font-mono">PITCH: <span id="gyro-x">0.00</span> // YAW: <span id="gyro-y">0.00</span></div>
@@ -252,7 +256,7 @@
                         <div class="w-4 h-4 border border-cyber-pink/80 absolute"></div>
                     </div>
                     <div class="absolute bottom-2 right-2 z-20 pointer-events-none">
-                        <span class="text-[10px] text-cyber-pink/70 bg-black/50 px-1 font-mono blink">[CLICK TO ENHANCE / ZOOM]</span>
+                        <span class="text-[10px] text-cyber-green/70 bg-black/50 px-1 font-mono blink">[CLICK TO ENHANCE / ZOOM]</span>
                     </div>
                     <div id="mini-map-container" class="w-full h-full cursor-crosshair"></div>
                 </div>
@@ -260,7 +264,8 @@
 
             <!-- 3. RIGHT STATUS (FLIGHT DECK) -->
             <aside class="lg:col-span-1 flex flex-col gap-4">
-                <div class="border border-cyber-blue/30 p-4 bg-cyber-black">
+                <!-- System Status -->
+                <div class="border-[3px] border-cyber-blue p-4 bg-cyber-black">
                     <h4 class="text-cyber-blue text-xs border-b border-cyber-blue/20 pb-2 mb-2 font-mono">SYSTEM_STATUS</h4>
                     <div class="space-y-2">
                         <div class="flex items-center gap-2"><div class="w-2 h-2 bg-cyber-green rounded-full animate-pulse"></div><span class="text-xs text-gray-300 font-mono">SERVER: OPTIMAL</span></div>
@@ -270,7 +275,7 @@
                 </div>
 
                 <!-- FLIGHT DECK CONTROLS -->
-                <div class="border border-cyber-pink/30 p-4 bg-cyber-black flex flex-col gap-5 h-full relative overflow-hidden">
+                <div class="border-[3px] border-cyber-pink p-4 bg-cyber-black flex flex-col gap-5 h-full relative overflow-hidden">
                     <h4 class="text-cyber-pink text-xs border-b border-cyber-pink/20 pb-2 font-mono">FLIGHT_DECK // CONTROLS</h4>
                     <div>
                         <div class="flex justify-between text-[10px] text-gray-400 font-mono mb-1"><span>HYPER_VELOCITY</span><span id="velocity-val" class="text-cyber-blue">0 KM/S</span></div>
@@ -315,11 +320,13 @@
             </button>
         </header>
 
-        <!-- Project 1 -->
-        <article class="bg-transparent border border-cyber-green/30 p-1 md:p-6 relative group">
+        <!-- PROJECT 1 -->
+        <!-- Changed 'border' to 'border-[3px]' -->
+        <article class="bg-transparent border-[0px] border-cyber-green p-1 md:p-6 relative group">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- ... content ... -->
                 <div class="space-y-4">
-                    <div id="p1-viewer" class="aspect-video bg-black border border-cyber-green/50 relative overflow-hidden flex items-center justify-center">
+                    <div id="p1-viewer" class="aspect-video bg-black border border-transparent relative overflow-hidden flex items-center justify-center">
                         <video class="w-full h-full object-cover" autoplay loop muted playsinline><source src="demo.mp4" type="video/mp4"></video>
                     </div>
                     <div class="flex gap-3 overflow-x-auto pb-2">
@@ -329,20 +336,49 @@
                 </div>
                 <div class="flex flex-col h-full font-mono">
                     <h2 class="text-3xl md:text-4xl text-white font-bold mb-2 glitch-text">MY_JAVA_ROOM</h2>
-                    <p class="text-gray-400 text-sm mb-6 border-l-2 border-cyber-green/20 pl-4">An interactive 3D environment built with Three.js.</p>
+                    
+                    <div class="text-white-400 text-sm mb-6 border-l-2 border-cyber-green/70 pl-4 space-y-4">
+                        <p>An interactive <span class="text-cyber-pink font-bold">3D</span> environment built with <span class="text-cyber-pink font-bold">Three.js</span> 
+                            and <span class="text-cyber-pink font-bold">WebGL</span>, featuring a fully furnished, procedurally generated room with real-time dynamic 
+                            lighting and shadows.</p><br>
+                        <p>This project is an immersive 3D web experience built with Three.js, rendering a stylized, fully furnished workspace directly in the browser 
+                            using procedural generation rather than external model files. By constructing objects like the bookshelf, sofa, and electronics from basic 
+                            geometric shapes, the application remains lightweight and highly performant.</p><br>
+                            <p>The core feature is a dynamic, real-time lighting system that creates a cozy "dark mode" atmosphere; users have full control over the 
+                                environment via a GUI panel, allowing them to adjust the TV’s Ambilight, dim the desk lamp, and change screen colors to alter the room's 
+                                mood.</p><br>
+                                <p>To blend 3D graphics with traditional web design, the project implements a scroll-driven narrative layer. As users scroll down the 
+                                    page, informational text sections appear over the 3D scene using smooth, long-duration fade-in effects, creating a seamless 
+                                    interaction between the background environment and the foreground content. <span class="text-cyber-pink font-bold">Work in progress.</span></p>
+                    </div>
+
+                    <!-- NEW BUTTONS -->
+                    <div class="mt-auto flex gap-4">
+                        <!-- Live Demo Button -->
+                        <a href="https://fixlixpender.github.io/myjavaroom/" target="_blank" class="flex-1 text-center py-3 bg-cyber-green/10 border border-cyber-green text-cyber-green hover:bg-cyber-green hover:text-black transition-all font-bold text-xs md:text-sm tracking-widest">
+                            LAUNCH_DEMO
+                        </a>
+                        
+                        <!-- Source Code Button -->
+                        <a href="https://github.com/fixlixpender/myjavaroom" target="_blank" class="flex-1 text-center py-3 border border-gray-700 text-gray-400 hover:border-white hover:text-white transition-all text-xs md:text-sm tracking-widest">
+                            SOURCE_CODE
+                        </a>
+                    </div>
                 </div>
             </div>
         </article>
 
-        <!-- Project 2 -->
-        <article class="bg-transparent border border-cyber-pink/30 p-1 md:p-6 relative group">
-             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- PROJECT 2 -->
+        <!-- Changed 'border' to 'border-[3px]' -->
+        <article class="bg-transparent border-[0px] border-cyber-pink p-1 md:p-6 relative group">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- ... content ... -->
                 <div class="flex flex-col h-full order-2 lg:order-1 font-mono">
                     <h2 class="text-3xl md:text-4xl text-white font-bold mb-2">TOUCHLESS WEBSITE</h2>
-                    <p class="text-gray-400 text-sm mb-6 border-l-2 border-cyber-pink/20 pl-4">Controlled entirely with hand gestures via webcam.</p>
+                    <p class="text-gray-400 text-sm mb-6 border-l-2 border-cyber-pink/70 pl-4">Controlled entirely with hand gestures via webcam.</p>
                 </div>
                 <div class="space-y-4 order-1 lg:order-2">
-                    <div id="p2-viewer" class="aspect-video bg-black border border-cyber-pink/50 relative overflow-hidden flex items-center justify-center">
+                    <div id="p2-viewer" class="aspect-video bg-black border border-transparent relative overflow-hidden flex items-center justify-center">
                         <video class="w-full h-full object-contain" autoplay loop muted playsinline><source src="websitevid.mp4" type="video/mp4"></video>
                     </div>
                      <div class="flex gap-3 overflow-x-auto pb-2">
@@ -354,12 +390,14 @@
             </div>
         </article>
 
-        <!-- Project 3 -->
-        <article class="bg-transparent border border-cyber-blue/30 p-1 md:p-6 relative group">
-            <div class="absolute top-0 left-0 w-full h-[1px] bg-cyber-blue/30"></div>
+        <!-- PROJECT 3 -->
+        <!-- Changed 'border' to 'border-[3px]' -->
+        <article class="bg-transparent border-[0px] border-cyber-blue p-1 md:p-6 relative group">
+            <div class="absolute top-0 left-0 w-full h-[0px] bg-cyber-blue/30"></div>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- ... content ... -->
                 <div class="space-y-4">
-                    <div id="p3-viewer" class="aspect-video bg-black border border-cyber-blue/50 relative overflow-hidden flex items-center justify-center">
+                    <div id="p3-viewer" class="aspect-video bg-black border border-transparent relative overflow-hidden flex items-center justify-center">
                         <video class="w-full h-full object-contain" autoplay loop muted playsinline><source src="ball.mp4" type="video/mp4"></video>
                     </div>
                     <div class="flex gap-3 overflow-x-auto pb-2">
@@ -370,7 +408,7 @@
                 </div>
                 <div class="flex flex-col h-full font-mono">
                     <h2 class="text-3xl md:text-4xl text-white font-bold mb-2">Kinetic Core</h2>
-                    <p class="text-gray-400 text-sm mb-6 border-l-2 border-cyber-blue/20 pl-4">Interactive AI particle interface using MediaPipe & WebGL.</p>
+                    <p class="text-gray-400 text-sm mb-6 border-l-2 border-cyber-blue/70 pl-4">Interactive AI particle interface using MediaPipe & WebGL.</p>
                 </div>
             </div>
         </article>
@@ -592,6 +630,62 @@
             let msg = "";
             let action = null;
             switch(cmd) {
+                // ... previous commands ...
+
+                // --- ENGINES COMMANDS ---
+                case "ENGINES ON":
+                case "ENGINE ON":
+                    if (document.getElementById('btn-engines').classList.contains('border-gray-700')) {
+                        // If border is gray, engines are OFF, so toggle them ON
+                        msg = "ENGAGING HYPERDRIVE SYSTEMS...";
+                        action = () => {
+                            if(window.deckAPI) window.deckAPI.toggle('engines');
+                        };
+                    } else {
+                        msg = "ENGINES ARE ALREADY ONLINE.";
+                    }
+                    break;
+
+                case "ENGINES OFF":
+                case "ENGINE OFF":
+                    if (document.getElementById('btn-engines').classList.contains('border-cyber-blue')) {
+                        // If border is blue, engines are ON, so toggle them OFF
+                        msg = "DISENGAGING HYPERDRIVE...";
+                        action = () => {
+                            if(window.deckAPI) window.deckAPI.toggle('engines');
+                        };
+                    } else {
+                        msg = "ENGINES ARE ALREADY OFFLINE.";
+                    }
+                    break;
+                // ------------------------
+                // --- VOICE LOG COMMANDS ---
+                case "PLAY LOG":
+                case "PLAY MESSAGE":
+                    const voiceAudio = document.getElementById('voice-msg');
+                    if (voiceAudio && voiceAudio.paused) {
+                        msg = "DECODING INCOMING TRANSMISSION...";
+                        // Call the existing function to play and animate UI
+                        action = () => toggleVoiceMessage();
+                    } else {
+                        msg = "LOG IS ALREADY PLAYING.";
+                    }
+                    break;
+
+                case "STOP LOG":
+                case "STOP MESSAGE":
+                    const voiceAudioStop = document.getElementById('voice-msg');
+                    if (voiceAudioStop && !voiceAudioStop.paused) {
+                        msg = "ENDING TRANSMISSION...";
+                        // Call the existing function to stop and reset UI
+                        action = () => toggleVoiceMessage();
+                    } else {
+                        msg = "NO ACTIVE TRANSMISSION.";
+                    }
+                    break;
+                // --------------------------
+
+                // ... rest of commands (REBOOT, CLEAR, HELP) ...
                 case "WHOAMI": case "ABOUT": action = () => navigateTo('about-section'); break;
                 case "LS": case "PROJECTS": action = () => navigateTo('projects-section'); break;
                 case "RECRUIT": case "CONTACT": action = () => navigateTo('recruit-section'); break;
@@ -606,7 +700,16 @@
                 case "MUSIC OFF": action = () => toggleMusic(false); break;
                 case "REBOOT": sessionStorage.removeItem('deck_booted'); action = () => window.location.reload(); break;
                 case "CLEAR": case "CLS": action = () => { helper.style.height = "0"; helper.innerHTML = ""; }; break;
-                case "HELP": case "CMDS": msg = `AVAILABLE COMMANDS: <br>> NAV: HOME, PROJECTS, ABOUT, RECRUIT <br>> GYRO: ZOOM, SCAN, MODE [RED/BLUE], RESET <br>> SYS: MUSIC ON/OFF, REBOOT, CLEAR`; break;
+                // Update the HELP case to include Engines and Logs
+                case "HELP":
+                case "CMDS": 
+                    msg = `AVAILABLE COMMANDS:<br>
+                           > NAV: HOME, PROJECTS, ABOUT, RECRUIT<br>
+                           > GYRO: ZOOM [IN/OUT], SCAN, MODE [RED/BLUE], RESET<br>
+                           > FLIGHT: ENGINES [ON/OFF]<br>
+                           > AUDIO: MUSIC [ON/OFF], PLAY/STOP LOG<br>
+                           > SYSTEM: REBOOT, CLEAR`;
+                    break;
                 default: msg = `COMMAND '${cmd}' NOT RECOGNIZED.`;
             }
             if (msg) { helper.innerHTML = `>> ${msg}`; helper.style.height = "auto"; }
