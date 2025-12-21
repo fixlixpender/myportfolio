@@ -1,4 +1,4 @@
-// background.js - Updated with Warp Speed Logic
+// background.js - With Mobile Gyro Support
 
 const initThreeJS = () => {
     const container = document.getElementById('canvas-container');
@@ -39,67 +39,88 @@ const initThreeJS = () => {
     const starField = new THREE.Points(geometry, material);
     scene.add(starField);
 
-    // --- 3. MOUSE INTERACTION VARIABLES ---
+    // --- 3. INPUT VARIABLES ---
     let mouseX = 0;
     let mouseY = 0;
     let windowHalfX = window.innerWidth / 2;
     let windowHalfY = window.innerHeight / 2;
 
+    // Desktop Mouse
     document.addEventListener('mousemove', (event) => {
         mouseX = (event.clientX - windowHalfX);
         mouseY = (event.clientY - windowHalfY);
     });
 
-    // --- 4. SPEED CONTROL VARIABLES (NEW) ---
-    let currentSpeed = 2;    // Default cruising speed
-    let targetSpeed = 2;     // The speed we want to reach
-    const normalSpeed = 2;
-    const warpSpeed = 40;    // How fast is "Engines On"?
+    // --- 4. MOBILE GYRO LOGIC (NEW) ---
+    function handleOrientation(event) {
+        // Gamma: Left/Right tilt (-90 to 90)
+        // Beta: Front/Back tilt (-180 to 180)
+        
+        // We amplify the tilt so you don't have to turn your phone too much
+        const tiltX = event.gamma * 4; 
+        const tiltY = (event.beta - 45) * 4; // Subtract 45 to account for holding phone at angle
 
-    // EXPOSE GLOBAL FUNCTION TO CHANGE SPEED
-    window.setWarpSpeed = (isActive) => {
-        if (isActive) {
-            targetSpeed = warpSpeed;
+        // Map to mouse coordinates
+        mouseX = tiltX * 5;
+        mouseY = tiltY * 5;
+    }
+
+    // Expose function to enable sensors (Must be called on Click)
+    window.enableStarfieldGyro = () => {
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            // iOS 13+ requires explicit permission
+            DeviceOrientationEvent.requestPermission()
+                .then(response => {
+                    if (response === 'granted') {
+                        window.addEventListener('deviceorientation', handleOrientation);
+                    }
+                })
+                .catch(console.error);
         } else {
-            targetSpeed = normalSpeed;
+            // Android / Older devices allow it automatically
+            window.addEventListener('deviceorientation', handleOrientation);
         }
     };
 
-    // --- 5. ANIMATION LOOP ---
+    // --- 5. SPEED CONTROL ---
+    let currentSpeed = 2;    
+    let targetSpeed = 2;     
+    const normalSpeed = 2;
+    const warpSpeed = 40;    
+
+    window.setWarpSpeed = (isActive) => {
+        targetSpeed = isActive ? warpSpeed : normalSpeed;
+    };
+
+    // --- 6. ANIMATION LOOP ---
     const animate = () => {
         requestAnimationFrame(animate);
 
-        // A. Smooth Acceleration/Deceleration
-        // Lerp current speed towards target speed (0.02 is the acceleration factor)
+        // Smooth Acceleration
         currentSpeed += (targetSpeed - currentSpeed) * 0.02;
 
-        // B. Move Stars Forward
+        // Move Stars
         const positions = starField.geometry.attributes.position.array;
         for (let i = 2; i < count * 3; i += 3) {
-            
-            positions[i] += currentSpeed; // Use dynamic speed
-            
-            if (positions[i] > 1000) {
-                positions[i] = -1000;
-            }
+            positions[i] += currentSpeed; 
+            if (positions[i] > 1000) positions[i] = -1000;
         }
         starField.geometry.attributes.position.needsUpdate = true;
 
-        // C. Mouse Follow Rotation (Reduced slightly at high speeds for stability)
+        // Rotation Logic (Works with both Mouse and Gyro)
         const targetX = mouseX * 0.0001;
         const targetY = mouseY * 0.0001;
 
         starField.rotation.y += 0.05 * (targetX - starField.rotation.y);
         starField.rotation.x += 0.05 * (targetY - starField.rotation.x);
 
-        // Optional: Stretch stars slightly when moving fast (Warp effect)
-        // This requires custom shaders usually, but we can simulate intensity by opacity
+        // Warp Visuals
         if (currentSpeed > 5) {
              material.opacity = 0.8;
-             material.color.setHex(0xFFFFFF); // Turn stars white at warp
+             material.color.setHex(0xFFFFFF); 
         } else {
              material.opacity = 0.6;
-             material.color.setHex(0x00f0ff); // Back to blue
+             material.color.setHex(0x00f0ff); 
         }
 
         renderer.render(scene, camera);
@@ -107,7 +128,7 @@ const initThreeJS = () => {
 
     animate();
 
-    // --- 6. HANDLE RESIZE ---
+    // Handle Resize
     window.addEventListener('resize', () => {
         windowHalfX = window.innerWidth / 2;
         windowHalfY = window.innerHeight / 2;

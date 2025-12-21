@@ -432,6 +432,7 @@
         } else {
             if (startOverlay) {
                 startOverlay.addEventListener('click', () => {
+                    if (window.enableStarfieldGyro) window.enableStarfieldGyro();
                     sessionStorage.setItem('deck_booted', 'true');
                     startOverlay.style.transition = "opacity 0.5s ease";
                     startOverlay.style.opacity = '0';
