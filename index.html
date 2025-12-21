@@ -54,6 +54,17 @@
             color: #e0e0e0;
             overflow-x: hidden;
             font-family: "Share Tech Mono", monospace;
+            /* CRITICAL FIX: Removed perspective from body so Fixed positioning works */
+        }
+
+        /* Wrapper for 3D Page Transitions */
+        .deck-wrapper {
+            perspective: 1000px;
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+            padding-bottom: 100px; /* Space for terminal */
         }
 
         /* RGB Text Glitch */
@@ -74,80 +85,44 @@
         }
 
         /* --- ADVANCED DECK TRANSFORMATIONS --- */
-        
-        /* 1. Set the stage for 3D effects */
-        body {
-            perspective: 1000px; /* Essential for the 3D zoom effect */
-            overflow-x: hidden; /* Prevents scrollbars during zoom */
-        }
-
         .section-container {
-            /* Base state */
             width: 100%;
             backface-visibility: hidden;
             will-change: transform, opacity, filter;
         }
 
-        /* 2. Class for HIDING (The Exit) */
-        /* The old page zooms toward you and blurs out */
         .deck-exit {
             animation: transformOut 0.5s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
-            position: absolute; /* Take it out of flow so new page can overlap */
-            top: 100px; /* Adjust based on your padding */
+            position: absolute;
+            top: 100px;
             left: 0;
             right: 0;
             z-index: 0;
         }
 
-        /* 3. Class for SHOWING (The Enter) */
-        /* The new page zooms in from the back */
         .deck-enter {
             display: block;
             animation: transformIn 0.6s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
             z-index: 10;
         }
 
-        /* 4. Utility to hide completely */
-        .hidden-section {
-            display: none;
-        }
-
-        /* --- KEYFRAMES --- */
+        .hidden-section { display: none; }
 
         @keyframes transformOut {
-            0% {
-                opacity: 1;
-                transform: scale(1) translateZ(0);
-                filter: blur(0) brightness(1);
-            }
-            100% {
-                opacity: 0;
-                transform: scale(1.2) translateZ(100px); /* Zooms 'into' the camera */
-                filter: blur(10px) brightness(2); /* Flashes bright before vanishing */
-            }
+            0% { opacity: 1; transform: scale(1) translateZ(0); filter: blur(0) brightness(1); }
+            100% { opacity: 0; transform: scale(1.2) translateZ(100px); filter: blur(10px) brightness(2); }
         }
 
         @keyframes transformIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.8) translateZ(-100px); /* Starts small/far away */
-                filter: blur(10px);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) translateZ(0);
-                filter: blur(0);
-            }
+            0% { opacity: 0; transform: scale(0.8) translateZ(-100px); filter: blur(10px); }
+            100% { opacity: 1; transform: scale(1) translateZ(0); filter: blur(0); }
         }
         
-        /* Thumbnails */
         .thumb-active { border-color: #00ff41 !important; box-shadow: 0 0 8px #00ff41; }
-        
-        /* Utils */
         .hidden-force { display: none !important; }
     </style>
 </head>
-<body class="bg-cyber-black min-h-screen pb-32 relative selection:bg-cyber-pink selection:text-black"></body>
+<body class="bg-cyber-black min-h-screen relative selection:bg-cyber-pink selection:text-black">
 
     <!-- FX LAYERS -->
     <div id="canvas-container" class="fixed inset-0 z-[-1] pointer-events-none"></div>
@@ -159,7 +134,7 @@
     <audio id="sfx-hover" src="sfx-hover.mp3"></audio>
     <audio id="sfx-boot" src="sfx-boot.mp3"></audio>
 
-    <!-- 1. START OVERLAY (Click to Initialize) -->
+    <!-- 1. START OVERLAY -->
     <div id="start-overlay" class="fixed inset-0 bg-cyber-black z-[200] flex items-center justify-center cursor-pointer">
         <div class="text-center">
             <div class="text-cyber-green text-2xl md:text-4xl font-mono tracking-widest animate-pulse border-b-2 border-cyber-green pb-2">
@@ -169,48 +144,43 @@
         </div>
     </div>
 
-    <!-- 2. BOOT LOGS SCREEN (Black screen with text) -->
+    <!-- 2. BOOT LOGS SCREEN -->
     <div id="boot-screen" class="fixed inset-0 bg-cyber-black z-[150] hidden flex-col justify-end p-8 text-cyber-green font-mono">
         <div class="max-w-2xl w-full mx-auto" id="log-container"></div>
     </div>
 
-    <!-- ================================================================= -->
-    <!-- SECTION: HOME DASHBOARD (ID: home-section)                        -->
-    <!-- ================================================================= -->
+    <!-- 3. PAGE CONTENT WRAPPER (Handles 3D Transitions) -->
+    <div class="deck-wrapper">
+
+        <!-- A. HOME DASHBOARD -->
     <section id="home-section" class="hidden-section section-container px-6 pb-6 pt-24 md:p-12 max-w-[1600px] mx-auto z-10 relative">
         
         <!-- HEADER -->
-        <!-- Added 'relative z-[60]' to force it above the scanlines -->
+        <!-- Fixed the closing bracket z-[60] below -->
         <header class="mb-12 border-b border-cyber-green/30 pb-6 flex justify-between items-end relative z-[60]">
             <div>
                 <h2 class="text-cyber-green text-sm mb-2 tracking-widest">SYSTEM: <span class="animate-pulse">ONLINE</span></h2>
                 <h1 class="text-3xl md:text-6xl font-russo text-white cursor-default glitch-wrapper" data-text="THE DEVELOPER'S DECK">THE DEVELOPER'S DECK</h1>
                 <p class="mt-2 text-cyber-pink max-w-lg font-mono">FILIPE OLIVEIRA // FULL-STACK OPERATIVE</p>
             </div>
+            
             <div class="flex items-center gap-4">
-    <!-- CMD LIST ICON (Terminal Prompt) -->
-    <button onclick="processCommand('HELP')" title="COMMAND LIST" class="w-12 h-12 border border-cyber-blue text-cyber-blue flex items-center justify-center hover:bg-cyber-blue hover:text-black transition-all duration-300 group">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="4 17 10 11 4 5"></polyline>
-            <line x1="12" y1="19" x2="20" y2="19"></line>
-        </svg>
-    </button>
-    
-    <!-- MUSIC TOGGLE ICON (Speaker) -->
-    <button id="music-btn" title="TOGGLE AUDIO" class="w-12 h-12 border border-cyber-green text-cyber-green flex items-center justify-center hover:bg-cyber-green hover:text-black transition-all duration-300">
-        <!-- Default: Speaker OFF Icon -->
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-            <line x1="23" y1="9" x2="17" y2="15"></line>
-            <line x1="17" y1="9" x2="23" y2="15"></line>
-        </svg>
-    </button>
-</div>
+                <!-- CMD LIST ICON -->
+                <button onclick="processCommand('HELP')" title="COMMAND LIST" class="w-12 h-12 border border-cyber-blue text-cyber-blue flex items-center justify-center hover:bg-cyber-blue hover:text-black transition-all duration-300 group">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                </button>
+                
+                <!-- MUSIC ICON -->
+                <button id="music-btn" title="TOGGLE AUDIO" class="w-12 h-12 border border-cyber-green text-cyber-green flex items-center justify-center hover:bg-cyber-green hover:text-black transition-all duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+                </button>
+            </div>
         </header>
 
         <!-- DASHBOARD GRID -->
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <!-- NAV -->
+            
+            <!-- 1. NAVIGATION -->
             <nav class="lg:col-span-1 flex flex-col gap-4">
                 <button onclick="navigateTo('projects-section')" class="bg-transparent border border-gray-800 p-6 text-center transition-all duration-300 neon-box-blue group hover:bg-cyber-blue/10">
                     <span class="font-bold text-lg group-hover:text-cyber-blue font-mono">PROJECTS [LS]</span>
@@ -226,106 +196,62 @@
                     <div class="flex flex-wrap gap-2 text-xs text-gray-400 font-mono"><span>JavaScript</span>/<span>HTML5</span>/<span>Tailwind</span>/<span>Three.js</span></div>
                 </div>
             </nav>
-            <!-- FEED (CENTER COLUMN) -->
-<section class="lg:col-span-2 h-full">
-    <!-- NAV GYRO CONTAINER (Expanded) -->
-    <!-- Changed bg-cyber-dark/80 to bg-transparent -->
-        <div class="bg-transparent border border-cyber-pink/30 relative overflow-hidden group h-[500px] flex flex-col w-full">
-        
-        <!-- Header -->
-        <div class="absolute top-0 left-0 w-full p-2 z-10 flex justify-between pointer-events-none">
-            <h3 class="text-xs text-cyber-pink font-mono tracking-widest bg-black/50 px-2">NAV_GYRO_SYSTEM // TACTICAL_VIEW</h3>
-            <div class="text-[10px] text-cyber-blue font-mono">
-                PITCH: <span id="gyro-x">0.00</span> // YAW: <span id="gyro-y">0.00</span>
-            </div>
-        </div>
-        
-        <!-- Crosshair Overlay -->
-        <div class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center opacity-30">
-            <div class="w-full h-[1px] bg-cyber-pink/50"></div>
-            <div class="h-full w-[1px] bg-cyber-pink/50 absolute"></div>
-            <div class="w-32 h-32 border border-cyber-pink/50 rounded-full absolute"></div>
-            <div class="w-4 h-4 border border-cyber-pink/80 absolute"></div>
-        </div>
 
-        <!-- Interactive Hint -->
-        <div class="absolute bottom-2 right-2 z-20 pointer-events-none">
-            <span class="text-[10px] text-cyber-pink/70 bg-black/50 px-1 font-mono blink">
-                [CLICK TO ENHANCE / ZOOM]
-            </span>
-        </div>
+            <!-- 2. CENTER FEED (GYRO) -->
+            <section class="lg:col-span-2 h-full">
+                <div class="bg-transparent border border-cyber-pink/30 relative overflow-hidden group h-[500px] flex flex-col w-full">
+                    <div class="absolute top-0 left-0 w-full p-2 z-10 flex justify-between pointer-events-none">
+                        <h3 class="text-xs text-cyber-pink font-mono tracking-widest bg-black/50 px-2">NAV_GYRO_SYSTEM // TACTICAL_VIEW</h3>
+                        <div class="text-[10px] text-cyber-blue font-mono">PITCH: <span id="gyro-x">0.00</span> // YAW: <span id="gyro-y">0.00</span></div>
+                    </div>
+                    <div class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center opacity-30">
+                        <div class="w-full h-[1px] bg-cyber-pink/50"></div>
+                        <div class="h-full w-[1px] bg-cyber-pink/50 absolute"></div>
+                        <div class="w-32 h-32 border border-cyber-pink/50 rounded-full absolute"></div>
+                        <div class="w-4 h-4 border border-cyber-pink/80 absolute"></div>
+                    </div>
+                    <div class="absolute bottom-2 right-2 z-20 pointer-events-none">
+                        <span class="text-[10px] text-cyber-pink/70 bg-black/50 px-1 font-mono blink">[CLICK TO ENHANCE / ZOOM]</span>
+                    </div>
+                    <div id="mini-map-container" class="w-full h-full cursor-crosshair"></div>
+                </div>
+            </section>
 
-        <!-- The 3D Canvas -->
-        <div id="mini-map-container" class="w-full h-full cursor-crosshair"></div>
-    </div>
-</section>
-            <!-- STATUS -->
+            <!-- 3. RIGHT STATUS (FLIGHT DECK) -->
             <aside class="lg:col-span-1 flex flex-col gap-4">
                 <div class="border border-cyber-blue/30 p-4 bg-cyber-black">
                     <h4 class="text-cyber-blue text-xs border-b border-cyber-blue/20 pb-2 mb-2 font-mono">SYSTEM_STATUS</h4>
                     <div class="space-y-2">
-                        <!-- FLIGHT DECK CONTROL PANEL -->
-    <!-- h-full ensures it fills the space down to the bottom -->
-    <div class="border border-cyber-pink/30 p-4 bg-cyber-black flex flex-col gap-5 h-full relative overflow-hidden">
-        <h4 class="text-cyber-pink text-xs border-b border-cyber-pink/20 pb-2 font-mono">FLIGHT_DECK // CONTROLS</h4>
-
-        <!-- 1. VELOCITY GAUGE -->
-        <div>
-            <div class="flex justify-between text-[10px] text-gray-400 font-mono mb-1">
-                <span>HYPER_VELOCITY</span>
-                <span id="velocity-val" class="text-cyber-blue">0 KM/S</span>
-            </div>
-            <!-- Visual Bar -->
-            <div class="w-full bg-gray-900 h-2 overflow-hidden flex">
-                 <div id="velocity-bar" class="h-full bg-cyber-blue w-0 shadow-[0_0_10px_#00f0ff] transition-all duration-300"></div>
-            </div>
-        </div>
-
-        <!-- 2. LIFE SUPPORT (INTERACTIVE) -->
-        <div class="cursor-pointer group" onclick="deckAPI.refillO2()">
-            <div class="flex justify-between text-[10px] text-gray-400 font-mono mb-1">
-                <span>O2_RESERVE</span>
-                <span id="o2-val" class="text-cyber-green">100%</span>
-            </div>
-            <div class="w-full bg-gray-900 h-6 border border-gray-700 relative overflow-hidden">
-                <!-- Progress Bar -->
-                <div id="o2-bar" class="h-full bg-cyber-green/40 w-full transition-all duration-1000"></div>
-                <!-- Warning Overlay -->
-                <div id="o2-warning" class="absolute inset-0 bg-red-500/20 hidden animate-pulse"></div>
-                <!-- Interactive Hover Text -->
-                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span class="text-[9px] bg-black/80 text-cyber-green border border-cyber-green px-2 py-0.5 tracking-widest">[ REPRESSURIZE ]</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. NAVIGATIONAL DATA -->
-        <div class="border border-gray-800 p-3 bg-gray-900/30">
-            <div class="flex justify-between items-start">
-                <div>
-                    <div class="text-[9px] text-gray-500 mb-1">TARGET_SECTOR</div>
-                    <div id="dest-text" class="text-sm text-white font-mono font-bold">ORION_NEBULA</div>
-                </div>
-                <div class="text-right">
-                    <div class="text-[9px] text-gray-500 mb-1">DISTANCE</div>
-                    <div class="text-xs text-cyber-pink font-mono"><span id="dist-val">40.2</span> LY</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 4. MANUAL TOGGLES -->
-        <div class="grid grid-cols-2 gap-3 mt-auto">
-            <button id="btn-shields" onclick="deckAPI.toggle('shields')" class="border border-gray-700 text-gray-500 text-[10px] py-3 hover:border-cyber-blue hover:text-cyber-blue transition-all duration-300 font-mono">
-                SHIELDS: OFF
-            </button>
-            <button id="btn-engines" onclick="deckAPI.toggle('engines')" class="border border-gray-700 text-gray-500 text-[10px] py-3 hover:border-cyber-blue hover:text-cyber-blue transition-all duration-300 font-mono">
-                ENGINES: OFF
-            </button>
-        </div>
-    </div>
                         <div class="flex items-center gap-2"><div class="w-2 h-2 bg-cyber-green rounded-full animate-pulse"></div><span class="text-xs text-gray-300 font-mono">SERVER: OPTIMAL</span></div>
                         <div class="w-full bg-gray-800 h-1 mt-2"><div class="bg-cyber-blue h-full" style="width: 87%"></div></div>
                         <div class="text-right text-[10px] text-cyber-blue font-mono">MEMORY_LOAD: 87%</div>
+                    </div>
+                </div>
+
+                <!-- FLIGHT DECK CONTROLS -->
+                <div class="border border-cyber-pink/30 p-4 bg-cyber-black flex flex-col gap-5 h-full relative overflow-hidden">
+                    <h4 class="text-cyber-pink text-xs border-b border-cyber-pink/20 pb-2 font-mono">FLIGHT_DECK // CONTROLS</h4>
+                    <div>
+                        <div class="flex justify-between text-[10px] text-gray-400 font-mono mb-1"><span>HYPER_VELOCITY</span><span id="velocity-val" class="text-cyber-blue">0 KM/S</span></div>
+                        <div class="w-full bg-gray-900 h-2 overflow-hidden flex"><div id="velocity-bar" class="h-full bg-cyber-blue w-0 shadow-[0_0_10px_#00f0ff] transition-all duration-300"></div></div>
+                    </div>
+                    <div class="cursor-pointer group" onclick="deckAPI.refillO2()">
+                        <div class="flex justify-between text-[10px] text-gray-400 font-mono mb-1"><span>O2_RESERVE</span><span id="o2-val" class="text-cyber-green">100%</span></div>
+                        <div class="w-full bg-gray-900 h-6 border border-gray-700 relative overflow-hidden">
+                            <div id="o2-bar" class="h-full bg-cyber-green/40 w-full transition-all duration-1000"></div>
+                            <div id="o2-warning" class="absolute inset-0 bg-red-500/20 hidden animate-pulse"></div>
+                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><span class="text-[9px] bg-black/80 text-cyber-green border border-cyber-green px-2 py-0.5 tracking-widest">[ REPRESSURIZE ]</span></div>
+                        </div>
+                    </div>
+                    <div class="border border-gray-800 p-3 bg-gray-900/30">
+                        <div class="flex justify-between items-start">
+                            <div><div class="text-[9px] text-gray-500 mb-1">TARGET_SECTOR</div><div id="dest-text" class="text-sm text-white font-mono font-bold">ORION_NEBULA</div></div>
+                            <div class="text-right"><div class="text-[9px] text-gray-500 mb-1">DISTANCE</div><div class="text-xs text-cyber-pink font-mono"><span id="dist-val">40.2</span> LY</div></div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 mt-auto">
+                        <button id="btn-shields" onclick="deckAPI.toggle('shields')" class="border border-gray-700 text-gray-500 text-[10px] py-3 hover:border-cyber-blue hover:text-cyber-blue transition-all duration-300 font-mono">SHIELDS: OFF</button>
+                        <button id="btn-engines" onclick="deckAPI.toggle('engines')" class="border border-gray-700 text-gray-500 text-[10px] py-3 hover:border-cyber-blue hover:text-cyber-blue transition-all duration-300 font-mono">ENGINES: OFF</button>
                     </div>
                 </div>
             </aside>
@@ -333,7 +259,7 @@
     </section>
 
     <!-- ================================================================= -->
-    <!-- SECTION: PROJECTS DIRECTORY (ID: projects-section)                -->
+    <!-- B. PROJECTS SECTION                                               -->
     <!-- ================================================================= -->
     <section id="projects-section" class="hidden-section section-container max-w-[90vw] mx-auto p-4 md:p-8 space-y-24 z-10 relative">
         <header class="sticky top-0 z-40 bg-cyber-black/95 backdrop-blur-md border-b border-cyber-green/30 p-4 mb-8 flex justify-between items-center">
@@ -341,7 +267,7 @@
             <button onclick="navigateTo('home-section')" class="px-4 py-2 border border-cyber-blue text-cyber-blue hover:bg-cyber-blue hover:text-black transition-colors text-sm uppercase font-mono">[ < BACK TO ROOT ]</button>
         </header>
 
-        <!-- PROJECT 1 -->
+        <!-- Project 1 -->
         <article class="bg-transparent border border-cyber-green/30 p-1 md:p-6 relative group">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div class="space-y-4">
@@ -360,7 +286,7 @@
             </div>
         </article>
 
-        <!-- PROJECT 2 -->
+        <!-- Project 2 -->
         <article class="bg-transparent border border-cyber-pink/30 p-1 md:p-6 relative group">
              <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div class="flex flex-col h-full order-2 lg:order-1 font-mono">
@@ -380,7 +306,7 @@
             </div>
         </article>
 
-        <!-- PROJECT 3 (Video Left) -->
+        <!-- Project 3 -->
         <article class="bg-transparent border border-cyber-blue/30 p-1 md:p-6 relative group">
             <div class="absolute top-0 left-0 w-full h-[1px] bg-cyber-blue/30"></div>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -402,40 +328,30 @@
         </article>
     </section>
 
-    <!-- Placeholders for About/Recruit -->
+    <!-- C. OTHER SECTIONS -->
     <section id="about-section" class="hidden-section section-container text-center pt-24"><h1 class="text-4xl text-cyber-green font-mono">IDENTITY MATRIX LOADING...</h1></section>
     <section id="recruit-section" class="hidden-section section-container text-center pt-24"><h1 class="text-4xl text-cyber-pink font-mono">COMM CHANNELS OPENING...</h1></section>
 
-    <!-- TERMINAL (FIXED BOTTOM) -->
+    </div> <!-- 🛑 CLOSE DECK-WRAPPER HERE -->
+
+    <!-- TERMINAL (FIXED POSITION - OUTSIDE WRAPPER) -->
     <div class="fixed bottom-0 left-0 w-full bg-cyber-black/95 border-t border-cyber-green/30 p-4 backdrop-blur-md z-[100]">
         <div class="max-w-7xl mx-auto w-full">
-            <!-- Helper Text (Slide Up Animation) -->
             <div id="terminal-helper" class="text-cyber-blue mb-2 overflow-hidden h-0 transition-all duration-300 font-mono text-xs md:text-sm"></div>
-            
-            <!-- Input Line -->
             <div class="flex items-center text-sm md:text-xl text-cyber-green font-mono">
-                <span class="mr-2 md:mr-3 font-bold">
-                    <span class="hidden md:inline">admin@deck:</span>~$
-                </span>
-                <input 
-                    id="terminal-input" 
-                    type="text" 
-                    class="flex-1 bg-transparent border-none outline-none text-cyber-green placeholder-cyber-green/30 uppercase min-w-0" 
-                    placeholder="ENTER COMMAND..." 
-                    autocomplete="off"
-                    spellcheck="false"
-                >
+                <span class="mr-2 md:mr-3 font-bold"><span class="hidden md:inline">admin@deck:</span>~$</span>
+                <input id="terminal-input" type="text" class="flex-1 bg-transparent border-none outline-none text-cyber-green placeholder-cyber-green/30 uppercase min-w-0" placeholder="ENTER COMMAND..." autocomplete="off">
             </div>
         </div>
     </div>
 
-    <!-- MAIN JAVASCRIPT LOGIC -->
+    <!-- JAVASCRIPT LOGIC -->
     <script>
         // --- 1. CONFIG & VARIABLES ---
         const logs = [ "INITIALIZING KERNEL...", "LOADING NEURAL INTERFACE...", "CHECKING SECURITY PROTOCOLS... OK", "ESTABLISHING CONNECTION...", "MOUNTING FILE SYSTEM...", "DECK ONLINE." ];
         let logIndex = 0;
         
-        // DOM Elements
+        // DOM
         const logContainer = document.getElementById('log-container');
         const bootScreen = document.getElementById('boot-screen');
         const startOverlay = document.getElementById('start-overlay');
@@ -444,14 +360,10 @@
         const input = document.getElementById('terminal-input');
         const helper = document.getElementById('terminal-helper');
 
-        // --- AUDIO DEBUGGER ---
-        // This will tell you if the MP3 file is missing
+        // AUDIO CHECK
         if (music) {
-            music.volume = 1.0; // Set to MAX volume to be sure
-            music.addEventListener('error', function(e) {
-                console.error("Audio Error:", e);
-                alert("SYSTEM ERROR: 'factions.mp3' not found or format unsupported. Check file name and folder.");
-            });
+            music.volume = 1.0; 
+            music.addEventListener('error', function(e) { console.error("Audio Error:", e); alert("SYSTEM ERROR: 'factions.mp3' not found."); });
         }
 
         // --- 2. AUDIO SYSTEM ---
@@ -463,18 +375,9 @@
 
         function toggleMusic(turnOn) {
             if (turnOn) {
-                // Try to play
                 const playPromise = music.play();
-                
                 if (playPromise !== undefined) {
-                    playPromise.then(() => {
-                        // Success
-                        updateMusicBtnUI(true);
-                    }).catch(error => {
-                        // Failed (Browser policy or File missing)
-                        console.error("Playback failed:", error);
-                        updateMusicBtnUI(false);
-                    });
+                    playPromise.then(() => updateMusicBtnUI(true)).catch(e => updateMusicBtnUI(false));
                 }
             } else {
                 music.pause();
@@ -482,25 +385,19 @@
             }
         }
 
-        // --- 2b. UI UPDATE FOR ICONS ---
         const iconMusicOn = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
-        
         const iconMusicOff = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`;
 
         function updateMusicBtnUI(isOn) {
             const btn = document.getElementById('music-btn');
             if (isOn) {
-                // Change to PINK & WAVES Icon
                 btn.innerHTML = iconMusicOn;
-                btn.classList.add('text-cyber-pink', 'border-cyber-pink');
+                btn.classList.add('text-cyber-pink', 'border-cyber-pink', 'hover:bg-cyber-pink');
                 btn.classList.remove('text-cyber-green', 'border-cyber-green', 'hover:bg-cyber-green');
-                btn.classList.add('hover:bg-cyber-pink');
             } else {
-                // Change to GREEN & MUTED Icon
                 btn.innerHTML = iconMusicOff;
-                btn.classList.add('text-cyber-green', 'border-cyber-green');
+                btn.classList.add('text-cyber-green', 'border-cyber-green', 'hover:bg-cyber-green');
                 btn.classList.remove('text-cyber-pink', 'border-cyber-pink', 'hover:bg-cyber-pink');
-                btn.classList.add('hover:bg-cyber-green');
             }
         }
 
@@ -528,7 +425,6 @@
 
         // --- 4. STARTUP LOGIC ---
         const isBooted = sessionStorage.getItem('deck_booted');
-
         if (isBooted === 'true') {
             if (startOverlay) startOverlay.style.display = 'none';
             if (bootScreen) bootScreen.style.display = 'none';
@@ -540,9 +436,7 @@
                     startOverlay.style.transition = "opacity 0.5s ease";
                     startOverlay.style.opacity = '0';
                     setTimeout(() => startOverlay.remove(), 500);
-                    
                     playSFX('sfx-boot');
-                    
                     bootScreen.style.display = 'flex';
                     logIndex = 0;
                     logContainer.innerHTML = '';
@@ -551,45 +445,27 @@
             }
         }
 
-        // --- 5. NAVIGATION SYSTEM (TRANSFORMING DECK) ---
+        // --- 5. NAVIGATION ---
         function navigateTo(sectionId) {
-            // 1. Audio Feedback
             playSFX('sfx-enter');
-
-            // 2. Identify Current and Target
-            // Find which section is currently active (not hidden)
             const currentSection = document.querySelector('.section-container:not(.hidden-section)');
             const targetSection = document.getElementById(sectionId);
-
-            // Safety: If clicking the same link, do nothing
             if (currentSection && currentSection.id === sectionId) return;
 
-            // 3. The Transformation Sequence
             if (currentSection) {
-                // A. Animate Old Section OUT
-                currentSection.classList.remove('deck-enter'); // Clean up
+                currentSection.classList.remove('deck-enter'); 
                 currentSection.classList.add('deck-exit');
-
-                // B. Wait for animation, then hide it and show new one
                 setTimeout(() => {
                     currentSection.classList.add('hidden-section');
                     currentSection.classList.remove('deck-exit');
-                    
-                    // C. Animate New Section IN
                     if (targetSection) {
-                        window.scrollTo(0, 0); // Reset scroll
+                        window.scrollTo(0, 0);
                         targetSection.classList.remove('hidden-section');
                         targetSection.classList.add('deck-enter');
-                        
-                        // Optional: Trigger Gyro Resize if going Home
-                        if (sectionId === 'home-section' && window.resizeGyro) {
-                            setTimeout(window.resizeGyro, 50);
-                        }
+                        if (sectionId === 'home-section' && window.resizeGyro) setTimeout(window.resizeGyro, 50);
                     }
-                }, 400); // Wait 400ms (slightly less than CSS 0.5s to overlap slightly)
-                
+                }, 400);
             } else {
-                // Fallback (First load): Just show the target
                 if (targetSection) {
                     targetSection.classList.remove('hidden-section');
                     targetSection.classList.add('deck-enter');
@@ -619,24 +495,16 @@
             event.currentTarget.classList.add('thumb-active');
         }
 
-        // --- 7. INPUT & COMMANDS ---
+        // --- 7. COMMAND LOGIC ---
         if (musicBtn) {
             musicBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                if (music.paused) {
-                    toggleMusic(true);
-                } else {
-                    toggleMusic(false);
-                }
+                if (music.paused) toggleMusic(true); else toggleMusic(false);
             });
         }
 
-        // Focus Logic: Keep input focused unless clicking specific UI elements
         document.addEventListener('click', (e) => {
-            // Ignore Buttons, Links, Text Selection, AND the 3D Globe Container
-            if (e.target.closest('#mini-map-container') || e.target.closest('button') || e.target.closest('a') || window.getSelection().toString().length > 0) {
-                return;
-            }
+            if (e.target.closest('#mini-map-container') || e.target.closest('button') || e.target.closest('a') || window.getSelection().toString().length > 0) return;
             input.focus();
         });
 
@@ -653,405 +521,150 @@
             let msg = "";
             let action = null;
             switch(cmd) {
-                case "WHOAMI": case "ABOUT": 
-                    msg = "NAVIGATING TO IDENTITY MATRIX..."; action = () => navigateTo('about-section'); break;
-                case "LS": case "PROJECTS": 
-                    msg = "LISTING PROJECT DIRECTORIES..."; action = () => navigateTo('projects-section'); break;
-                case "RECRUIT": case "CONTACT": 
-                    msg = "OPENING COMM CHANNELS..."; action = () => navigateTo('recruit-section'); break;
-                case "HOME": case "CD ..": 
-                    msg = "RETURNING TO ROOT..."; action = () => navigateTo('home-section'); break;
-
-                    // ... inside switch(cmd) ...
-
-                case "GYRO REFRESH":
-                case "RESET GYRO":
-                    msg = "RESTORING DEFAULT CONFIGURATION...";
-                    action = () => {
-                        if (window.gyroAPI) window.gyroAPI.reset();
-                    };
-                    break;
-                
-                /// --- GYRO COMMANDS (UPDATED) ---
-                case "ZOOM":
-                case "ZOOM IN":
-                case "ENHANCE":
-                    msg = "ENHANCING OPTICAL SENSORS...";
-                    action = () => {
-                        // We check if it's already zoomed in? 
-                        // The toggle function handles both, but let's just trigger it.
-                        if (window.gyroAPI) window.gyroAPI.toggleZoom();
-                    };
-                    break;
-                case "ZOOM OUT":
-                    msg = "RESETTING OPTICAL SENSORS...";
-                    action = () => {
-                        if (window.gyroAPI) window.gyroAPI.toggleZoom();
-                    };
-                    break;
-                case "SCAN":
-                    msg = "PERFORMING STRUCTURAL SCAN...";
-                    action = () => {
-                        if (window.gyroAPI) window.gyroAPI.scan();
-                    };
-                    break;
-                case "MODE RED":
-                    msg = "SWITCHING HUD TO: TACTICAL RED";
-                    action = () => { if (window.gyroAPI) window.gyroAPI.setColor(0xff0000); };
-                    break;
-                case "MODE BLUE":
-                    msg = "SWITCHING HUD TO: OCEANIC BLUE";
-                    action = () => { if (window.gyroAPI) window.gyroAPI.setColor(0x00f0ff); };
-                    break;
-                
-                // Update HELP
-                case "HELP":
-                case "CMDS": // Added shortcut
-                    // Broken into lines for better readability in the terminal
-                    msg = `AVAILABLE COMMANDS: <br>
-                           > NAVIGATION: HOME, PROJECTS, ABOUT, RECRUIT <br>
-                           > GYRO: ZOOM, SCAN, GYRO REFRESH, MODE [RED/BLUE] <br>
-                           > SYSTEM: MUSIC ON/OFF, REBOOT, CLEAR`;
-                    break;
-                
-                // Update HELP to show new commands
-                case "HELP": 
-                    msg = "COMMANDS: HOME, PROJECTS, BOOST, SCAN, MODE [RED/BLUE], MUSIC ON/OFF"; break;    
-
-
-                // MUSIC COMMANDS
-                case "MUSIC ON":
-                    msg = "AUDIO STREAM ESTABLISHED.";
-                    action = () => toggleMusic(true);
-                    break;
-                case "MUSIC OFF":
-                    msg = "AUDIO STREAM DISCONNECTED.";
-                    action = () => toggleMusic(false);
-                    break;
-
-                case "REBOOT": 
-                    sessionStorage.removeItem('deck_booted'); action = () => window.location.reload(); break;
-                case "HELP": 
-                    msg = "COMMANDS: HOME, LS, WHOAMI, RECRUIT, MUSIC ON/OFF, REBOOT"; break;
-                // CLEAR COMMAND
-                case "CLEAR":
-                case "CLS":
-                    // No message string, just an action to wipe the DOM
-                    action = () => {
-                        const helper = document.getElementById('terminal-helper');
-                        helper.style.height = "0";
-                        helper.innerHTML = "";
-                    };
-                    break;
-
-                // ... default ...
-                default: 
-                    msg = `COMMAND '${cmd}' NOT RECOGNIZED.`;
+                case "WHOAMI": case "ABOUT": action = () => navigateTo('about-section'); break;
+                case "LS": case "PROJECTS": action = () => navigateTo('projects-section'); break;
+                case "RECRUIT": case "CONTACT": action = () => navigateTo('recruit-section'); break;
+                case "HOME": case "CD ..": action = () => navigateTo('home-section'); break;
+                case "GYRO REFRESH": case "RESET GYRO": msg = "RESTORING..."; action = () => { if(window.gyroAPI) window.gyroAPI.reset(); }; break;
+                case "ZOOM": case "ZOOM IN": action = () => { if(window.gyroAPI) window.gyroAPI.toggleZoom(); }; break;
+                case "ZOOM OUT": action = () => { if(window.gyroAPI) window.gyroAPI.toggleZoom(); }; break;
+                case "SCAN": action = () => { if(window.gyroAPI) window.gyroAPI.scan(); }; break;
+                case "MODE RED": action = () => { if(window.gyroAPI) window.gyroAPI.setColor(0xff0000); }; break;
+                case "MODE BLUE": action = () => { if(window.gyroAPI) window.gyroAPI.setColor(0x00f0ff); }; break;
+                case "MUSIC ON": action = () => toggleMusic(true); break;
+                case "MUSIC OFF": action = () => toggleMusic(false); break;
+                case "REBOOT": sessionStorage.removeItem('deck_booted'); action = () => window.location.reload(); break;
+                case "CLEAR": case "CLS": action = () => { helper.style.height = "0"; helper.innerHTML = ""; }; break;
+                case "HELP": case "CMDS": msg = `AVAILABLE COMMANDS: <br>> NAV: HOME, PROJECTS, ABOUT, RECRUIT <br>> GYRO: ZOOM, SCAN, MODE [RED/BLUE], RESET <br>> SYS: MUSIC ON/OFF, REBOOT, CLEAR`; break;
+                default: msg = `COMMAND '${cmd}' NOT RECOGNIZED.`;
             }
             if (msg) { helper.innerHTML = `>> ${msg}`; helper.style.height = "auto"; }
             if (action) action();
         }
 
-        document.querySelectorAll('button').forEach(btn => btn.addEventListener('mouseenter', () => playSFX('sfx-hover')));
+        // --- 8. GYRO SYSTEM ---
+        function initGyroSystem() {
+            const container = document.getElementById('mini-map-container');
+            if (!container) return;
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 100);
+            camera.position.z = 8;
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
 
-        const style = document.createElement('style');
-        style.innerHTML = `@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }`;
-        document.head.appendChild(style);
+            const geometry = new THREE.IcosahedronGeometry(2.2, 2); 
+            const material = new THREE.MeshBasicMaterial({ color: 0xff00ff, wireframe: true, transparent: true, opacity: 0.4 });
+            const globe = new THREE.Mesh(geometry, material);
+            scene.add(globe);
 
-        // ==========================================
-    // MINI-MAP GYRO SYSTEM v7.1 (SLOW & HEAVY)
-    // ==========================================
-    function initGyroSystem() {
-        const container = document.getElementById('mini-map-container');
-        if (!container) return;
+            const particleGeo = new THREE.BufferGeometry();
+            const particleCount = 1500;
+            const posArray = new Float32Array(particleCount * 3);
+            for(let i = 0; i < particleCount * 3; i++) posArray[i] = (Math.random() - 0.5) * 3.6;
+            particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const particleMat = new THREE.PointsMaterial({ size: 0.03, color: 0x00f0ff, transparent: true, opacity: 0.0, blending: THREE.AdditiveBlending });
+            const core = new THREE.Points(particleGeo, particleMat);
+            scene.add(core);
 
-        // 1. Setup Scene
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 100);
-        camera.position.z = 8; 
+            const ringGeo = new THREE.TorusGeometry(3.5, 0.02, 16, 100);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.2 });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.rotation.x = Math.PI / 2;
+            scene.add(ring);
 
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        container.appendChild(renderer.domElement);
+            let isZoomed = false, targetZ = 8, targetOpacity = 0.0, targetWireOpacity = 0.4;
+            let mouseX = 0, mouseY = 0, currentBaseColor = 0xff00ff;
+            const uiX = document.getElementById('gyro-x'), uiY = document.getElementById('gyro-y');
 
-        // 2. The Outer Shell
-        const geometry = new THREE.IcosahedronGeometry(2.2, 2); 
-        const material = new THREE.MeshBasicMaterial({ 
-            color: 0xff00ff, 
-            wireframe: true, 
-            transparent: true, 
-            opacity: 0.4 
-        });
-        const globe = new THREE.Mesh(geometry, material);
-        scene.add(globe);
+            window.gyroAPI = {
+                toggleZoom: () => { isZoomed = !isZoomed; playSFX('sfx-enter'); if(isZoomed) { targetZ = 2.5; targetOpacity = 0.8; targetWireOpacity = 0.1; } else { targetZ = 8; targetOpacity = 0.0; targetWireOpacity = 0.4; } },
+                setColor: (hex) => { currentBaseColor = hex; material.color.setHex(hex); core.material.color.setHex(hex); },
+                reset: () => { currentBaseColor = 0xff00ff; material.color.setHex(0xff00ff); core.material.color.setHex(0xff00ff); if(isZoomed) { isZoomed=false; targetZ=8; targetOpacity=0; targetWireOpacity=0.4; }},
+                scan: () => { const os = ring.scale.x; ring.scale.setScalar(0.1); let iv = setInterval(() => { ring.scale.addScalar(0.1); if(ring.scale.x >= os) { ring.scale.setScalar(os); clearInterval(iv); } }, 20); }
+            };
 
-        // 3. The Inner Core (Data Particles)
-        const particleGeo = new THREE.BufferGeometry();
-        const particleCount = 1500;
-        const posArray = new Float32Array(particleCount * 3);
-        
-        for(let i = 0; i < particleCount * 3; i++) {
-            posArray[i] = (Math.random() - 0.5) * 3.6;
+            document.addEventListener('mousemove', (e) => {
+                if (!container || container.offsetParent === null) return;
+                const rect = container.getBoundingClientRect();
+                if(rect.width === 0) return;
+                mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+                mouseY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            });
+
+            container.addEventListener('mousedown', (e) => { e.stopPropagation(); window.gyroAPI.toggleZoom(); });
+            container.addEventListener('touchstart', (e) => { e.stopPropagation(); e.preventDefault(); window.gyroAPI.toggleZoom(); }, {passive:false});
+
+            const animate = () => {
+                requestAnimationFrame(animate);
+                if (container.offsetParent === null) return;
+                camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetZ, 0.05);
+                core.material.opacity = THREE.MathUtils.lerp(core.material.opacity, targetOpacity, 0.05);
+                globe.material.opacity = THREE.MathUtils.lerp(globe.material.opacity, targetWireOpacity, 0.05);
+                globe.rotation.y += 0.0005 + (mouseX * 0.005);
+                globe.rotation.x += 0.0002 - (mouseY * 0.005);
+                core.rotation.y = globe.rotation.y * 1.1; core.rotation.x = globe.rotation.x * 1.1;
+                ring.rotation.x += 0.001; ring.rotation.y += 0.001;
+                if(uiX) uiX.innerText = (globe.rotation.x % 6.28).toFixed(2);
+                if(uiY) uiY.innerText = (globe.rotation.y % 6.28).toFixed(2);
+                renderer.render(scene, camera);
+            };
+            animate();
+
+            window.resizeGyro = () => {
+                if(!container) return;
+                const w = container.clientWidth || 100, h = container.clientHeight || 100;
+                camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h);
+            };
+            window.addEventListener('resize', window.resizeGyro);
         }
-        
-        particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        const particleMat = new THREE.PointsMaterial({
-            size: 0.03,
-            color: 0x00f0ff, 
-            transparent: true,
-            opacity: 0.0, 
-            blending: THREE.AdditiveBlending
-        });
-        const core = new THREE.Points(particleGeo, particleMat);
-        scene.add(core);
+        window.addEventListener('load', initGyroSystem);
 
-        // 4. Orbital Ring
-        const ringGeo = new THREE.TorusGeometry(3.5, 0.02, 16, 100);
-        const ringMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.2 });
-        const ring = new THREE.Mesh(ringGeo, ringMat);
-        ring.rotation.x = Math.PI / 2;
-        scene.add(ring);
+        // --- 9. FLIGHT DECK LOGIC ---
+        function initFlightDeck() {
+            const velBar = document.getElementById('velocity-bar'), velVal = document.getElementById('velocity-val');
+            const o2Bar = document.getElementById('o2-bar'), o2Val = document.getElementById('o2-val'), o2Warn = document.getElementById('o2-warning');
+            const destText = document.getElementById('dest-text');
+            let o2Level = 100, currentVelocity = 0, targetVelocity = 1200;
+            const destinations = ["ORION_NEBULA", "KEPLER-186F", "ANDROMEDA", "CYGNUS_X-1", "EARTH_STATION"];
 
-        // 5. Variables
-        let isZoomed = false;
-        let targetZ = 8;       
-        let targetOpacity = 0.0; 
-        let targetWireOpacity = 0.4;
-        
-        // --- NEW SLOWER SPEEDS ---
-        let mouseX = 0, mouseY = 0;
-        let autoRotateX = 0.0002; // Was 0.001 (5x slower)
-        let autoRotateY = 0.0005; // Was 0.002 (4x slower)
-        const mouseSensitivity = 0.005; // Was 0.02 (4x slower)
-
-        const uiX = document.getElementById('gyro-x');
-        const uiY = document.getElementById('gyro-y');
-        let currentBaseColor = 0xff00ff; 
-
-        // 6. API
-        window.gyroAPI = {
-            toggleZoom: () => {
-                isZoomed = !isZoomed;
-                playSFX('sfx-enter');
-
-                if (isZoomed) {
-                    targetZ = 2.5;         
-                    targetOpacity = 0.8;   
-                    targetWireOpacity = 0.1; 
-                } else {
-                    targetZ = 8;
-                    targetOpacity = 0.0;   
-                    targetWireOpacity = 0.4;
-                }
-            },
-            setColor: (hex) => {
-                currentBaseColor = hex;
-                material.color.setHex(hex);
-                core.material.color.setHex(hex);
-            },
-            reset: () => {
-                const defaultPink = 0xff00ff;
-                currentBaseColor = defaultPink;
-                material.color.setHex(defaultPink);
-                core.material.color.setHex(defaultPink);
-                if (isZoomed) {
-                     isZoomed = false;
-                     targetZ = 8;
-                     targetOpacity = 0.0;
-                     targetWireOpacity = 0.4;
-                }
-            },
-            scan: () => {
-                const originalScale = ring.scale.x;
-                ring.scale.setScalar(0.1);
-                let growInterval = setInterval(() => {
-                    ring.scale.addScalar(0.1);
-                    if(ring.scale.x >= originalScale) {
-                        ring.scale.setScalar(originalScale);
-                        clearInterval(growInterval);
-                    }
-                }, 20);
-            }
-        };
-
-        // Inputs
-        document.addEventListener('mousemove', (e) => {
-            if (!container || container.offsetParent === null) return;
-            const rect = container.getBoundingClientRect();
-            if (rect.width === 0) return;
-            mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-            mouseY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-        });
-
-        // Handle Click (Zoom) - With Mobile Fix
-        const handleClick = (e) => {
-            e.stopPropagation();
-            // Optional: Prevent default if you want to stop scrolling on mobile, 
-            // but usually we want to allow scrolling unless dragging.
-            window.gyroAPI.toggleZoom();
-        };
-
-        container.addEventListener('mousedown', handleClick);
-        container.addEventListener('touchstart', (e) => {
-            e.stopPropagation();
-            e.preventDefault(); // Stop keyboard popping up / scrolling on globe
-            window.gyroAPI.toggleZoom();
-        }, { passive: false });
-
-
-        // 7. Animation Loop
-        const animate = () => {
-            requestAnimationFrame(animate);
-            if (container.offsetParent === null) return;
-
-            // Camera Move
-            camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetZ, 0.05);
-            
-            // Fades
-            core.material.opacity = THREE.MathUtils.lerp(core.material.opacity, targetOpacity, 0.05);
-            globe.material.opacity = THREE.MathUtils.lerp(globe.material.opacity, targetWireOpacity, 0.05);
-
-            // --- ROTATION (SLOWED DOWN) ---
-            globe.rotation.y += autoRotateY + (mouseX * mouseSensitivity);
-            globe.rotation.x += autoRotateX - (mouseY * mouseSensitivity);
-            
-            core.rotation.y = globe.rotation.y * 1.1; // Core moves slightly faster for depth
-            core.rotation.x = globe.rotation.x * 1.1;
-
-            // Ring Tumble
-            ring.rotation.x += 0.001; // Slower ring
-            ring.rotation.y += 0.001;
-
-            // Update UI
-            if (uiX) uiX.innerText = (globe.rotation.x % 6.28).toFixed(2);
-            if (uiY) uiY.innerText = (globe.rotation.y % 6.28).toFixed(2);
-
-            renderer.render(scene, camera);
-        };
-        animate();
-
-        window.resizeGyro = () => {
-            if(!container) return;
-            const width = container.clientWidth || 100;
-            const height = container.clientHeight || 100;
-            camera.aspect = width / height;
-            camera.updateProjectionMatrix();
-            renderer.setSize(width, height);
-        };
-        window.addEventListener('resize', window.resizeGyro);
-    }
-
-    window.addEventListener('load', initGyroSystem);
-
-    // ==========================================
-    // FLIGHT DECK LOGIC (DASHBOARD)
-    // ==========================================
-    function initFlightDeck() {
-        // Elements
-        const velBar = document.getElementById('velocity-bar');
-        const velVal = document.getElementById('velocity-val');
-        const o2Bar = document.getElementById('o2-bar');
-        const o2Val = document.getElementById('o2-val');
-        const o2Warn = document.getElementById('o2-warning');
-        const destText = document.getElementById('dest-text');
-        
-        // State
-        let o2Level = 100;
-        let currentVelocity = 0;
-        let targetVelocity = 1200; // Cruising speed
-        const destinations = ["ORION_NEBULA", "KEPLER-186F", "ANDROMEDA", "CYGNUS_X-1", "VOID_SECTOR", "EARTH_STATION"];
-
-        // API
-        window.deckAPI = {
-            refillO2: () => {
-                o2Level = 100;
-                o2Bar.style.width = '100%';
-                o2Bar.classList.remove('bg-red-500/60');
-                o2Bar.classList.add('bg-cyber-green/40');
-                o2Val.classList.remove('text-red-500');
-                o2Val.classList.add('text-cyber-green');
-                o2Warn.classList.add('hidden');
-                playSFX('sfx-enter');
-            },
-            toggle: (sys) => {
-                const btn = document.getElementById(`btn-${sys}`);
-                const isActive = btn.classList.contains('border-cyber-blue');
-                
-                if (!isActive) {
-                    // Turn ON
-                    btn.classList.remove('border-gray-700', 'text-gray-500');
-                    btn.classList.add('border-cyber-blue', 'text-cyber-blue', 'shadow-[0_0_10px_#00f0ff]');
-                    btn.innerHTML = `${sys.toUpperCase()}: ONLINE`;
-                    playSFX('sfx-enter');
-                    
-                    if(sys === 'engines') {
-                        targetVelocity = 8500; // Update Dashboard Number
-                        if (window.setWarpSpeed) window.setWarpSpeed(true); // *** TRIGGER STARFIELD ***
-                    }
-
-                } else {
-                    // Turn OFF
-                    btn.classList.add('border-gray-700', 'text-gray-500');
-                    btn.classList.remove('border-cyber-blue', 'text-cyber-blue', 'shadow-[0_0_10px_#00f0ff]');
-                    btn.innerHTML = `${sys.toUpperCase()}: OFF`;
-                    playSFX('sfx-type');
-                    
-                    if(sys === 'engines') {
-                        targetVelocity = 1200; // Update Dashboard Number
-                        if (window.setWarpSpeed) window.setWarpSpeed(false); // *** TRIGGER STARFIELD ***
+            window.deckAPI = {
+                refillO2: () => { o2Level = 100; o2Bar.style.width = '100%'; o2Bar.classList.remove('bg-red-500/60'); o2Bar.classList.add('bg-cyber-green/40'); o2Val.classList.remove('text-red-500'); o2Val.classList.add('text-cyber-green'); o2Warn.classList.add('hidden'); playSFX('sfx-enter'); },
+                toggle: (sys) => {
+                    const btn = document.getElementById(`btn-${sys}`);
+                    if (!btn.classList.contains('border-cyber-blue')) {
+                        btn.classList.remove('border-gray-700', 'text-gray-500'); btn.classList.add('border-cyber-blue', 'text-cyber-blue', 'shadow-[0_0_10px_#00f0ff]'); btn.innerHTML = `${sys.toUpperCase()}: ONLINE`; playSFX('sfx-enter');
+                        if(sys === 'engines') { targetVelocity = 8500; if (window.setWarpSpeed) window.setWarpSpeed(true); }
+                    } else {
+                        btn.classList.add('border-gray-700', 'text-gray-500'); btn.classList.remove('border-cyber-blue', 'text-cyber-blue', 'shadow-[0_0_10px_#00f0ff]'); btn.innerHTML = `${sys.toUpperCase()}: OFF`; playSFX('sfx-type');
+                        if(sys === 'engines') { targetVelocity = 1200; if (window.setWarpSpeed) window.setWarpSpeed(false); }
                     }
                 }
-            }
-        };
+            };
 
-        // 1. O2 Decay Loop
-        setInterval(() => {
-            if (o2Level > 0) {
-                o2Level -= 0.5; // Drain rate
-                o2Bar.style.width = `${o2Level}%`;
-                o2Val.innerText = `${Math.floor(o2Level)}%`;
+            setInterval(() => {
+                if (o2Level > 0) { o2Level -= 0.5; o2Bar.style.width = `${o2Level}%`; o2Val.innerText = `${Math.floor(o2Level)}%`;
+                if (o2Level < 20) { o2Bar.classList.remove('bg-cyber-green/40'); o2Bar.classList.add('bg-red-500/60'); o2Val.classList.remove('text-cyber-green'); o2Val.classList.add('text-red-500'); o2Warn.classList.remove('hidden'); } }
+            }, 500);
 
-                // Critical Warning (< 20%)
-                if (o2Level < 20) {
-                    o2Bar.classList.remove('bg-cyber-green/40');
-                    o2Bar.classList.add('bg-red-500/60');
-                    o2Val.classList.remove('text-cyber-green');
-                    o2Val.classList.add('text-red-500');
-                    o2Warn.classList.remove('hidden');
-                }
-            }
-        }, 500);
+            setInterval(() => {
+                currentVelocity += (targetVelocity - currentVelocity + (Math.random()-0.5)*200) * 0.1;
+                velVal.innerText = `${Math.floor(currentVelocity)} KM/S`;
+                velBar.style.width = `${Math.min((currentVelocity/10000)*100, 100)}%`;
+            }, 100);
 
-        // 2. Velocity Fluctuation Loop
-        setInterval(() => {
-            // Random fluctuation
-            const noise = (Math.random() - 0.5) * 200;
-            const target = targetVelocity + noise;
-            
-            // Smooth lerp
-            currentVelocity += (target - currentVelocity) * 0.1;
-            
-            // Update UI
-            velVal.innerText = `${Math.floor(currentVelocity)} KM/S`;
-            // Clamp bar width between 0 and 100%
-            const percentage = Math.min((currentVelocity / 10000) * 100, 100);
-            velBar.style.width = `${percentage}%`;
-        }, 100);
+            setInterval(() => {
+                destText.innerText = destinations[Math.floor(Math.random()*destinations.length)];
+                document.getElementById('dist-val').innerText = (Math.random()*100).toFixed(1);
+            }, 10000);
+        }
+        window.addEventListener('load', initFlightDeck);
 
-        // 3. Destination Glitch Loop (Every 10 seconds)
-        setInterval(() => {
-            const randomDest = destinations[Math.floor(Math.random() * destinations.length)];
-            destText.innerText = randomDest;
-            destText.classList.add('glitch-text'); // Re-trigger glitch CSS if you have it
-            
-            // Random Distance
-            document.getElementById('dist-val').innerText = (Math.random() * 100).toFixed(1);
-        }, 10000);
-    }
-
-    // Initialize
-    window.addEventListener('load', initFlightDeck);
+        document.querySelectorAll('button').forEach(btn => btn.addEventListener('mouseenter', () => playSFX('sfx-hover')));
+        const style2 = document.createElement('style');
+        style2.innerHTML = `@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }`;
+        document.head.appendChild(style2);
     </script>
 </body>
 </html>
