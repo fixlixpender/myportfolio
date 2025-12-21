@@ -120,6 +120,25 @@
         
         .thumb-active { border-color: #00ff41 !important; box-shadow: 0 0 8px #00ff41; }
         .hidden-force { display: none !important; }
+
+        /* Audio Visualizer Animation */
+.viz-bar {
+    transition: height 0.1s;
+    animation: none;
+}
+.playing .viz-bar {
+    animation: soundWave 0.5s infinite ease-in-out alternate;
+}
+/* Stagger the animation for each bar */
+.playing .viz-bar:nth-child(1) { animation-delay: 0.0s; }
+.playing .viz-bar:nth-child(2) { animation-delay: 0.1s; }
+.playing .viz-bar:nth-child(3) { animation-delay: 0.2s; }
+.playing .viz-bar:nth-child(4) { animation-delay: 0.3s; }
+
+@keyframes soundWave {
+    0% { height: 20%; opacity: 0.5; }
+    100% { height: 100%; opacity: 1; }
+}
     </style>
 </head>
 <body class="bg-cyber-black min-h-screen relative selection:bg-cyber-pink selection:text-black">
@@ -133,6 +152,7 @@
     <audio id="sfx-enter" src="sfx-enter.mp3"></audio>
     <audio id="sfx-hover" src="sfx-hover.mp3"></audio>
     <audio id="sfx-boot" src="sfx-boot.mp3"></audio>
+    <audio id="voice-msg" src="voice-message.mp3"></audio>
 
     <!-- 1. START OVERLAY -->
     <div id="start-overlay" class="fixed inset-0 bg-cyber-black z-[200] flex items-center justify-center cursor-pointer">
@@ -191,6 +211,27 @@
                 <button onclick="navigateTo('recruit-section')" class="bg-transparent border border-gray-800 p-6 text-center transition-all duration-300 neon-box-pink group hover:bg-cyber-pink/10">
                     <span class="font-bold text-lg group-hover:text-cyber-pink font-mono">RECRUIT [RECRUIT]</span>
                 </button>
+                <!-- VOICE MESSAGE PLAYER -->
+                <div onclick="toggleVoiceMessage()" class="border border-cyber-blue p-4 bg-cyber-dark/30 cursor-pointer relative overflow-hidden group hover:border-white transition-colors duration-300">
+                    
+                    <!-- Scanning Line Effect (Animation) -->
+                    <div class="absolute top-0 left-0 w-full h-[2px] bg-cyber-blue/50 animate-[scan_3s_linear_infinite] opacity-50 pointer-events-none"></div>
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-[9px] text-gray-400 font-mono mb-1">INCOMING_TRANSMISSION</h3>
+                            <div id="voice-status" class="text-cyber-blue font-bold text-sm tracking-wider font-mono animate-pulse">[ PLAY_LOG ]</div>
+                        </div>
+                        
+                        <!-- Visualizer Bars -->
+                        <div id="voice-visualizer" class="flex items-end gap-1 h-6 w-8">
+                            <div class="viz-bar w-1.5 h-1 bg-cyber-blue"></div>
+                            <div class="viz-bar w-1.5 h-3 bg-cyber-blue"></div>
+                            <div class="viz-bar w-1.5 h-5 bg-cyber-blue"></div>
+                            <div class="viz-bar w-1.5 h-2 bg-cyber-blue"></div>
+                        </div>
+                    </div>
+                </div>
                 <div class="mt-auto p-4 border border-cyber-green/20 bg-transparent">
                     <h3 class="text-cyber-green text-xs mb-2 font-mono">SKILL_TREE</h3>
                     <div class="flex flex-wrap gap-2 text-xs text-gray-400 font-mono"><span>JavaScript</span>/<span>HTML5</span>/<span>Tailwind</span>/<span>Three.js</span></div>
@@ -666,6 +707,55 @@
         const style2 = document.createElement('style');
         style2.innerHTML = `@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }`;
         document.head.appendChild(style2);
+
+        // ==========================================
+    // VOICE MESSAGE LOGIC
+    // ==========================================
+    function toggleVoiceMessage() {
+        const audio = document.getElementById('voice-msg');
+        const status = document.getElementById('voice-status');
+        const viz = document.getElementById('voice-visualizer');
+        const bgMusic = document.getElementById('bg-music');
+
+        if (!audio) return;
+
+        if (audio.paused) {
+            // 1. Play Voice
+            audio.play();
+            
+            // 2. Lower Background Music Volume (Ducking effect)
+            if (bgMusic && !bgMusic.paused) bgMusic.volume = 0.2;
+
+            // 3. Update UI
+            status.innerText = "[ STOP_LOG ]";
+            status.classList.remove('animate-pulse');
+            status.classList.add('text-white');
+            viz.classList.add('playing'); // Starts animation
+            
+        } else {
+            // 1. Stop Voice
+            audio.pause();
+            audio.currentTime = 0; // Reset to start
+
+            // 2. Restore Music Volume
+            if (bgMusic) bgMusic.volume = 1.0;
+
+            // 3. Reset UI
+            status.innerText = "[ PLAY_LOG ]";
+            status.classList.add('animate-pulse');
+            status.classList.remove('text-white');
+            viz.classList.remove('playing');
+        }
+
+        // Auto-Reset when audio finishes
+        audio.onended = () => {
+            if (bgMusic) bgMusic.volume = 1.0;
+            status.innerText = "[ PLAY_LOG ]";
+            status.classList.add('animate-pulse');
+            status.classList.remove('text-white');
+            viz.classList.remove('playing');
+        };
+    }
     </script>
 </body>
 </html>
