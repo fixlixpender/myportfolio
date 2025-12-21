@@ -127,17 +127,25 @@
                 <h1 class="text-3xl md:text-6xl font-russo text-white cursor-default glitch-wrapper" data-text="THE DEVELOPER'S DECK">THE DEVELOPER'S DECK</h1>
                 <p class="mt-2 text-cyber-pink max-w-lg font-mono">FILIPE OLIVEIRA // FULL-STACK OPERATIVE</p>
             </div>
-            <div class="flex flex-col items-end gap-2">
-            <!-- New Help Button -->
-            <button onclick="processCommand('HELP')" class="border border-cyber-blue text-cyber-blue px-3 py-1 text-xs hover:bg-cyber-blue hover:text-black transition-colors uppercase font-mono">
-                [ CMD_LIST ]
-            </button>
-            
-            <!-- Existing Music Button -->
-            <button id="music-btn" class="border border-cyber-green text-cyber-green px-3 py-1 text-xs hover:bg-cyber-green hover:text-black transition-colors uppercase font-mono">
-                [ MUSIC: OFF ]
-            </button>
-        </div>
+            <div class="flex items-center gap-4">
+    <!-- CMD LIST ICON (Terminal Prompt) -->
+    <button onclick="processCommand('HELP')" title="COMMAND LIST" class="w-12 h-12 border border-cyber-blue text-cyber-blue flex items-center justify-center hover:bg-cyber-blue hover:text-black transition-all duration-300 group">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="4 17 10 11 4 5"></polyline>
+            <line x1="12" y1="19" x2="20" y2="19"></line>
+        </svg>
+    </button>
+    
+    <!-- MUSIC TOGGLE ICON (Speaker) -->
+    <button id="music-btn" title="TOGGLE AUDIO" class="w-12 h-12 border border-cyber-green text-cyber-green flex items-center justify-center hover:bg-cyber-green hover:text-black transition-all duration-300">
+        <!-- Default: Speaker OFF Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+        </svg>
+    </button>
+</div>
         </header>
 
         <!-- DASHBOARD GRID -->
@@ -159,7 +167,38 @@
                 </div>
             </nav>
             <!-- FEED (CENTER COLUMN) -->
-    </section>
+<section class="lg:col-span-2 h-full">
+    <!-- NAV GYRO CONTAINER (Expanded) -->
+    <!-- Changed h-64 to h-[500px] to make it much bigger/taller -->
+    <div class="bg-cyber-dark/80 border border-cyber-pink/30 relative overflow-hidden group h-[500px] flex flex-col w-full">
+        
+        <!-- Header -->
+        <div class="absolute top-0 left-0 w-full p-2 z-10 flex justify-between pointer-events-none">
+            <h3 class="text-xs text-cyber-pink font-mono tracking-widest bg-black/50 px-2">NAV_GYRO_SYSTEM // TACTICAL_VIEW</h3>
+            <div class="text-[10px] text-cyber-blue font-mono">
+                PITCH: <span id="gyro-x">0.00</span> // YAW: <span id="gyro-y">0.00</span>
+            </div>
+        </div>
+        
+        <!-- Crosshair Overlay -->
+        <div class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center opacity-30">
+            <div class="w-full h-[1px] bg-cyber-pink/50"></div>
+            <div class="h-full w-[1px] bg-cyber-pink/50 absolute"></div>
+            <div class="w-32 h-32 border border-cyber-pink/50 rounded-full absolute"></div>
+            <div class="w-4 h-4 border border-cyber-pink/80 absolute"></div>
+        </div>
+
+        <!-- Interactive Hint -->
+        <div class="absolute bottom-2 right-2 z-20 pointer-events-none">
+            <span class="text-[10px] text-cyber-pink/70 bg-black/50 px-1 font-mono blink">
+                [CLICK TO ENHANCE / ZOOM]
+            </span>
+        </div>
+
+        <!-- The 3D Canvas -->
+        <div id="mini-map-container" class="w-full h-full cursor-crosshair"></div>
+    </div>
+</section>
             <!-- STATUS -->
             <aside class="lg:col-span-1 flex flex-col gap-4">
                 <div class="border border-cyber-blue/30 p-4 bg-cyber-black">
@@ -312,15 +351,25 @@
             }
         }
 
+        // --- 2b. UI UPDATE FOR ICONS ---
+        const iconMusicOn = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
+        
+        const iconMusicOff = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`;
+
         function updateMusicBtnUI(isOn) {
+            const btn = document.getElementById('music-btn');
             if (isOn) {
-                musicBtn.innerHTML = "[ MUSIC: <span class='animate-pulse'>ON</span> ]";
-                musicBtn.classList.add('text-cyber-pink', 'border-cyber-pink');
-                musicBtn.classList.remove('text-cyber-green', 'border-cyber-green');
+                // Change to PINK & WAVES Icon
+                btn.innerHTML = iconMusicOn;
+                btn.classList.add('text-cyber-pink', 'border-cyber-pink');
+                btn.classList.remove('text-cyber-green', 'border-cyber-green', 'hover:bg-cyber-green');
+                btn.classList.add('hover:bg-cyber-pink');
             } else {
-                musicBtn.innerHTML = "[ MUSIC: OFF ]";
-                musicBtn.classList.add('text-cyber-green', 'border-cyber-green');
-                musicBtn.classList.remove('text-cyber-pink', 'border-cyber-pink');
+                // Change to GREEN & MUTED Icon
+                btn.innerHTML = iconMusicOff;
+                btn.classList.add('text-cyber-green', 'border-cyber-green');
+                btn.classList.remove('text-cyber-pink', 'border-cyber-pink', 'hover:bg-cyber-pink');
+                btn.classList.add('hover:bg-cyber-green');
             }
         }
 
